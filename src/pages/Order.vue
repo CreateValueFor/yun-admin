@@ -22,44 +22,92 @@
     </nav>
     <!-- breadcrumb end -->
 
-    <div class="lg:flex justify-start items-center mb-6">
-      <button
-        class="bg-blue-500 hover:bg-blue-600 focus:outline-none rounded-lg px-6 py-2 text-white font-semibold mr-3 shadow"
-      >
-        주문 업로드
-      </button>
-      <button
-        class="bg-blue-500 hover:bg-blue-600 focus:outline-none rounded-lg px-6 py-2 text-white font-semibold mr-3 shadow"
-      >
-        주문 리스트
-      </button>
-      <button
-        class="bg-blue-500 hover:bg-blue-600 focus:outline-none rounded-lg px-6 py-2 text-white font-semibold  shadow"
-      >
-        주문 취소 리스트
-      </button>
-    </div>
+    <tap-menu />
 
     <div class="flex flex-1 flex-wrap -mx-3 ">
       <div class="h-full grow w-full bg-white rounded-lg">
         <p>주문업로드 리스트 엑셀파일을 드래그하여 옮겨주세요</p>
-        <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
-
+        <input
+          @change="onChange"
+          type="file"
+          accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        />
       </div>
     </div>
     <div>
-      <button class="bg-green-500	rounded-lg px-6 py-2 text-white font-semibold shadow">업로드</button>
+      <button
+        class="bg-green-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
+      >
+        업로드
+      </button>
     </div>
   </div>
 </template>
 
 <script>
+import TapMenu from '../components/order/TapMenu.vue'
+import { read, utils } from 'xlsx'
+
 export default {
   name: 'DashboardHome',
+  components: { TapMenu },
   data() {
     return {}
   },
-  methods: {},
+  methods: {
+    onChange(event) {
+      const file = event.target.files[0]
+      // const fileName = file.name
+      // declare FileReader, temp result
+      const reader = new FileReader()
+      let tmpResult = []
+
+      reader.onload = (e) => {
+        console.log(e)
+        let data = reader.result
+        let workbook = read(data, { type: 'binary' })
+
+        workbook.SheetNames.forEach((sheetName) => {
+          // workbook.Sheets[sheetName].A1.w = 'test1'
+          // workbook.Sheets[sheetName].B1.w = 'test2'
+          // workbook.Sheets[sheetName].C1.w = 'test3'
+          // workbook.Sheets[sheetName].D1.w = 'test4'
+
+          const roa = utils.sheet_to_json(workbook.Sheets[sheetName])
+          tmpResult = roa
+        })
+        console.log(tmpResult)
+
+        console.log(this.ExcelDateToJSDate(tmpResult[0].결제일))
+      }
+      reader.readAsBinaryString(file)
+    },
+    ExcelDateToJSDate(serial) {
+      var utc_days = Math.floor(serial - 25569)
+      var utc_value = utc_days * 86400
+      var date_info = new Date(utc_value * 1000)
+
+      var fractional_day = serial - Math.floor(serial) + 0.0000001
+
+      var total_seconds = Math.floor(86400 * fractional_day)
+
+      var seconds = total_seconds % 60
+
+      total_seconds -= seconds
+
+      var hours = Math.floor(total_seconds / (60 * 60))
+      var minutes = Math.floor(total_seconds / 60) % 60
+
+      return new Date(
+        date_info.getFullYear(),
+        date_info.getMonth(),
+        date_info.getDate(),
+        hours,
+        minutes,
+        seconds
+      )
+    },
+  },
 }
 </script>
 <style lang="scss" scoped></style>
