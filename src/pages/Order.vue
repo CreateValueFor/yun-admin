@@ -174,7 +174,10 @@
         </div>
       </div>
       <div slot="footer" class="flex justify-end">
-        <button class="bg-white shadow border rounded-lg px-6 py-2 mr-3">
+        <button
+          class="bg-white shadow border rounded-lg px-6 py-2 mr-3"
+          @click="showUploadModal = false"
+        >
           취소
         </button>
         <button class="bg-green-500 shadow rounded-lg px-6 py-2 text-white">
