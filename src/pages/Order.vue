@@ -110,7 +110,6 @@ export default {
       const workBook = utils.book_new()
       utils.book_append_sheet(workBook, excelData, '주문 취합')
       writeFile(workBook, 'test.xlsx')
-      console.log('heeloo')
     },
     onChange(event) {
       const file = event.target.files[0]
@@ -119,8 +118,7 @@ export default {
       const reader = new FileReader()
       let tmpResult = []
 
-      reader.onload = (e) => {
-        console.log(e)
+      reader.onload = () => {
         let data = reader.result
         let workbook = read(data, { type: 'binary' })
 
@@ -133,8 +131,8 @@ export default {
           const roa = utils.sheet_to_json(workbook.Sheets[sheetName])
           tmpResult = roa
         })
-        console.log(tmpResult)
-        console.log(this.groupOrder(tmpResult))
+        // console.log(tmpResult)
+        // console.log(this.groupOrder(tmpResult))
         this.uploadedOrder = this.processRaw(this.groupOrder(tmpResult))
         console.log(this.processRaw(this.groupOrder(tmpResult)))
       }
@@ -166,18 +164,24 @@ export default {
       )
     },
     groupOrder(jsonData) {
-      let init_buyer = jsonData[0].구매자명
-      let init_receiver = jsonData[0].수취인명
+      // let init_buyer = jsonData[0].구매자명
+      // let init_receiver = jsonData[0].수취인명
+      let init_buySerial = jsonData[0].주문번호
       let order = []
       let totalOrder = []
       jsonData.forEach((item) => {
         // 같은 주문끼리 모으기
-        if (item.구매자명 !== init_buyer || init_receiver !== item.수취인명) {
-          init_buyer = item.구매자명
-          init_receiver = item.수취인명
+        if (item.주문번호 !== init_buySerial) {
+          init_buySerial = item.주문번호
           totalOrder.push(order)
           order = []
         }
+        // if (item.구매자명 !== init_buyer || init_receiver !== item.수취인명) {
+        //   init_buyer = item.구매자명
+        //   init_receiver = item.수취인명
+        //   totalOrder.push(order)
+        //   order = []
+        // }
         order.push(item)
       })
       totalOrder.push(order)
@@ -186,6 +190,7 @@ export default {
     processRaw(groupedRaw) {
       let initOrder = {}
       let totalOrder = []
+
       groupedRaw.forEach((order) => {
         initOrder.구매자명 = order[0].구매자명
         initOrder.수취인명 = order[0].수취인명
@@ -202,41 +207,71 @@ export default {
         initOrder.탄수화물량 = 1
         initOrder['탄수화물 구성'] = '고구마'
         initOrder.제외토핑 = '없음'
+        initOrder.제외메뉴 = '없음'
         order.forEach((item) => {
           if (item.옵션정보.includes('단백질')) {
             initOrder.단백질량 = 1.5
           }
           if (item.옵션정보.includes('현미밥')) {
-            initOrder['탄수화물 구성'] = item.옵션정보.split(':')[1]
+            const carboType = item.옵션정보.split(':')[1]
+            if (carboType !== undefined) {
+              initOrder['탄수화물 구성'] = custom.carbohydrateValueFormatter(
+                item.옵션정보.split(':')[1].trim()
+              )
+            }
           }
           if (item.옵션정보.includes('탄수화물')) {
             initOrder.탄수화물량 = 1.5
           }
           if (item.옵션정보.includes('공동현관')) {
             let options = item.옵션정보.split(' / ')
+            let password = ''
+            let allergy = ''
+            let deliveryType = ''
+
             if (options.length !== 3) {
               console.log(item)
-              // console.log(options)
-              return
+              const passwordRaw =
+                item.옵션정보.indexOf(
+                  "공동현관 출입비밀번호 (없을 시 '없음'작성):"
+                ) + 1
+
+              const allergyAndEtc = item.옵션정보.indexOf(
+                "/ 알러지 및 기타요청 (없을 시 '없음'작성):"
+              )
+
+              const deliveryRaw = item.옵션정보.indexOf('/ 프로그램: ')
+              password = item.옵션정보.substring(
+                passwordRaw + 26,
+                allergyAndEtc
+              )
+              allergy = item.옵션정보.substring(allergyAndEtc + 27, deliveryRaw)
+
+              deliveryType = item.옵션정보.substring(
+                deliveryRaw + 8,
+                item.옵션정보.length
+              )
+            } else {
+              password = options[0].split(':')[1]
+              allergy = options[1].split(':')[1]
+              deliveryType = options[2].split(':')[1]
             }
 
-            const password = options[0].split(':')[1]
-            const allergy = options[1].split(':')[1]
-            const deliveryType = options[2].split(':')[1]
             initOrder['공동현관 비밀번호'] = password
             initOrder.제외메뉴 = allergy.trim()
 
             initOrder.배송 = deliveryType.includes('일반') ? '일반' : '새벽'
           }
           if (item.옵션정보.includes('토핑')) {
-            // console.log(item.옵션정보)
-
             initOrder.제외토핑 = item.옵션정보
               .split('토핑')[1]
               .replace('제외', '')
               .trim()
           }
           initOrder.상품명 = custom.serviceNameFormatter(item.상품명)
+          if (custom.serviceNameFormatter(item.상품명.includes('새벽'))) {
+            initOrder.배송 = '새벽'
+          }
           // 공통 정보
         })
         totalOrder.push(initOrder)
