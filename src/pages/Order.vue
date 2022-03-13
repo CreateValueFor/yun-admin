@@ -25,7 +25,7 @@
     <tap-menu />
 
     <div class="flex flex-1 flex-wrap -mx-3 ">
-      <div class="h-full grow w-full bg-white rounded-lg">
+      <div class="h-full grow w-full  rounded-lg">
         <div v-if="!uploadedOrder.length">
           <p>주문업로드 리스트 엑셀파일을 드래그하여 옮겨주세요</p>
           <input
@@ -35,13 +35,22 @@
           />
         </div>
         <div v-else>
-          <div class="mb-5">
-            <button
-              class="bg-green-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
-              @click="downloadExcel"
-            >
-              파일 다운로드
-            </button>
+          <div class="mb-5 flex justify-between items-center">
+            <div>주문 총 개수 - {{ orderCount.total }}</div>
+            <div>
+              <button
+                class="bg-white	rounded-lg px-6 py-2 font-semibold shadow mr-3"
+                @click="downloadExcel"
+              >
+                파일 다운로드
+              </button>
+              <button
+                class="bg-green-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
+                @click="uploadOrder"
+              >
+                파일 업로드
+              </button>
+            </div>
           </div>
           <table>
             <thead>
@@ -60,11 +69,18 @@
               <th>탄수화물량</th>
               <th>탄수화물 구성</th>
               <th>제외토핑</th>
+              <th>요청사항</th>
               <th>제외메뉴</th>
               <th>배송</th>
+              <th>메모</th>
             </thead>
             <tbody>
-              <tr v-for="(item, idx) in uploadedOrder" :key="idx">
+              <tr
+                v-for="(item, idx) in uploadedOrder"
+                :key="idx"
+                :class="{ needCheck: item.확인필요 }"
+                @click="checkOrder(item, idx)"
+              >
                 <td>{{ item.구매자명 }}</td>
                 <td>{{ item.수취인명 }}</td>
                 <td>{{ item.구매자연락처 }}</td>
@@ -80,31 +96,250 @@
                 <td>{{ item.탄수화물량 }}</td>
                 <td>{{ item['탄수화물 구성'] }}</td>
                 <td>{{ item.제외토핑 }}</td>
+                <td>{{ item.요청사항 }}</td>
                 <td>{{ item.제외메뉴 }}</td>
                 <td>{{ item.배송 }}</td>
+                <td>{{ item.메모 }}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
+    <modal
+      v-if="showModal"
+      @close="showModal = false"
+      @submit="changeOrder"
+      :order="selectedOrder"
+    >
+      <div slot="header">
+        <h3>{{ selectedOrder.구매자명 }} - 제외메뉴 설정</h3>
+        <p>요청사항 : {{ selectedOrder.요청사항 }}</p>
+      </div>
+    </modal>
+    <modal v-if="showUploadModal">
+      <h3 slot="header">주문 업로드 설정</h3>
+      <div slot="body" class="flex">
+        <div class="w-1/2 p-3 border-r">
+          <h3>새벽배송</h3>
+          <div class="mt-3">
+            <input
+              type="radio"
+              v-model="uploadOption.earlyType"
+              name="deliveryDate"
+              value="mw"
+              id="mw-date"
+            />
+            <label for="mw-date" class="mr-3">월/수</label>
+            <input
+              type="radio"
+              v-model="uploadOption.earlyType"
+              name="deliveryDate"
+              value="tt"
+              id="tt-date"
+            />
+            <label for="tt-date">화/목</label>
+          </div>
+          <div class="mt-3">10일 프로그램 - {{ orderCount.early10 }}개</div>
+          <input
+            v-model="uploadOption.early10"
+            class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+            type="date"
+            id="program-10-early"
+          />
+          <div class="mt-3">20일 프로그램 - {{ orderCount.early20 }}개</div>
+          <input
+            v-model="uploadOption.early20"
+            class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+            type="date"
+            id="program-20-early"
+          />
+        </div>
+        <div class="w-1/2 p-3">
+          <h3>일반배송(화, 목 배송)</h3>
+          <div class="mt-3">10일 프로그램 - {{ orderCount.day10 }}개</div>
+          <input
+            v-model="uploadOption.day10"
+            class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+            type="date"
+            id="program-10-day"
+          />
+          <div class="mt-3">20일 프로그램 - {{ orderCount.day20 }}개</div>
+          <input
+            v-model="uploadOption.day20"
+            class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+            type="date"
+            id="program-20-day"
+          />
+        </div>
+      </div>
+      <div slot="footer" class="flex justify-end">
+        <button class="bg-white shadow border rounded-lg px-6 py-2 mr-3">
+          취소
+        </button>
+        <button class="bg-green-500 shadow rounded-lg px-6 py-2 text-white">
+          업로드
+        </button>
+      </div>
+    </modal>
   </div>
 </template>
 
 <script>
 import TapMenu from '../components/order/TapMenu.vue'
+import Modal from '../components/order/Modal.vue'
 import { read, utils, writeFile } from 'xlsx'
 import custom from '@/api/custom.js'
 
 export default {
   name: 'DashboardHome',
-  components: { TapMenu },
+  components: { TapMenu, Modal },
   data() {
     return {
       uploadedOrder: [],
+      showModal: false,
+      selectedOrder: {},
+      selectedIndex: -1,
+      showUploadModal: false,
+      uploadOption: {
+        earlyType: '',
+        early10: '',
+        early20: '',
+        day10: '',
+        day20: '',
+      },
     }
   },
+  watch: {
+    uploadOption: {
+      deep: true,
+      handler(value) {
+        if (
+          value.day10 !== '' &&
+          ![2, 4].includes(new Date(value.day10).getDay())
+        ) {
+          window.alert(
+            '일반배송 10일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+          )
+          value.day10 = ''
+        }
+
+        if (
+          value.day20 !== '' &&
+          ![2, 4].includes(new Date(value.day20).getDay())
+        ) {
+          window.alert(
+            '일반배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+          )
+          value.day20 = ''
+        }
+
+        console.log(new Date(value.early10).getDay())
+        if (value.earlyType === 'mw') {
+          if (
+            value.early10 !== '' &&
+            ![1, 3].includes(new Date(value.early10).getDay())
+          ) {
+            window.alert(
+              '새벽배송 10일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
+            )
+            value.early10 = ''
+          }
+          if (
+            value.early20 !== '' &&
+            ![1, 3].includes(new Date(value.early20).getDay())
+          ) {
+            window.alert(
+              '새벽배송 20일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
+            )
+            value.early20 = ''
+          }
+        } else if (value.earlyType === 'tt') {
+          if (
+            value.early10 !== '' &&
+            ![2, 4].includes(new Date(value.early10).getDay())
+          ) {
+            window.alert(
+              '새벽배송 10일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+            )
+            value.early10 = ''
+          }
+          if (
+            value.early20 !== '' &&
+            ![2, 4].includes(new Date(value.early20).getDay())
+          ) {
+            window.alert(
+              '새벽배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+            )
+            value.early20 = ''
+          }
+        }
+        return value
+      },
+    },
+  },
+  computed: {
+    orderCount: function() {
+      if (!this.uploadedOrder) {
+        return
+      }
+      const total = this.uploadedOrder.length
+      let early10 = 0
+      let early20 = 0
+      let day10 = 0
+      let day20 = 0
+      this.uploadedOrder.map((item) => {
+        if (item.배송 === '새벽') {
+          if (item.상품명.includes('10일')) {
+            early10 += 1
+          } else {
+            early20 += 1
+          }
+        } else {
+          if (item.상품명.includes('10일')) {
+            day10 += 1
+          } else {
+            day20 += 1
+          }
+        }
+      })
+
+      console.log(total, early10, early20, day10, day20)
+      return {
+        total,
+        early10,
+        early20,
+        day10,
+        day20,
+      }
+    },
+  },
   methods: {
+    uploadOrder() {
+      // const isCheckedAll = this.uploadedOrder.filter((item) => item.확인필요)
+      //   .length
+      // if (isCheckedAll > 0) {
+      //   window.alert(`${isCheckedAll}개가 확인되지 않음`)
+      // }
+      this.showUploadModal = true
+    },
+    changeOrder(e) {
+      this.$set(
+        this.uploadedOrder[this.selectedIndex],
+        '제외메뉴',
+        e.product.join(',')
+      )
+      this.$set(this.uploadedOrder[this.selectedIndex], '메모', e.memo)
+      this.$set(this.uploadedOrder[this.selectedIndex], '확인필요', false)
+      this.showModal = false
+    },
+    checkOrder(item, idx) {
+      if (item.확인필요) {
+        this.selectedOrder = item
+        this.selectedIndex = idx
+        this.showModal = true
+      }
+    },
     downloadExcel() {
       const excelData = utils.json_to_sheet(this.uploadedOrder)
       const workBook = utils.book_new()
@@ -176,12 +411,6 @@ export default {
           totalOrder.push(order)
           order = []
         }
-        // if (item.구매자명 !== init_buyer || init_receiver !== item.수취인명) {
-        //   init_buyer = item.구매자명
-        //   init_receiver = item.수취인명
-        //   totalOrder.push(order)
-        //   order = []
-        // }
         order.push(item)
       })
       totalOrder.push(order)
@@ -206,11 +435,16 @@ export default {
         initOrder.단백질량 = 1
         initOrder.탄수화물량 = 1
         initOrder['탄수화물 구성'] = '고구마'
-        initOrder.제외토핑 = '없음'
+        initOrder.제외토핑 = []
         initOrder.제외메뉴 = '없음'
         order.forEach((item) => {
           if (item.옵션정보.includes('단백질')) {
-            initOrder.단백질량 = 1.5
+            if (item.옵션정보.includes('50g')) {
+              initOrder.단백질량 = 1.5
+            }
+            if (item.옵션정보.includes('100g')) {
+              initOrder.단백질량 = 2
+            } else initOrder.단백질량 = '확인 필요'
           }
           if (item.옵션정보.includes('현미밥')) {
             const carboType = item.옵션정보.split(':')[1]
@@ -230,7 +464,6 @@ export default {
             let deliveryType = ''
 
             if (options.length !== 3) {
-              console.log(item)
               const passwordRaw =
                 item.옵션정보.indexOf(
                   "공동현관 출입비밀번호 (없을 시 '없음'작성):"
@@ -258,15 +491,21 @@ export default {
             }
 
             initOrder['공동현관 비밀번호'] = password
-            initOrder.제외메뉴 = allergy.trim()
+            initOrder.요청사항 = allergy.trim()
+            if (initOrder.요청사항 !== '없음') {
+              initOrder.제외메뉴 = '확인 필요'
+              initOrder.확인필요 = true
+            }
 
             initOrder.배송 = deliveryType.includes('일반') ? '일반' : '새벽'
           }
           if (item.옵션정보.includes('토핑')) {
-            initOrder.제외토핑 = item.옵션정보
-              .split('토핑')[1]
-              .replace('제외', '')
-              .trim()
+            initOrder.제외토핑.push(
+              item.옵션정보
+                .split('토핑')[1]
+                .replace('제외', '')
+                .trim()
+            )
           }
           initOrder.상품명 = custom.serviceNameFormatter(item.상품명)
           if (custom.serviceNameFormatter(item.상품명.includes('새벽'))) {
@@ -274,6 +513,7 @@ export default {
           }
           // 공통 정보
         })
+        initOrder.제외토핑 = initOrder.제외토핑.join(',')
         totalOrder.push(initOrder)
 
         initOrder = {}
@@ -287,6 +527,11 @@ export default {
 table {
   th {
     font-size: 12px;
+  }
+  tr {
+    &.needCheck {
+      background: #48bb78;
+    }
   }
   td {
     font-size: 12px;
