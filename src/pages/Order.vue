@@ -342,9 +342,15 @@ export default {
       }
     },
     downloadExcel() {
-      const excelData = utils.json_to_sheet(this.uploadedOrder)
+      const excelDataDay = utils.json_to_sheet(
+        this.uploadedOrder.filter((item) => item.배송 === '일반')
+      )
+      const excelDataEarly = utils.json_to_sheet(
+        this.uploadedOrder.filter((item) => item.배송 === '새벽')
+      )
       const workBook = utils.book_new()
-      utils.book_append_sheet(workBook, excelData, '주문 취합')
+      utils.book_append_sheet(workBook, excelDataDay, '주문 취합(일반)')
+      utils.book_append_sheet(workBook, excelDataEarly, '주문 취합(새벽)')
       writeFile(workBook, 'test.xlsx')
     },
     onChange(event) {
