@@ -237,7 +237,6 @@ export default {
           value.day20 = ''
         }
 
-        console.log(new Date(value.early10).getDay())
         if (value.earlyType === 'mw') {
           if (
             value.early10 !== '' &&
@@ -307,7 +306,6 @@ export default {
         }
       })
 
-      console.log(total, early10, early20, day10, day20)
       return {
         total,
         early10,
@@ -492,7 +490,7 @@ export default {
               allergy = options[1].split(':')[1]
               deliveryType = options[2].split(':')[1]
             }
-
+            console.log(deliveryType)
             initOrder['공동현관 비밀번호'] = password
             initOrder.요청사항 = allergy.trim()
             if (initOrder.요청사항 !== '없음') {
@@ -500,7 +498,9 @@ export default {
               initOrder.확인필요 = true
             }
 
-            initOrder.배송 = deliveryType.includes('일반') ? '일반' : '새벽'
+            initOrder.배송 = deliveryType.includes('일반배송') ? '일반' : '새벽'
+            console.log()
+            console.log(initOrder.구매자명, initOrder.배송)
           }
           if (item.옵션정보.includes('토핑')) {
             initOrder.제외토핑.push(
@@ -510,8 +510,12 @@ export default {
                 .trim()
             )
           }
+
           initOrder.상품명 = custom.serviceNameFormatter(item.상품명)
-          if (custom.serviceNameFormatter(item.상품명.includes('새벽'))) {
+          if (
+            !initOrder.배송 &&
+            custom.serviceNameFormatter(item.상품명.includes('새벽'))
+          ) {
             initOrder.배송 = '새벽'
           }
           // 공통 정보
