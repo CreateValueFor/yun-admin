@@ -36,7 +36,11 @@
         </div>
         <div v-else>
           <div class="mb-5 flex justify-between items-center">
-            <div>주문 총 개수 - {{ orderCount.total }}</div>
+            <div>
+              주문 총 개수 - {{ orderCount.total }} 에러 -
+              {{ orderCount.error }}
+            </div>
+
             <div>
               <button
                 class="bg-white	rounded-lg px-6 py-2 font-semibold shadow mr-3"
@@ -286,6 +290,9 @@ export default {
         return
       }
       const total = this.uploadedOrder.length
+      const error = this.uploadedOrder.filter(
+        (item) => item.상품명 === '상품이 아님'
+      ).length
       let early10 = 0
       let early20 = 0
       let day10 = 0
@@ -312,6 +319,7 @@ export default {
         early20,
         day10,
         day20,
+        error,
       }
     },
   },
@@ -446,12 +454,14 @@ export default {
         initOrder.제외메뉴 = '없음'
         order.forEach((item) => {
           if (item.옵션정보.includes('단백질')) {
-            if (item.옵션정보.includes('50g')) {
+            if (item.옵션정보.indexOf('50g') !== -1) {
               initOrder.단백질량 = 1.5
-            }
-            if (item.옵션정보.includes('100g')) {
+            } else if (item.옵션정보.indexOf('100g') !== -1) {
               initOrder.단백질량 = 2
-            } else initOrder.단백질량 = '확인 필요'
+            } else {
+              console.log(item.옵션정보)
+              initOrder.단백질량 = '확인 필요'
+            }
           }
           if (item.옵션정보.includes('현미밥')) {
             const carboType = item.옵션정보.split(':')[1]
@@ -496,7 +506,7 @@ export default {
               allergy = options[1].split(':')[1]
               deliveryType = options[2].split(':')[1]
             }
-            console.log(deliveryType)
+
             initOrder['공동현관 비밀번호'] = password
             initOrder.요청사항 = allergy.trim()
             if (initOrder.요청사항 !== '없음') {
@@ -505,8 +515,6 @@ export default {
             }
 
             initOrder.배송 = deliveryType.includes('일반배송') ? '일반' : '새벽'
-            console.log()
-            console.log(initOrder.구매자명, initOrder.배송)
           }
           if (item.옵션정보.includes('토핑')) {
             initOrder.제외토핑.push(
