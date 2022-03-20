@@ -262,8 +262,32 @@ export default {
   },
   methods: {
     downloadExcel() {
+      console.log(this.searchList)
+      const excelData = this.searchList.map((item) => {
+        return {
+          구매자명: item.buyer,
+          수취인명: item.receiver,
+          수취인연락처: item.receiverPhone,
+          배송지: item.address1 + item.address2 || '',
+          '(기본주소)': item.address1,
+          '(상세주소)': item.address2,
+          '공동현관 비밀번호': item.entrancePassword,
+          배송메세지: item.deliveryMessage,
+          시작일: item.startDate,
+          종료일: '',
+          상품정보: item.productInfo,
+          상품명: item.producName,
+          '탄수화물 구성': item.carboType.name,
+          단백질량: item.carboAmount,
+          탄수화물량: item.proteinAmount,
+          제외메뉴: item.excludeProduct,
+          제외토핑: item.excludeTopping,
+          배송: item.deliveryType,
+        }
+      })
+      const excelDataEarly = utils.json_to_sheet(excelData)
       const workBook = utils.book_new()
-      utils.book_append_sheet(workBook, this.searchList, '제조 물량')
+      utils.book_append_sheet(workBook, excelDataEarly, '제조 물량')
       writeFile(workBook, 'test.xlsx')
     },
     async search() {
