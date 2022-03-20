@@ -8,6 +8,7 @@ import Order from '@/pages/Order'
 import Calendar from '@/pages/Calendar'
 import AddProduct from '@/pages/AddProduct'
 import ViewProduct from '@/pages/ViewProduct'
+import OrderList from "@/pages/OrderList"
 
 import store from './store'
 
@@ -25,6 +26,8 @@ const routes = [
       { path: '/', redirect: { name: 'Home' } },
       { path: 'home', name: 'Home', component: Home },
       { path: 'order', name: 'Order', component: Order },
+      { path: 'order-list', name: 'OrderList', component: OrderList },
+
       { path: 'calendar', name: 'Calendar', component: Calendar },
       { path: 'addProduct', name: 'AddProduct', component: AddProduct },
       { path: 'manageProduct', name: 'ManageProduct', component: ViewProduct }

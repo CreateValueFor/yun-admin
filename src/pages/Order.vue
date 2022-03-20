@@ -58,6 +58,7 @@
           </div>
           <table>
             <thead>
+              <th>주문번호</th>
               <th>구매자명</th>
               <th>수취인명</th>
               <th>구매자연락처</th>
@@ -85,9 +86,10 @@
                 :class="{ needCheck: item.확인필요 }"
                 @click="checkOrder(item, idx)"
               >
+                <td>{{ item.주문번호 }}</td>
                 <td>{{ item.구매자명 }}</td>
                 <td>{{ item.수취인명 }}</td>
-                <td>{{ item.구매자연락처 }}</td>
+                <td>{{ item.수취인연락처 }}</td>
                 <td>{{ item.배송지 }}</td>
                 <td>{{ item['(기본주소)'] }}</td>
                 <td>{{ item['(상세주소)'] }}</td>
@@ -184,7 +186,10 @@
         >
           취소
         </button>
-        <button class="bg-green-500 shadow rounded-lg px-6 py-2 text-white">
+        <button
+          @click="postOrder"
+          class="bg-green-500 shadow rounded-lg px-6 py-2 text-white"
+        >
           업로드
         </button>
       </div>
@@ -197,6 +202,7 @@ import TapMenu from '../components/order/TapMenu.vue'
 import Modal from '../components/order/Modal.vue'
 import { read, utils, writeFile } from 'xlsx'
 import custom from '@/api/custom.js'
+import axios from 'axios'
 
 export default {
   name: 'DashboardHome',
@@ -215,6 +221,10 @@ export default {
         day10: '',
         day20: '',
       },
+      early10: [],
+      early20: [],
+      day10: [],
+      day20: [],
     }
   },
   watch: {
@@ -324,7 +334,51 @@ export default {
     },
   },
   methods: {
+    async postOrder() {
+      this.early10 = []
+      this.early20 = []
+      this.day20 = []
+      this.day10 = []
+      this.uploadedOrder.map((item) => {
+        if (item.배송 === '새벽') {
+          if (item.상품명.includes('10일')) {
+            this.early10.push(item)
+          } else {
+            this.early20.push(item)
+          }
+        } else {
+          if (item.상품명.includes('10일')) {
+            this.day10.push(item)
+          } else {
+            this.day20.push(item)
+          }
+        }
+      })
+      // this.uploadedOrder.forEach((item) => {})
+      const res = await axios.post('http://localhost:3000/order', {
+        day10: {
+          data: this.day10,
+          startDate: this.uploadOption.day10,
+        },
+        day20: {
+          data: this.day20,
+          startDate: this.uploadOption.day20,
+        },
+        early10: {
+          data: this.early10,
+          startDate: this.uploadOption.early10,
+        },
+        early20: {
+          data: this.early20,
+          startDate: this.uploadOption.early20,
+        },
+      })
+      console.log(res)
+    },
+
     uploadOrder() {
+      // console.log(this.uploadedOrder)
+      // return
       // const isCheckedAll = this.uploadedOrder.filter((item) => item.확인필요)
       //   .length
       // if (isCheckedAll > 0) {
@@ -436,9 +490,10 @@ export default {
       let totalOrder = []
 
       groupedRaw.forEach((order) => {
+        initOrder.주문번호 = order[0].주문번호
         initOrder.구매자명 = order[0].구매자명
         initOrder.수취인명 = order[0].수취인명
-        initOrder.구매자연락처 = order[0]['구매자연락처']
+        initOrder.수취인연락처 = order[0]['(수취인연락처1)']
         initOrder.배송지 = order[0]['(기본주소)'] + order[0]['(상세주소)']
         initOrder['(기본주소)'] = order[0]['(기본주소)']
         initOrder['(상세주소)'] = order[0]['(상세주소)']

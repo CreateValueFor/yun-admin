@@ -1,75 +1,90 @@
 const productList = [
     {
+        id: 1,
         name: '닭가슴살',
         mainIngredient: '닭가슴살',
         checked: false
     },
     {
+        id: 2,
         name: '훈제오리',
         mainIngredient: '훈제오리',
         checked: false
     },
     {
+        id: 3,
         name: '소고기',
         mainIngredient: '소고기',
         checked: false
     },
     {
+        id: 4,
         name: '닭쏘',
         mainIngredient: '닭가슴살, 계란',
         checked: false
     },
     {
+        id: 5,
         name: '스테이크',
         mainIngredient: '닭가슴살, 계란',
         checked: false
     },
     {
+        id: 6,
         name: '에그코타',
         mainIngredient: '에그 샐러드, 계란, 치즈',
         checked: false
     },
     {
+        id: 7,
         name: '두부참치',
         mainIngredient: '두부, 참치, 계란',
         checked: false
     },
     {
+        id: 8,
         name: '꽃맛살',
         mainIngredient: '꽃맛살, 계란, 오이, 당근, 사과',
         checked: false
     },
     {
-        name: '유부두부',
-        mainIngredient: '두부, 유부, 단무지',
-        checked: false
-    },
-    {
-        name: '감또',
-        mainIngredient: '감자, 오이, 당근, 사과, 스위트콘, 또띠아, 계란, 마요네즈',
-        checked: false
-    },
-    {
-        name: '들깨닭',
-        mainIngredient: '닭가슴살, 양배추, 들깨가루, 단무지, 설탕, 마요네즈, 간장, 참기름',
-        checked: false
-    },
-    {
+        id: 9,
         name: '참또',
         mainIngredient: '참치, 계란, 오이, 마요네즈, 또띠아, 단무지',
         checked: false
     },
     {
+        id: 10,
+        name: '들깨닭',
+        mainIngredient: '닭가슴살, 양배추, 들깨가루, 단무지, 설탕, 마요네즈, 간장, 참기름',
+        checked: false
+    },
+    {
+        id: 11,
+        name: '감또',
+        mainIngredient: '감자, 오이, 당근, 사과, 스위트콘, 또띠아, 계란, 마요네즈',
+        checked: false
+    },
+    {
+        id: 12,
+        name: '유부두부',
+        mainIngredient: '두부, 유부, 단무지',
+        checked: false
+    },
+    {
+        id: 13,
         name: '유부닭',
         mainIngredient: '닭가슴살, 유부, 계란, 현미밥, 양배추, 당근',
         checked: false
     },
     {
+        id: 14,
         name: '샌닭',
         mainIngredient: '닭가슴살, 계란, 식빵, 크랜베리, 마요네즈, 머스타드',
         checked: false
     },
     {
+        id: 15,
         name: '키밥',
         mainIngredient: '계란, 치즈, 단무지, 양배추, 마요네즈, 당근, 상추',
         checked: false
@@ -78,6 +93,8 @@ const productList = [
 
 const serviceNameFormatter = (service) => {
     switch (service) {
+        case '[윤식단] 샐러드 정기 배달 - 1일 1식 10일 프로그램 (2주)':
+            return '1일 1식 10일 프로그램'
         case '[윤식단] 샐러드 정기 배달 - 1일1식 10일 프로그램 (2주)':
             return '1일 1식 10일 프로그램'
         case '[윤식단] 샐러드 정기 배달 - 1일1식10일 프로그램(2주)':
