@@ -355,7 +355,7 @@ export default {
         }
       })
       // this.uploadedOrder.forEach((item) => {})
-      const res = await axios.post('http://localhost:3000/order', {
+      const res = await axios.post('http://3.35.9.130:3000/order', {
         day10: {
           data: this.day10,
           startDate: this.uploadOption.day10,
