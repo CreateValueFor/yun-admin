@@ -3,6 +3,7 @@ import App from './App.vue'
 import Router from 'vue-router'
 
 import Dashboard from '@/components/Dashboard'
+import Customer from '@/components/customer/Customer'
 import Home from '@/pages/Home'
 import Order from '@/pages/Order'
 import Calendar from '@/pages/Calendar'
@@ -12,6 +13,9 @@ import OrderList from "@/pages/OrderList"
 
 import store from './store'
 
+//customer page
+import Login from "@/pages/customer/Login"
+
 import '@/assets/css/tailwind.css'
 
 
@@ -20,6 +24,12 @@ Vue.config.productionTip = false
 Vue.use(Router)
 
 const routes = [
+  {
+    path: "/customer", component: Customer, children: [
+      { path: "login", component: Login, name: "Login" },
+
+    ]
+  },
 
   {
     path: '/', component: Dashboard, children: [
@@ -33,6 +43,7 @@ const routes = [
       { path: 'manageProduct', name: 'ManageProduct', component: ViewProduct }
     ]
   }
+
 ]
 
 const router = new Router({
