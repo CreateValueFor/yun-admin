@@ -335,9 +335,9 @@ export default {
         }
         if (item.proteinAmount !== 1) {
           isSpecial = true
-          if (item.carboAmount === 1.5) {
+          if (item.proteinAmount === 1.5) {
             specialList.push('단150')
-          } else if (item.carboAmount === 2) {
+          } else if (item.proteinAmount === 2) {
             specialList.push('단200')
           }
         }
@@ -383,10 +383,11 @@ export default {
         }
 
         availableMenu = availableMenu.slice(0, saladCount)
+        console.log(specialList)
 
-        let productInfo = `${eatPerday}${
-          isExcludeProduct ? '-2' : isSpecial ? '-1' : ''
-        } ${specialList.join(' / ')} ${
+        let productInfo = `${eatPerday}
+          ${isExcludeProduct ? '-2' : isSpecial ? '-1' : ''}
+          ${specialList.join(' / ')} ${
           availableMenu.length
             ? ' / ' +
               availableMenu
