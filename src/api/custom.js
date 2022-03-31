@@ -148,14 +148,14 @@ const carbohydrateValueFormatter = (service) => {
             return service
     }
 }
-function JSDateToExcelDate(inDate) {
+const JSDateToExcelDate = (inDate) => {
 
     var returnDateTime = 25569.0 + ((inDate.getTime() - (inDate.getTimezoneOffset() * 60 * 1000)) / (1000 * 60 * 60 * 24));
     return returnDateTime.toString().substr(0, 5);
 
 }
 
-function ExcelDateToJSDate(serial) {
+const ExcelDateToJSDate = (serial) => {
     var utc_days = Math.floor(serial - 25569);
     var utc_value = utc_days * 86400;
     var date_info = new Date(utc_value * 1000);
@@ -173,11 +173,62 @@ function ExcelDateToJSDate(serial) {
 
     return new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate(), hours, minutes, seconds);
 }
+
+const orderTranslater = (item, language) => {
+    if (language === 'korean') {
+        return {
+            address1: item['(기본주소)'],
+            address2: item['(상세주소)'],
+            entrancePassword: item['공동현관 비밀번호'],
+            buyer: item.구매자명,
+            receiver: item.수취인명,
+            proteinAmount: item.단백질량,
+            deliveryType: item.배송,
+            deliveryMessage: item.배송메세지,
+
+            package: item.상품명,
+            receiverPhone: item.수취인연락처,
+            // excludeTopping: item.제외토핑,
+            excludeToppingObject: {
+                carrot: item.제외토핑.includes('당근'),
+                bean: item.제외토핑.includes('콩')
+            },
+            carboType: item['탄수화물 구성'],
+            carboAmount: item.탄수화물량
+
+
+        }
+    } else {
+        const excludeToppingList = [];
+        item.excludeToppingObject.carrot && excludeToppingList.push('당근')
+        item.excludeToppingObject.bean && excludeToppingList.push('carrot')
+
+        return {
+            '(기본주소)': item.address1,
+            '(상세주소)': item.address1,
+            '공동현관 비밀번호': item.entrancePassword,
+            구매자명: item.buyer,
+            단백질량: item.proteinAmount,
+            배송: item.deliveryType,
+
+
+            상품명: item.package,
+            수취인명: item.receiver,
+            수취인연락처: item.receiverPhone,
+            제외토핑: excludeToppingList.join(','),
+            '탄수화물 구성': item.carboType,
+            탄수화물량: item.carboAmount
+        }
+    }
+
+}
+
 export default {
     productList,
     serviceNameFormatter,
     JSDateToExcelDate,
     ExcelDateToJSDate,
     proteinValueFormatter,
-    carbohydrateValueFormatter
+    carbohydrateValueFormatter,
+    orderTranslater,
 }

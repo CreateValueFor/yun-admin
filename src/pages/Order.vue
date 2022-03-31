@@ -61,15 +61,13 @@
               <th>주문번호</th>
               <th>구매자명</th>
               <th>수취인명</th>
-              <th>구매자연락처</th>
+              <th>수취인연락처</th>
               <th>배송지</th>
               <th>기본주소</th>
               <th>상세주소</th>
               <th>공동현관 비밀번호</th>
               <th>배송메세지</th>
               <th>상품명</th>
-              <th>시작일</th>
-              <th>종료일</th>
               <th>단백질량</th>
               <th>탄수화물량</th>
               <th>탄수화물 구성</th>
@@ -78,13 +76,13 @@
               <th>제외메뉴</th>
               <th>배송</th>
               <th>메모</th>
+              <th></th>
             </thead>
             <tbody>
               <tr
                 v-for="(item, idx) in uploadedOrder"
                 :key="idx"
                 :class="{ needCheck: item.확인필요 }"
-                @click="checkOrder(item, idx)"
               >
                 <td>{{ item.주문번호 }}</td>
                 <td>{{ item.구매자명 }}</td>
@@ -96,22 +94,207 @@
                 <td>{{ item['공동현관 비밀번호'] }}</td>
                 <td>{{ item['배송메세지'] }}</td>
                 <td>{{ item.상품명 }}</td>
-                <td>{{ item.시작일 }}</td>
-                <td>{{ item.종료일 }}</td>
+                <!-- <td>{{ item.시작일 }}</td>
+                <td>{{ item.종료일 }}</td> -->
                 <td>{{ item.단백질량 }}</td>
                 <td>{{ item.탄수화물량 }}</td>
                 <td>{{ item['탄수화물 구성'] }}</td>
                 <td>{{ item.제외토핑 }}</td>
                 <td>{{ item.요청사항 }}</td>
-                <td>{{ item.제외메뉴 }}</td>
+                <td>
+                  <div v-if="item.확인필요">
+                    <button
+                      class="bg-green-500 shadow rounded-lg px-6 py-2 text-white"
+                      @click="checkOrder(item, idx)"
+                    >
+                      등록
+                    </button>
+                  </div>
+                  <div v-else>
+                    {{ item.제외메뉴 }}
+                  </div>
+                </td>
                 <td>{{ item.배송 }}</td>
                 <td>{{ item.메모 }}</td>
+                <td>
+                  <button
+                    class="bg-green-500 shadow rounded-lg px-6 py-2 text-white"
+                    @click="openUpdateModal(item, idx)"
+                  >
+                    수정
+                  </button>
+                  <button
+                    @click="postOrder"
+                    class="bg-red-500 shadow rounded-lg px-6 py-2 text-white"
+                  >
+                    삭제
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
+    <modal
+      v-if="showUpdateModal"
+      @close="showUpdateModal = false"
+      @submit="updateOrder"
+    >
+      <h3 slot="header">주문 수정</h3>
+      <div slot="body">
+        <div class="flex">
+          <div class="w-1/3 px-3">
+            구매자명
+            <input
+              v-model="modalData.buyer"
+              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+              type="text"
+              id="buyer"
+            />
+          </div>
+          <div class="w-1/3 px-3">
+            수취인명
+            <input
+              v-model="modalData.receiver"
+              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+              type="text"
+              id="receiver"
+            />
+          </div>
+          <div class="w-1/3 px-3">
+            수취인연락처
+            <input
+              v-model="modalData.receiverPhone"
+              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+              type="text"
+              id="buyer"
+            />
+          </div>
+        </div>
+        <div class="flex mt-3">
+          <div class="w-1/2  px-3">
+            기본주소
+            <input
+              v-model="modalData.address1"
+              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+              type="text"
+              id="address1"
+            />
+          </div>
+          <div class="w-1/2  px-3">
+            상세주소
+            <input
+              v-model="modalData.address2"
+              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+              type="text"
+              id="address2"
+            />
+          </div>
+        </div>
+        <div class="flex mt-3">
+          <div class="w-1/2 px-3">
+            공동현관 비밀번호
+            <input
+              v-model="modalData.entrancePassword"
+              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+              type="text"
+              id="entrancePassword"
+            />
+          </div>
+          <div class="w-1/2 px-3">
+            <div>상품명</div>
+            <select
+              v-model="modalData.package"
+              class="mt-3 bg-white h-10 w-full  px-5 rounded-lg border text-sm focus:outline-none"
+            >
+              <option>1일 1식 10일 프로그램</option>
+              <option>1일 2식 10일 프로그램</option>
+              <option>1일 3식 10일 프로그램</option>
+              <option>1일 1식 20일 프로그램</option>
+              <option>1일 2식 20일 프로그램</option>
+              <option>1일 3식 20일 프로그램</option>
+              <option>1일 4식 20일 프로그램</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex mt-3">
+          <div class="w-1/2 px-3">
+            제외토핑
+            <div>
+              <label for="excludeCarrotTopping">당근</label>
+              <input
+                v-model="modalData.excludeToppingObject.carrot"
+                class=" mx-3 bg-white rounded-lg border text-sm focus:outline-none"
+                type="checkbox"
+                id="excludeCarrotTopping"
+              />
+              <label for="excludeBeanTopping">콩</label>
+              <input
+                v-model="modalData.excludeToppingObject.bean"
+                class=" ml-3 bg-white rounded-lg border text-sm focus:outline-none"
+                type="checkbox"
+                id="excludeBeanTopping"
+              />
+            </div>
+          </div>
+          <div class="w-1/2 ">
+            탄수화물구성
+            <div>
+              <label for="sweetPotato">고구마</label>
+              <input
+                v-model="modalData.carboType"
+                value="고구마"
+                class=" mx-1 bg-white rounded-lg border text-sm focus:outline-none"
+                type="radio"
+                id="sweetPotato"
+              />
+              <label for="mixed">고구마 + 현미밥</label>
+              <input
+                v-model="modalData.carboType"
+                value="고구마 + 현미밥"
+                class=" mx-1 bg-white rounded-lg border text-sm focus:outline-none"
+                type="radio"
+                id="mixed"
+              />
+              <label for="rice">현미밥</label>
+              <input
+                v-model="modalData.carboType"
+                value="현미밥"
+                class=" ml-1 bg-white rounded-lg border text-sm focus:outline-none"
+                type="radio"
+                id="rice"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="flex mt-3">
+          <div class="w-1/2">
+            단백질량
+            <select
+              v-model="modalData.proteinAmount"
+              class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
+            >
+              <option value="1">1</option>
+              <option value="1.5">1.5</option>
+              <option value="2">2</option>
+            </select>
+          </div>
+          <div class="w-1/2">
+            탄수화물량
+            <select
+              v-model="modalData.carboAmount"
+              class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
+            >
+              <option value="1">1</option>
+              <option value="1.5">1.5</option>
+              <option value="2">2</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </modal>
     <modal
       v-if="showModal"
       @close="showModal = false"
@@ -214,6 +397,8 @@ export default {
       selectedOrder: {},
       selectedIndex: -1,
       showUploadModal: false,
+      showUpdateModal: false,
+      modalData: {},
       uploadOption: {
         earlyType: '',
         early10: '',
@@ -334,6 +519,22 @@ export default {
     },
   },
   methods: {
+    openUpdateModal(item, idx) {
+      this.selectedIndex = idx
+      this.modalData = custom.orderTranslater(item, 'korean')
+      console.log(this.modalData)
+      this.showUpdateModal = true
+    },
+    updateOrder() {
+      const data = {
+        ...this.uploadedOrder[this.selectedIndex],
+        ...custom.orderTranslater(this.modalData, 'english'),
+      }
+      this.selectedIndex
+      this.$set(this.uploadedOrder, this.selectedIndex, data)
+      this.showUpdateModal = false
+    },
+
     async postOrder() {
       this.early10 = []
       this.early20 = []
@@ -387,6 +588,7 @@ export default {
       // }
       this.showUploadModal = true
     },
+
     changeOrder(e) {
       this.$set(
         this.uploadedOrder[this.selectedIndex],
@@ -398,11 +600,11 @@ export default {
       this.showModal = false
     },
     checkOrder(item, idx) {
-      if (item.확인필요) {
-        this.selectedOrder = item
-        this.selectedIndex = idx
-        this.showModal = true
-      }
+      // if (item.확인필요) {
+      this.selectedOrder = item
+      this.selectedIndex = idx
+      this.showModal = true
+      // }
     },
     downloadExcel() {
       const excelDataDay = utils.json_to_sheet(
