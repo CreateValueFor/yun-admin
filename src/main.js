@@ -10,6 +10,7 @@ import Calendar from '@/pages/Calendar'
 import AddProduct from '@/pages/AddProduct'
 import ViewProduct from '@/pages/ViewProduct'
 import OrderList from "@/pages/OrderList"
+import DeliveryList from '@/pages/DeliveryList'
 
 import store from './store'
 
@@ -37,6 +38,7 @@ const routes = [
       { path: 'home', name: 'Home', component: Home },
       { path: 'order', name: 'Order', component: Order },
       { path: 'order-list', name: 'OrderList', component: OrderList },
+      { path: 'delivery-list', name: 'DeliveryList', component: DeliveryList },
 
       { path: 'calendar', name: 'Calendar', component: Calendar },
       { path: 'addProduct', name: 'AddProduct', component: AddProduct },

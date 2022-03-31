@@ -9,11 +9,31 @@ const _baseGetRequest = async (path) => {
     return res.data;
 }
 
+const _basePostRequest = async (path, param) => {
+    const res = await axios.post(BASE_URL + path, param)
+    return res.data;
+}
+
+
 const getOrderList = async () => {
     const res = await _baseGetRequest('order')
     return res.data;
 }
 
+
+const getDeliveryList = async (date) => {
+    const res = await _baseGetRequest(`order/delivery/${date}`)
+    return res.data;
+}
+
+const postOrderList = async (param) => {
+    const res = await _basePostRequest('order', param)
+    return res.data;
+}
+
 export default {
-    getOrderList
+    getOrderList,
+    postOrderList,
+    //배송 불러오기
+    getDeliveryList,
 }

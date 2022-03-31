@@ -14,6 +14,13 @@
         주문 리스트
       </button>
     </router-link>
+    <router-link to="/delivery-list">
+      <button
+        class="bg-blue-500 hover:bg-blue-600 focus:outline-none rounded-lg px-6 py-2 text-white font-semibold mr-3 shadow"
+      >
+        배송 리스트
+      </button>
+    </router-link>
     <button
       class="bg-blue-500 hover:bg-blue-600 focus:outline-none rounded-lg px-6 py-2 text-white font-semibold  shadow"
     >

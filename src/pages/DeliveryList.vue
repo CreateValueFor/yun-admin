@@ -35,33 +35,11 @@
     <div class="flex flex-1 flex-wrap -mx-3 ">
       <div class="bg-white w-full p-3 rounded-lg">
         <div class="flex mb-3">
-          <p class="font-semibold w-32 text-lg">업로드 날짜</p>
-          <input
-            name="serch"
-            type="date"
-            placeholder="Search products..."
-            class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
-          />
-        </div>
-        <div class="flex mb-3">
-          <p class="font-semibold w-32 text-lg">조건별 검색</p>
-          <select
-            class="bg-white h-10 w-64 mr-3 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option value="white">한얀색</option>
-          </select>
-          <input
-            name="serch"
-            type="search"
-            placeholder="Search products..."
-            class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
-          />
-        </div>
-        <div class="flex mb-3">
           <p class="font-semibold w-32 text-lg">배송날짜</p>
           <input
             name="serch"
             type="date"
+            v-model="searchDate"
             placeholder="Search products..."
             class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
           />
@@ -70,7 +48,7 @@
           <p class="font-semibold w-32 text-lg">제조메뉴</p>
           <select
             v-model="products.product1"
-            class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
+            class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
           >
             <option
               v-for="(product, idx) in productList"
@@ -82,7 +60,7 @@
           </select>
           <select
             v-model="products.product2"
-            class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
+            class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
           >
             <option
               v-for="(product, idx) in productList"
@@ -94,7 +72,7 @@
           </select>
           <select
             v-model="products.product3"
-            class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
+            class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
           >
             <option
               v-for="(product, idx) in productList"
@@ -106,7 +84,7 @@
           </select>
           <select
             v-model="products.product4"
-            class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
+            class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
           >
             <option
               v-for="(product, idx) in productList"
@@ -129,14 +107,6 @@
             >
           </select>
         </div>
-        <div class="flex mb-3">
-          <p class="font-semibold w-32 text-lg">제조토핑</p>
-          <select
-            class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option value="white">한얀색</option>
-          </select>
-        </div>
         <button
           class="bg-green-500 w-48	rounded-lg px-6 py-2 text-white font-semibold shadow"
           @click="search"
@@ -156,7 +126,6 @@
         <th>공동현관 비밀번호</th>
         <th>배송메세지</th>
         <th>시작일</th>
-        <th>종료일</th>
         <th>상품정보</th>
         <th>상품명</th>
         <th>탄수화물 구성</th>
@@ -168,27 +137,26 @@
         <th>요청사항</th>
       </thead>
       <tbody>
-        <tr v-for="(order, idx) in searchList" :key="idx">
-          <td>{{ order.buyer }}</td>
-          <td>{{ order.receiver }}</td>
-          <td>{{ order.receiverPhone }}</td>
-          <td>{{ order.address1 + order.address2 }}</td>
-          <td>{{ order.address1 }}</td>
-          <td>{{ order.address2 }}</td>
-          <td>{{ order.entrancePassword }}</td>
-          <td>{{ order.deliveryMessage }}</td>
-          <td>{{ order.startDate }}</td>
+        <tr v-for="(delivery, idx) in searchList" :key="idx">
+          <td>{{ delivery.Order.buyer }}</td>
+          <td>{{ delivery.Order.receiver }}</td>
+          <td>{{ delivery.Order.receiverPhone }}</td>
+          <td>{{ delivery.Order.address1 + delivery.Order.address2 }}</td>
+          <td>{{ delivery.Order.address1 }}</td>
+          <td>{{ delivery.Order.address2 }}</td>
+          <td>{{ delivery.Order.entrancePassword }}</td>
+          <td>{{ delivery.Order.deliveryMessage }}</td>
+          <td>{{ delivery.deliveryDate }}</td>
 
-          <td>{{ order.endDate }}</td>
-          <td>{{ order.productInfo }}</td>
-          <td>{{ order.productName }}</td>
-          <td>{{ order.CarboType.name }}</td>
-          <td>{{ order.carboAmount }}</td>
-          <td>{{ order.proteinAmount }}</td>
-          <td>{{ order.excludeProduct }}</td>
-          <td>{{ order.excludeTopping }}</td>
-          <td>{{ order.deliveryType }}</td>
-          <td>{{ order.request }}</td>
+          <td>{{ delivery.productInfo }}</td>
+          <td>{{ delivery.productName }}</td>
+          <td>{{ delivery.Order.CarboType.name }}</td>
+          <td>{{ delivery.Order.carboAmount }}</td>
+          <td>{{ delivery.Order.proteinAmount }}</td>
+          <td>{{ delivery.excludeProduct }}</td>
+          <td>{{ delivery.excludeTopping }}</td>
+          <td>{{ delivery.Order.deliveryType }}</td>
+          <td>{{ delivery.Order.request }}</td>
         </tr>
       </tbody>
     </table>
@@ -217,7 +185,7 @@ export default {
         product4: '',
         product5: '',
       },
-      searchCondition: {},
+      searchDate: '',
     }
   },
   watch: {
@@ -249,7 +217,6 @@ export default {
       },
     },
   },
-
   computed: {
     dailyMenuIds() {
       return [
@@ -266,30 +233,28 @@ export default {
       console.log(this.searchList)
       const excelData = this.searchList.map((item) => {
         return {
-          구매자명: item.buyer,
-          수취인명: item.receiver,
-          수취인연락처: item.receiverPhone,
-          배송지: item.address1 + item.address2 || '',
-          '(기본주소)': item.address1,
-          '(상세주소)': item.address2,
-          '공동현관 비밀번호': item.entrancePassword,
-          배송메세지: item.deliveryMessage,
-          시작일: item.startDate,
-          종료일: '',
+          구매자명: item.Order.buyer,
+          수취인명: item.Order.receiver,
+          수취인연락처: item.Order.receiverPhone,
+          배송지: item.Order.address1 + item.Order.address2 || '',
+          '(기본주소)': item.Order.address1,
+          '(상세주소)': item.Order.address2,
+          '공동현관 비밀번호': item.Order.entrancePassword,
+          배송메세지: item.Order.deliveryMessage,
           상품정보: item.productInfo,
-          상품명: item.producName,
-          '탄수화물 구성': item.carboType.name,
-          단백질량: item.carboAmount,
-          탄수화물량: item.proteinAmount,
+          상품명: item.productName,
+          '탄수화물 구성': item.Order.CarboType.name,
+          단백질량: item.Order.carboAmount,
+          탄수화물량: item.Order.proteinAmount,
           제외메뉴: item.excludeProduct,
           제외토핑: item.excludeTopping,
-          배송: item.deliveryType,
+          배송: item.Order.deliveryType,
         }
       })
       const excelDataEarly = utils.json_to_sheet(excelData)
       const workBook = utils.book_new()
       utils.book_append_sheet(workBook, excelDataEarly, '제조 물량')
-      writeFile(workBook, 'test.xlsx')
+      writeFile(workBook, `${this.searchDate}-제조물량.xlsx`)
     },
     async search() {
       // 제조 메뉴 선택 안할 경우 불가
@@ -309,7 +274,7 @@ export default {
         return window.alert('제조메뉴를 선택해주세요')
       }
 
-      const res = await api.getOrderList()
+      const res = await api.getDeliveryList(this.searchDate)
       const makeList = []
 
       res.map((item) => {
@@ -318,34 +283,34 @@ export default {
         let specialList = []
         let availableMenu = []
 
-        if (item.carboAmount !== 1) {
+        if (item.Order.carboAmount !== 1) {
           isSpecial = true
-          if (item.carboAmount === 1.5) {
+          if (item.Order.carboAmount === 1.5) {
             specialList.push('탄150')
-          } else if (item.carboAmount === 2) {
+          } else if (item.Order.carboAmount === 2) {
             specialList.push('탄200')
           }
         }
-        if (item.carboType !== 1) {
+        if (item.Order.carboType !== 1) {
           isSpecial = true
-          if (item.carboType === 2) {
+          if (item.Order.carboType === 2) {
             specialList.push('고구마 + 현미밥')
-          } else if (item.carboType === 3) {
+          } else if (item.Order.carboType === 3) {
             specialList.push('현미밥만')
           }
         }
-        if (item.proteinAmount !== 1) {
+        if (item.Order.proteinAmount !== 1) {
           isSpecial = true
-          if (item.proteinAmount === 1.5) {
+          if (item.Order.proteinAmount === 1.5) {
             specialList.push('단150')
-          } else if (item.proteinAmount === 2) {
+          } else if (item.Order.proteinAmount === 2) {
             specialList.push('단200')
           }
         }
-        if (item.Ingredients.length) {
+        if (item.Order.Ingredients.length) {
           isSpecial = true
           const toppings = []
-          item.Ingredients.map((item) => {
+          item.Order.Ingredients.map((item) => {
             switch (item.id) {
               case 3:
                 return
@@ -357,17 +322,17 @@ export default {
           })
           specialList.push(toppings.join(' '))
         }
-        if (item.Products.length) {
+        if (item.Order.Products.length) {
           isExcludeProduct = true
-          const excludeProductIds = item.Products.map((item) => item.id)
+          const excludeProductIds = item.Order.Products.map((item) => item.id)
           availableMenu = this.dailyMenuIds.filter(
             (item) => !excludeProductIds.includes(item)
           )
         }
 
         let eatPerday
-        if (item.Package) {
-          eatPerday = item.Package.eatPerDay
+        if (item.Order.Package) {
+          eatPerday = item.Order.Package.eatPerDay
         } else {
           eatPerday = 'something wrong'
         }
@@ -386,9 +351,9 @@ export default {
         availableMenu = availableMenu.slice(0, saladCount)
         console.log(specialList)
 
-        let productInfo = `${eatPerday}
-          ${isExcludeProduct ? '-2' : isSpecial ? '-1' : ''}
-          ${specialList.join(' / ')} ${
+        let productInfo = `${eatPerday} ${
+          isExcludeProduct ? '-2' : isSpecial ? '-1' : ''
+        } ${specialList.join(' / ')} ${
           availableMenu.length
             ? ' / ' +
               availableMenu
@@ -402,9 +367,13 @@ export default {
         makeList.push({
           ...item,
           productInfo,
-          productName: item.Package ? item.Package.name : '오류',
-          excludeProduct: item.Products.map((item) => item.name).join(','),
-          excludeTopping: item.Ingredients.map((item) => item.name).join(','),
+          productName: item.Order.Package ? item.Order.Package.name : '오류',
+          excludeProduct: item.Order.Products.map((item) => item.name).join(
+            ','
+          ),
+          excludeTopping: item.Order.Ingredients.map((item) => item.name).join(
+            ','
+          ),
         })
       })
       this.searchList = makeList
