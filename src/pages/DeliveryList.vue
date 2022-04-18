@@ -120,6 +120,7 @@
         <th>구매자명</th>
         <th>수취인명</th>
         <th>수취인연락처</th>
+        <th>구매자연락처</th>
         <th>배송지</th>
         <th>(기본주소)</th>
         <th>(상세주소)</th>
@@ -141,6 +142,7 @@
           <td>{{ delivery.Order.buyer }}</td>
           <td>{{ delivery.Order.receiver }}</td>
           <td>{{ delivery.Order.receiverPhone }}</td>
+          <td>{{ delivery.Order.buyerPhone }}</td>
           <td>{{ delivery.Order.address1 + delivery.Order.address2 }}</td>
           <td>{{ delivery.Order.address1 }}</td>
           <td>{{ delivery.Order.address2 }}</td>
@@ -236,6 +238,7 @@ export default {
           구매자명: item.Order.buyer,
           수취인명: item.Order.receiver,
           수취인연락처: item.Order.receiverPhone,
+          구매자연락처: item.Order.buyerPhone,
           배송지: item.Order.address1 + item.Order.address2 || '',
           '(기본주소)': item.Order.address1,
           '(상세주소)': item.Order.address2,

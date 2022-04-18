@@ -62,6 +62,7 @@
               <th>구매자명</th>
               <th>수취인명</th>
               <th>수취인연락처</th>
+              <th>구매자연락처</th>
               <th>배송지</th>
               <th>기본주소</th>
               <th>상세주소</th>
@@ -73,7 +74,7 @@
               <th>탄수화물 구성</th>
               <th>제외토핑</th>
               <th>요청사항</th>
-              <th>제외메뉴</th>
+              <th>제외식재료</th>
               <th>배송</th>
               <th>메모</th>
               <th></th>
@@ -88,6 +89,7 @@
                 <td>{{ item.구매자명 }}</td>
                 <td>{{ item.수취인명 }}</td>
                 <td>{{ item.수취인연락처 }}</td>
+                <td>{{ item.구매자연락처 }}</td>
                 <td>{{ item.배송지 }}</td>
                 <td>{{ item['(기본주소)'] }}</td>
                 <td>{{ item['(상세주소)'] }}</td>
@@ -111,7 +113,7 @@
                     </button>
                   </div>
                   <div v-else>
-                    {{ item.제외메뉴 }}
+                    {{ item.제외식재료 }}
                   </div>
                 </td>
                 <td>{{ item.배송 }}</td>
@@ -166,6 +168,15 @@
             수취인연락처
             <input
               v-model="modalData.receiverPhone"
+              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+              type="text"
+              id="buyer"
+            />
+          </div>
+          <div class="w-1/3 px-3">
+            구매자연락처
+            <input
+              v-model="modalData.buyerPhone"
               class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
               type="text"
               id="buyer"
@@ -302,7 +313,7 @@
       :order="selectedOrder"
     >
       <div slot="header">
-        <h3>{{ selectedOrder.구매자명 }} - 제외메뉴 설정</h3>
+        <h3>{{ selectedOrder.구매자명 }} - 제외식재료 설정</h3>
         <p>요청사항 : {{ selectedOrder.요청사항 }}</p>
       </div>
     </modal>
@@ -371,9 +382,19 @@
         </button>
         <button
           @click="postOrder"
+          :disabled="loading"
           class="bg-green-500 shadow rounded-lg px-6 py-2 text-white"
         >
-          업로드
+          <svg
+            v-if="loading"
+            class="animate-spin h-5 w-5 mr-3 ..."
+            viewBox="0 0 24 24"
+          >
+            <!-- ... -->
+          </svg>
+          <span v-else>
+            업로드
+          </span>
         </button>
       </div>
     </modal>
@@ -398,6 +419,7 @@ export default {
       selectedIndex: -1,
       showUploadModal: false,
       showUpdateModal: false,
+      loading: false,
       modalData: {},
       uploadOption: {
         earlyType: '',
@@ -536,6 +558,7 @@ export default {
     },
 
     async postOrder() {
+      this.loading = true
       this.early10 = []
       this.early20 = []
       this.day20 = []
@@ -576,6 +599,8 @@ export default {
         },
       })
       console.log(res)
+      this.loading = false
+      this.showUploadModal = false
     },
 
     uploadOrder() {
@@ -592,7 +617,7 @@ export default {
     changeOrder(e) {
       this.$set(
         this.uploadedOrder[this.selectedIndex],
-        '제외메뉴',
+        '제외식재료',
         e.product.join(',')
       )
       this.$set(this.uploadedOrder[this.selectedIndex], '메모', e.memo)
@@ -693,10 +718,13 @@ export default {
       let totalOrder = []
 
       groupedRaw.forEach((order) => {
+        // const excludeIngredients = [];
+
         initOrder.주문번호 = order[0].주문번호
         initOrder.구매자명 = order[0].구매자명
         initOrder.수취인명 = order[0].수취인명
         initOrder.수취인연락처 = order[0]['(수취인연락처1)']
+        initOrder.구매자연락처 = order[0]['구매자연락처']
         initOrder.배송지 = order[0]['(기본주소)'] + order[0]['(상세주소)']
         initOrder['(기본주소)'] = order[0]['(기본주소)']
         initOrder['(상세주소)'] = order[0]['(상세주소)']
@@ -709,8 +737,19 @@ export default {
         initOrder.탄수화물량 = 1
         initOrder['탄수화물 구성'] = '고구마'
         initOrder.제외토핑 = []
-        initOrder.제외메뉴 = '없음'
+        initOrder.제외식재료 = []
+        // initOrder.제외식재료 = '없음'
         order.forEach((item) => {
+          const excludeIngredient = custom.excludeMenuList(item.상품명)
+          if (excludeIngredient) {
+            if (excludeIngredient.includes('기타')) {
+              initOrder.확인필요 = true
+              initOrder['제외식재료'].push('기타')
+            } else {
+              initOrder['제외식재료'].push(excludeIngredient)
+            }
+          }
+
           if (item.옵션정보.includes('단백질')) {
             if (item.옵션정보.indexOf('50g') !== -1) {
               initOrder.단백질량 = 1.5
@@ -735,10 +774,10 @@ export default {
           if (item.옵션정보.includes('공동현관')) {
             let options = item.옵션정보.split(' / ')
             let password = ''
-            let allergy = ''
+            // let allergy = ''
             let deliveryType = ''
 
-            if (options.length !== 3) {
+            if (options.length !== 2) {
               const passwordRaw =
                 item.옵션정보.indexOf(
                   "공동현관 출입비밀번호 (없을 시 '없음'작성):"
@@ -753,7 +792,7 @@ export default {
                 passwordRaw + 26,
                 allergyAndEtc
               )
-              allergy = item.옵션정보.substring(allergyAndEtc + 27, deliveryRaw)
+              // allergy = item.옵션정보.substring(allergyAndEtc + 27, deliveryRaw)
 
               deliveryType = item.옵션정보.substring(
                 deliveryRaw + 8,
@@ -761,16 +800,17 @@ export default {
               )
             } else {
               password = options[0].split(':')[1]
-              allergy = options[1].split(':')[1]
-              deliveryType = options[2].split(':')[1]
+              // allergy = options[1].split(':')[1]
+              deliveryType = options[1].split(':')[1]
+              console.log(options)
             }
 
-            initOrder['공동현관 비밀번호'] = password
-            initOrder.요청사항 = allergy.trim()
-            if (initOrder.요청사항 !== '없음') {
-              initOrder.제외메뉴 = '확인 필요'
-              initOrder.확인필요 = true
-            }
+            initOrder['공동현관 비밀번호'] = password.trim()
+            // initOrder.요청사항 = allergy.trim()
+            // if (initOrder.요청사항 !== '없음') {
+            //   initOrder.제외식재료 = '확인 필요'
+            //   initOrder.확인필요 = true
+            // }
 
             initOrder.배송 = deliveryType.includes('일반배송') ? '일반' : '새벽'
           }
@@ -793,6 +833,7 @@ export default {
           // 공통 정보
         })
         initOrder.제외토핑 = initOrder.제외토핑.join(',')
+        initOrder.제외식재료 = initOrder.제외식재료.join(',')
         totalOrder.push(initOrder)
 
         initOrder = {}

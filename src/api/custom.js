@@ -91,6 +91,17 @@ const productList = [
     },
 ]
 
+const excludeMenuList = (menu) => {
+    const menuList = [
+        '당근', '사과', '견과류', '오이', '소', '닭', '오리', '해산물', '치즈', '유부', '두부', '밀가루', '토마토', '기타(배송메세지에 남겨주세요)'
+    ]
+    if (menuList.includes(menu)) {
+        return menu
+    } else {
+        return false
+    }
+}
+
 const serviceNameFormatter = (service) => {
     switch (service) {
         case '[윤식단] 샐러드 정기 배달 - 1일 1식 10일 프로그램 (2주)':
@@ -231,4 +242,5 @@ export default {
     proteinValueFormatter,
     carbohydrateValueFormatter,
     orderTranslater,
+    excludeMenuList,
 }
