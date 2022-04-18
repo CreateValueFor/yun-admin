@@ -1,6 +1,6 @@
 <template>
   <div class="leading-normal tracking-normal" id="main-body">
-    <div class="flex flex-wrap">
+    <div style="max-width: 800px; margin: 0 auto;">
       <Header v-if="header" />
 
       <!-- <div
@@ -8,7 +8,7 @@
         :class="sideBarOpen ? 'overlay' : ''"
         id="main-content"
       > -->
-      <!-- <Navbar /> -->
+      <NavBar />
 
       <!-- <div class="p-6 bg-gray-100 mb-20 flex-1 flex flex-col"> -->
       <router-view />
@@ -22,20 +22,32 @@
 
 <script>
 import Header from './Header.vue'
+import NavBar from './NavBar.vue'
 
 export default {
   name: 'Customer',
   components: {
     Header,
+    NavBar,
   },
   data() {
     return {
       header: false,
     }
   },
+  mounted() {
+    if (window.location.pathname.includes('login')) {
+      this.header = false
+    } else {
+      this.header = true
+    }
+  },
   watch: {
     $route(to, from) {
       console.log(to, from)
+      if (to.name !== 'Login') {
+        this.header = true
+      }
     },
   },
 }

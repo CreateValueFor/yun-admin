@@ -3,7 +3,7 @@
     class="yun-btn"
     :class="{ 'btn-primary': primary }"
     @click="onClick"
-    disabled="disabled"
+    :disabled="disabled"
   >
     {{ label }}
   </button>

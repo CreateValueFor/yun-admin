@@ -2,8 +2,12 @@ import Vue from 'vue'
 import App from './App.vue'
 import Router from 'vue-router'
 
+//customer
 import Dashboard from '@/components/Dashboard'
 import Customer from '@/components/customer/Customer'
+
+
+// admin
 import Home from '@/pages/Home'
 import Order from '@/pages/Order'
 import Calendar from '@/pages/Calendar'
@@ -16,6 +20,9 @@ import store from './store'
 
 //customer page
 import Login from "@/pages/customer/Login"
+import Delivery from '@/pages/customer/Delivery'
+import Info from '@/pages/customer/Info'
+import CustomerCalendar from '@/pages/customer/Calendar'
 
 import '@/assets/css/tailwind.css'
 
@@ -28,7 +35,9 @@ const routes = [
   {
     path: "/customer", component: Customer, children: [
       { path: "login", component: Login, name: "Login" },
-
+      { path: "calendar", component: CustomerCalendar, name: "CustomerCalendar" },
+      { path: "info", component: Info, name: "Info" },
+      { path: "delivery", component: Delivery, name: "Delivery" },
     ]
   },
 

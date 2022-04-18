@@ -34,13 +34,14 @@
         @onClick="onClick"
       />
       <div class="flex items-center">
-        <label for="keepLogin" class="text-lg flex w-full">
+        <label for="keepLogin" class="text-lg flex w-full flex items-center">
           <img
             :src="keepLogin ? loginImage.checked : loginImage.notChecked"
             alt="keep-login"
-            class="w-12 h-12"
+            class="w-12 h-12 mr-3 mb-1"
+            style="width:17px; height: 17px;"
           />
-          <span>로그인 정보 저장</span>
+          <span style="mb-0">로그인 정보 저장</span>
         </label>
 
         <input
@@ -74,13 +75,22 @@ export default {
       },
       keepLogin: false,
       loginImage: {
-        checked: require('../../assets/로그인선택2.svg'),
-        notChecked: require('../../assets/로그인선택1.svg'),
+        checked: require('../../assets/loginChecked.svg'),
+        notChecked: require('../../assets/loginNotChecked.svg'),
       },
     }
   },
   methods: {
     onClick() {
+      // 로그인 요청
+
+      // 성공했을 경우 세션에 저장
+      // if(this.keepLogin)
+
+      // 로그인 정보 저장 시 세션 저장
+      // else
+
+      this.$router.push({ name: 'CustomerCalendar' })
       console.log('login')
     },
   },

@@ -91,6 +91,10 @@ const productList = [
     },
 ]
 
+const ingredeintList = [
+    '당근,'
+]
+
 const excludeMenuList = (menu) => {
     const menuList = [
         '당근', '사과', '견과류', '오이', '소', '닭', '오리', '해산물', '치즈', '유부', '두부', '밀가루', '토마토', '기타(배송메세지에 남겨주세요)'
@@ -239,6 +243,7 @@ export default {
     serviceNameFormatter,
     JSDateToExcelDate,
     ExcelDateToJSDate,
+    ingredeintList,
     proteinValueFormatter,
     carbohydrateValueFormatter,
     orderTranslater,
