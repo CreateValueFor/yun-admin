@@ -23,14 +23,16 @@
         </div>
       </slot>
     </guide>
+    <divider title="배송지 정보" />
   </div>
 </template>
 <script>
 import Guide from '@/components/customer/Guide'
+import Divider from '../../components/customer/Divider.vue'
 
 export default {
   name: 'Delivery',
-  components: { Guide },
+  components: { Guide, Divider },
 }
 </script>
 <style lang="scss"></style>

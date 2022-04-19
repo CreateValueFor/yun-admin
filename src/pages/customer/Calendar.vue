@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="margin-bottom: 50px;">
     <guide title="나의 배송 일정 관리하기" content="일정 변경하기">
       <slot>
         <div class="detail">
@@ -20,14 +20,88 @@
         </div>
       </slot>
     </guide>
+    <divider title="나의 식단 일정" />
+    <div class="program">
+      <div class="program-container flex justify-between">
+        <h2 class="program-title">식단 프로그램</h2>
+        <div class="program-contents">{{ program }}</div>
+        <div class="program-label" :class="{ early: isEarly, day: !isEarly }">
+          {{ isEarly ? '새벽배송' : '일반배송' }}
+        </div>
+      </div>
+      <div class="program-container flex justify-between">
+        <h2 class="program-title">식단 종료일</h2>
+        <div class="program-contents">{{ endDate }}</div>
+        <div class="program-label" :class="{ early: isEarly, day: !isEarly }">
+          {{ isEarly ? '새벽배송' : '일반배송' }}
+        </div>
+      </div>
+    </div>
+    <divider title="일정 변경하기" />
+    <VCalendar />
+    <img
+      src="@/assets/customer/notice.svg"
+      alt="notice"
+      style="width: 224px; height : 20p;"
+    />
+    <button class="btn">저장하기</button>
   </div>
 </template>
 <script>
 import Guide from '@/components/customer/Guide'
-// import Guide from '../../components/customer/Guide.vue'
+import Divider from '@/components/customer/Divider.vue'
+import VCalendar from '../../components/customer/VCalendar.vue'
 
 export default {
-  components: { Guide },
+  components: { Guide, Divider, VCalendar },
+  data() {
+    return {
+      program: '1일 1식 20일 프로그램',
+      endDate: '2021년 12월 1일 수요일',
+      isEarly: false,
+    }
+  },
 }
 </script>
-<style lang=""></style>
+<style lang="scss">
+.program {
+  margin: 50px auto;
+  width: 80%;
+}
+.program-container {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: #000000;
+  margin: 10px auto;
+
+  align-items: center;
+  .program-title {
+    font-weight: 600;
+  }
+  .program-contents {
+    font-weight: 300;
+  }
+  .program-label {
+    color: #fff;
+    display: inline;
+    padding: 3px 5px;
+    border-radius: 5px;
+    &.early {
+      background: #002a5b;
+    }
+    &.day {
+      background: #26331e;
+    }
+  }
+}
+.btn {
+  margin-top: 20px;
+  width: 100px;
+  float: right;
+  height: 30px;
+  background: #26331e;
+  color: #fff;
+  border-radius: 5px;
+  margin-bottom: 50px;
+}
+</style>

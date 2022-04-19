@@ -13,11 +13,6 @@
         <p style="font-size:1rem">수정을 위한 가이드</p>
       </div>
       <slot> </slot>
-      <div class="guide-title">
-        <div class="guide-title-contents">
-          {{ content }}
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -59,28 +54,6 @@ export default {
   color: #999999;
   .detail {
     padding-left: 1rem;
-  }
-  .guide-title {
-    position: relative;
-    margin-bottom: 15px;
-    margin-top: 70px;
-    width: 100%;
-    height: 0.7px;
-    background: #e6e6e6;
-    .guide-title-contents {
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      left: 50%;
-      top: 50%;
-      width: 33%;
-      height: 30px;
-      border: 1px solid #e6e6e6;
-      background: #fff;
-      border-radius: 18px;
-      transform: translate(-50%, -50%);
-    }
   }
 }
 </style>

@@ -8,7 +8,7 @@
         :class="sideBarOpen ? 'overlay' : ''"
         id="main-content"
       > -->
-      <NavBar />
+      <NavBar v-if="header" />
 
       <!-- <div class="p-6 bg-gray-100 mb-20 flex-1 flex flex-col"> -->
       <router-view />
@@ -36,6 +36,7 @@ export default {
     }
   },
   mounted() {
+    console.log(window.location.pathname.includes('login'))
     if (window.location.pathname.includes('login')) {
       this.header = false
     } else {
@@ -53,11 +54,22 @@ export default {
 }
 </script>
 <style lang="scss">
-$y-green: '#26331e';
-$y-red: '#9a1111';
-$y-dark-blue: '#02204b';
-$y-blue: '#002a5b';
 * {
   font-family: 'Noto Sans KR';
+}
+.yun-customer-select,
+.yun-customer-input {
+  border: 1px solid #b3b3b3;
+  /* background: black; */
+  width: 200px;
+  height: 30px;
+  border-radius: 0px;
+  box-sizing: border-box;
+}
+select {
+  -o-appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 </style>

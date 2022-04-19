@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import Router from 'vue-router'
+import VCalendar from 'v-calendar'
 
 //customer
 import Dashboard from '@/components/Dashboard'
@@ -25,11 +26,12 @@ import Info from '@/pages/customer/Info'
 import CustomerCalendar from '@/pages/customer/Calendar'
 
 import '@/assets/css/tailwind.css'
-
+import "@/assets/css/main.scss"
 
 Vue.config.productionTip = false
 
 Vue.use(Router)
+Vue.use(VCalendar)
 
 const routes = [
   {

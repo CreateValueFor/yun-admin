@@ -10,11 +10,11 @@
           />
           <h2
             style="text-align:center;font-weight: 600;
-font-size: 1rem;
-line-height: 1.5rem;
-margin-top: 10px;
-margin-bottom: 30px;
-"
+                    font-size: 1rem;
+                    line-height: 1.5rem;
+                    margin-top: 10px;
+                    margin-bottom: 30px;
+                    "
           >
             식단 한팩 구성
           </h2>
@@ -35,12 +35,123 @@ margin-bottom: 30px;
         </div>
       </slot>
     </guide>
+    <divider title="식단 주문정보" />
+    <div class="program">
+      <div class="program-container text-center">
+        <h2 class="program-title">나의 식단 프로그램</h2>
+        <div class="program-contents mt-5">{{ program }}</div>
+        <hr style="width:200px; margin: 0 auto; margin-top:28px;" />
+      </div>
+    </div>
+    <div
+      class="carbo-protein-type program-container flex flex-col align-items:center;"
+    >
+      <div class="flex">
+        <div>
+          <img src="@/assets/customer/carbo.svg" alt="carbo" />
+          <h2 class="program-title">탄수화물 구성</h2>
+        </div>
+        <select class="yun-customer-select" name="carboType" id="carboType">
+          <option>고구마</option>
+          <option>고구마+현미밥</option>
+          <option>현미밥</option>
+        </select>
+        <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div>
+      </div>
+      <div class="flex">
+        <div>
+          <img src="@/assets/customer/carbo.svg" alt="carbo" />
+          <h2 class="program-title">탄수화물 양</h2>
+        </div>
+        <input class="yun-customer-input" type="text" disabled />
+        <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div>
+      </div>
+      <div class="flex">
+        <div>
+          <img src="@/assets/customer/protein.svg" alt="carbo" />
+          <h2 class="program-title">단백질 양</h2>
+        </div>
+        <input class="yun-customer-input" type="text" disabled />
+        <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div>
+      </div>
+    </div>
+    <hr style="width: 100%; margin: 50px 0px;" />
+    <div class="allergy-container program-container">
+      <button class="input-button">메뉴별 구성 식재료 보기</button>
+      <div>
+        <img src="@/assets/customer/exclude.svg" alt="exclude" />
+        <h2 class="program-title">알러지 및<br />식재료 제외</h2>
+        <select class="yun-customer-select" name="allergy" id="allergy">
+          <option v-for="(item, idx) in ingredients" :key="idx">
+            {{ item }}
+          </option>
+        </select>
+        <button class="input-button">추가</button>
+      </div>
+      <h2 style="font-size:12px" class="program-title">
+        {{ userName }}님이 제외하는 메뉴에요!
+      </h2>
+    </div>
   </div>
 </template>
 <script>
 import Guide from '@/components/customer/Guide'
+import Divider from '@/components/customer/Divider.vue'
+import Custom from '@/api/custom'
+// import Divider from '../../components/customer/Divider.vue'
 export default {
-  components: { Guide },
+  components: { Guide, Divider },
+  data() {
+    return {
+      program: '1일 1식 20일 프로그램',
+      ingredients: Custom.ingredientList,
+      userName: '윤식단',
+    }
+  },
 }
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+.carbo-protein-type {
+  & > div > div {
+    display: flex;
+  }
+  & > div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  img {
+    width: 35px;
+    object-fit: none;
+  }
+  h2 {
+    display: flex;
+    align-items: center;
+    width: 200px;
+    margin-bottom: 0px;
+  }
+  .yun-label {
+    margin-left: 1rem;
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 5.5px;
+    line-height: 6px;
+
+    color: #b3b3b3;
+  }
+}
+.allergy-container {
+  .input-button {
+    padding: 5px 10px;
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    background: #e6e6e6;
+    border: 1px solid #fff;
+    color: #555555;
+  }
+}
+</style>
