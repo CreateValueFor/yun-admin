@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-bottom: 50px;">
+  <div class="p-5" style="margin-bottom: 50px;">
     <guide title="나의 배송 일정 관리하기" content="일정 변경하기">
       <slot>
         <div class="detail">
@@ -69,13 +69,14 @@ export default {
   width: 80%;
 }
 .program-container {
-  font-size: 1rem;
+  font-size: 0.875rem;
   line-height: 1.5rem;
   color: #000000;
   margin: 10px auto;
 
   align-items: center;
   .program-title {
+    /* font-size: 10r; */
     font-weight: 600;
   }
   .program-contents {

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="p-5">
     <guide title="나의 배송지 변경하기" content="배송지 정보">
       <slot>
         <div class="detail">
@@ -24,15 +24,58 @@
       </slot>
     </guide>
     <divider title="배송지 정보" />
+    <div class="input-row">
+      <div class="input-title">
+        <img src="@/assets/customer/carbo.svg" alt="carbo" />
+        <h2 class="program-title">탄수화물 구성</h2>
+      </div>
+      <Select
+        :options="deliveryType"
+        name="carboType"
+        :value="selectedDeliveryType"
+      />
+      <!-- <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div> -->
+    </div>
   </div>
 </template>
 <script>
+import Select from '@/components/customer/Select'
 import Guide from '@/components/customer/Guide'
 import Divider from '../../components/customer/Divider.vue'
 
 export default {
   name: 'Delivery',
-  components: { Guide, Divider },
+  components: { Guide, Divider, Select },
+  data() {
+    return {
+      deliveryType: ['새벽배송', '일반배송'],
+      selectedDeliveryType: '일반배송',
+    }
+  },
 }
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+.input-row {
+  display: flex;
+  align-items: center;
+  .input-title {
+    display: flex;
+    align-items: center;
+    width: 33%;
+    img {
+      width: 35px;
+      object-fit: none;
+    }
+  }
+  .customer-select {
+    display: flex;
+    align-items: center;
+    .yun-customer-select {
+      width: 150px;
+    }
+    .yun-customer-select + img {
+      margin-top: 10px;
+    }
+  }
+}
+</style>

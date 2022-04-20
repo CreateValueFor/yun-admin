@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="p-5">
     <guide title="나의 메뉴 구성 관리하기" content="식단 주문정보">
       <slot>
         <div class="detail">
@@ -46,76 +46,111 @@
     <div
       class="carbo-protein-type program-container flex flex-col align-items:center;"
     >
-      <div class="flex">
-        <div>
-          <img src="@/assets/customer/carbo.svg" alt="carbo" />
-          <h2 class="program-title">탄수화물 구성</h2>
+      <div>
+        <div class="flex">
+          <div class="program-title-container">
+            <img src="@/assets/customer/carbo.svg" alt="carbo" />
+            <h2 class="program-title">탄수화물 구성</h2>
+          </div>
+          <Select
+            :options="carboType"
+            name="carboType"
+            :value="carboAndProteinInfo.carboType"
+          />
+          <!-- <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div> -->
         </div>
-        <select class="yun-customer-select" name="carboType" id="carboType">
-          <option>고구마</option>
-          <option>고구마+현미밥</option>
-          <option>현미밥</option>
-        </select>
-        <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div>
-      </div>
-      <div class="flex">
-        <div>
-          <img src="@/assets/customer/carbo.svg" alt="carbo" />
-          <h2 class="program-title">탄수화물 양</h2>
+        <div class="flex">
+          <div class="program-title-container">
+            <img src="@/assets/customer/carbo.svg" alt="carbo" />
+            <h2 class="program-title">탄수화물 양</h2>
+          </div>
+          <input class="yun-customer-input" type="text" disabled />
+          <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div>
         </div>
-        <input class="yun-customer-input" type="text" disabled />
-        <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div>
-      </div>
-      <div class="flex">
-        <div>
-          <img src="@/assets/customer/protein.svg" alt="carbo" />
-          <h2 class="program-title">단백질 양</h2>
+        <div class="flex">
+          <div class="program-title-container">
+            <img src="@/assets/customer/protein.svg" alt="carbo" />
+            <h2 class="program-title">단백질 양</h2>
+          </div>
+          <input class="yun-customer-input" type="text" disabled />
+          <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div>
         </div>
-        <input class="yun-customer-input" type="text" disabled />
-        <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div>
       </div>
     </div>
     <hr style="width: 100%; margin: 50px 0px;" />
-    <div class="allergy-container program-container">
-      <button class="input-button">메뉴별 구성 식재료 보기</button>
-      <div>
-        <img src="@/assets/customer/exclude.svg" alt="exclude" />
-        <h2 class="program-title">알러지 및<br />식재료 제외</h2>
-        <select class="yun-customer-select" name="allergy" id="allergy">
-          <option v-for="(item, idx) in ingredients" :key="idx">
-            {{ item }}
-          </option>
-        </select>
-        <button class="input-button">추가</button>
-      </div>
-      <h2 style="font-size:12px" class="program-title">
-        {{ userName }}님이 제외하는 메뉴에요!
-      </h2>
+    <div class="allergy-container program-container flex flex-col w-full">
+      <button class="input-button ml-auto">
+        메뉴별 구성 식재료 보기
+      </button>
+      <InfoSelect
+        title="메뉴 제외"
+        :options="products"
+        type="메뉴"
+        label="제외 된 메뉴를 뺀 식단 구성으로
+자율적 / 가능한 순차적으로
+식단이 랜덤 제공됩니다."
+        :userName="userName"
+        :selectedList="excludedIngredients"
+      >
+        <div name="header">
+          <h2 style="width:100px" class="program-title">
+            알러지 및 <br />
+            식재료 제외
+          </h2>
+        </div>
+      </InfoSelect>
+      <hr class="w-full" />
+      <InfoSelect
+        title="메뉴 제외"
+        :options="products"
+        type="메뉴"
+        label="제외 된 메뉴를 뺀 식단 구성으로
+자율적 / 가능한 순차적으로
+식단이 랜덤 제공됩니다."
+        :userName="userName"
+        :selectedList="excludedIngredients"
+      />
     </div>
+    <hr class="w-full" />
+    <button class="btn">저장하기</button>
   </div>
 </template>
 <script>
 import Guide from '@/components/customer/Guide'
 import Divider from '@/components/customer/Divider.vue'
 import Custom from '@/api/custom'
+import InfoSelect from '../../components/customer/InfoSelect.vue'
+import Select from '@/components/customer/Select.vue'
+
 // import Divider from '../../components/customer/Divider.vue'
 export default {
-  components: { Guide, Divider },
+  components: { Guide, Divider, InfoSelect, Select },
   data() {
     return {
       program: '1일 1식 20일 프로그램',
       ingredients: Custom.ingredientList,
+      products: Custom.productList,
       userName: '윤식단',
+      excludedIngredients: ['당근'],
+      carboType: ['고구마', '고구마+현미밥', '현미밥'],
+      carboAndProteinInfo: {
+        carboType: '고구마',
+        carboAmount: 100,
+        proteinAmount: 100,
+      },
     }
   },
 }
 </script>
 <style lang="scss">
 .carbo-protein-type {
-  & > div > div {
+  .program-title-container {
+    width: 110px;
+  }
+  & > div > div > div {
     display: flex;
   }
-  & > div {
+  & > div > div {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
@@ -125,21 +160,22 @@ export default {
     object-fit: none;
   }
   h2 {
+    font-size: 10px;
     display: flex;
     align-items: center;
-    width: 200px;
+    width: 76px;
     margin-bottom: 0px;
   }
-  .yun-label {
-    margin-left: 1rem;
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 5.5px;
-    line-height: 6px;
+}
+.yun-label {
+  margin-left: 1rem;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 5.5px;
+  line-height: 10px;
 
-    color: #b3b3b3;
-  }
+  color: #b3b3b3;
 }
 .allergy-container {
   .input-button {
@@ -153,5 +189,7 @@ export default {
     border: 1px solid #fff;
     color: #555555;
   }
+}
+.submit-button {
 }
 </style>

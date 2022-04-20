@@ -196,7 +196,7 @@ export default {
 .custom-calendar.vc-container {
   --day-border: 1px solid #e6e6e6;
   --day-border-highlight: 1px solid #e6e6e6;
-  --day-width: 90px;
+  --day-width: 100%;
   --day-height: 90px;
   --weekday-bg: #f8fafc;
   --weekday-border: 1px solid #eaeaea;
@@ -235,7 +235,7 @@ export default {
 .custom-calendar.vc-container .vc-day {
   padding: 0 5px 3px;
   text-align: left;
-  /*min-height: var(--day-height);*/
+  /* min-height: var(--day-height); */
   min-width: var(--day-width);
   background-color: #fff;
 }

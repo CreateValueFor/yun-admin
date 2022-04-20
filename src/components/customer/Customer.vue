@@ -61,8 +61,8 @@ export default {
 .yun-customer-input {
   border: 1px solid #b3b3b3;
   /* background: black; */
-  width: 200px;
-  height: 30px;
+  width: 120px;
+  height: 20px;
   border-radius: 0px;
   box-sizing: border-box;
 }

@@ -3,14 +3,14 @@
     <h1 class="page--header">
       {{ title }}
     </h1>
-    <div class="page--guide py-5" style="padding-bottom:50px;">
-      <div class="flex items-center mb-10">
+    <div class="page--guide py-5">
+      <div class="flex mb-3">
         <img
           src="@/assets/customer/questionMark.svg"
           alt="question"
           style="width:15px; height:15px; margin-right:4px;"
         />
-        <p style="font-size:1rem">수정을 위한 가이드</p>
+        <p class="mb-0" style="font-size:.75rem">수정을 위한 가이드</p>
       </div>
       <slot> </slot>
     </div>
@@ -53,7 +53,6 @@ export default {
 
   color: #999999;
   .detail {
-    padding-left: 1rem;
   }
 }
 </style>
