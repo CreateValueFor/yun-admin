@@ -76,7 +76,7 @@ export default {
 
   align-items: center;
   .program-title {
-    /* font-size: 10r; */
+    font-size: 0.75rem;
     font-weight: 600;
   }
   .program-contents {

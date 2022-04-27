@@ -1,16 +1,18 @@
 <template>
   <div style="padding-top: 50px; padding-bottom:100px;">
     <div class="flex items-center">
-      <img
-        src="@/assets/customer/exclude.svg"
-        alt="exclude"
-        class="mr-3"
-        style="width:20px; height:20px; object-fit:none;"
-      />
-      <slot>
-        <h2 style="width:100px" class="program-title">{{ title }}</h2>
-      </slot>
-      <div class="mr-3" style="position:relative">
+      <div class="flex items-center">
+        <img
+          src="@/assets/customer/exclude.svg"
+          alt="exclude"
+          class="mr-3"
+          style="width:15px; height:15px; object-fit:none;"
+        />
+        <slot>
+          <h2 style="width:70px" class="program-title">{{ title }}</h2>
+        </slot>
+      </div>
+      <div class="mr-3" style="position:relative; width:50%">
         <!-- <select class="yun-customer-select" name="allergy" id="allergy">
           <option v-for="(item, idx) in ingredients" :key="idx">
             {{ item }}
@@ -37,7 +39,7 @@
         </button>
         <div
           class="yun-label"
-          style="width:120px; line-height: .75rem; margin-left:0; position:absolute; top: 35px"
+          style="width:50px; line-height: .75rem; margin-left:0; position:absolute; top: 35px"
         >
           {{ label }}
         </div>

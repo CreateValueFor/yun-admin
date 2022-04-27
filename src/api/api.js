@@ -1,8 +1,8 @@
 import axios from "axios";
 
 // const BASE_URL = "http://3.35.9.130:3000/"
-const BASE_URL = "./"
-// const BASE_URL = "http://localhost:3000/"
+// const BASE_URL = "./"
+const BASE_URL = "http://localhost:3000/"
 
 const _baseGetRequest = async (path) => {
     const res = await axios.get(BASE_URL + path)

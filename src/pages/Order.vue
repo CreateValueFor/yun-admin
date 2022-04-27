@@ -61,8 +61,8 @@
               <th>주문번호</th>
               <th>구매자명</th>
               <th>수취인명</th>
-              <th>수취인연락처</th>
               <th>구매자연락처</th>
+              <th>수취인연락처</th>
               <th>배송지</th>
               <th>기본주소</th>
               <th>상세주소</th>
@@ -72,11 +72,11 @@
               <th>단백질량</th>
               <th>탄수화물량</th>
               <th>탄수화물 구성</th>
-              <th>제외토핑</th>
-              <th>요청사항</th>
-              <th>제외식재료</th>
+              <th>제외 식재료</th>
+              <!-- <th>요청사항</th> -->
+              <!-- <th>제외식재료</th> -->
               <th>배송</th>
-              <th>메모</th>
+              <!-- <th>메모</th> -->
               <th></th>
             </thead>
             <tbody>
@@ -85,25 +85,25 @@
                 :key="idx"
                 :class="{ needCheck: item.확인필요 }"
               >
-                <td>{{ item.주문번호 }}</td>
-                <td>{{ item.구매자명 }}</td>
-                <td>{{ item.수취인명 }}</td>
-                <td>{{ item.수취인연락처 }}</td>
-                <td>{{ item.구매자연락처 }}</td>
+                <td>{{ item.serial }}</td>
+                <td>{{ item.buyer }}</td>
+                <td>{{ item.receiver }}</td>
+                <td>{{ item.buyerPhone }}</td>
+                <td>{{ item.receiverPhone }}</td>
                 <td>{{ item.배송지 }}</td>
-                <td>{{ item['(기본주소)'] }}</td>
-                <td>{{ item['(상세주소)'] }}</td>
-                <td>{{ item['공동현관 비밀번호'] }}</td>
-                <td>{{ item['배송메세지'] }}</td>
+                <td>{{ item.address1 }}</td>
+                <td>{{ item.address2 }}</td>
+                <td>{{ item.entrancePassword }}</td>
+                <td>{{ item.deliveryMessage }}</td>
                 <td>{{ item.상품명 }}</td>
                 <!-- <td>{{ item.시작일 }}</td>
                 <td>{{ item.종료일 }}</td> -->
-                <td>{{ item.단백질량 }}</td>
-                <td>{{ item.탄수화물량 }}</td>
-                <td>{{ item['탄수화물 구성'] }}</td>
-                <td>{{ item.제외토핑 }}</td>
-                <td>{{ item.요청사항 }}</td>
-                <td>
+                <td>{{ item.proteinAmount }}</td>
+                <td>{{ item.carboAmount }}</td>
+                <td>{{ item.carboType }}</td>
+                <td>{{ item.excludeIngredient.join(' , ') }}</td>
+                <!-- <td>{{ item.요청사항 }}</td> -->
+                <!-- <td>
                   <div v-if="item.확인필요">
                     <button
                       class="bg-green-500 shadow rounded-lg px-6 py-2 text-white"
@@ -115,9 +115,9 @@
                   <div v-else>
                     {{ item.제외식재료 }}
                   </div>
-                </td>
+                </td> -->
                 <td>{{ item.배송 }}</td>
-                <td>{{ item.메모 }}</td>
+                <!-- <td>{{ item.메모 }}</td> -->
                 <td>
                   <button
                     class="bg-green-500 shadow rounded-lg px-6 py-2 text-white"
@@ -345,6 +345,7 @@
             v-model="uploadOption.early10"
             class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
             type="date"
+            max="9999-12-31"
             id="program-10-early"
           />
           <div class="mt-3">20일 프로그램 - {{ orderCount.early20 }}개</div>
@@ -352,6 +353,7 @@
             v-model="uploadOption.early20"
             class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
             type="date"
+            max="9999-12-31"
             id="program-20-early"
           />
         </div>
@@ -362,6 +364,7 @@
             v-model="uploadOption.day10"
             class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
             type="date"
+            max="9999-12-31"
             id="program-10-day"
           />
           <div class="mt-3">20일 프로그램 - {{ orderCount.day20 }}개</div>
@@ -369,6 +372,7 @@
             v-model="uploadOption.day20"
             class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
             type="date"
+            max="9999-12-31"
             id="program-20-day"
           />
         </div>
@@ -515,7 +519,7 @@ export default {
       let day10 = 0
       let day20 = 0
       this.uploadedOrder.map((item) => {
-        if (item.배송 === '새벽') {
+        if (item.deliveryType === '새벽') {
           if (item.상품명.includes('10일')) {
             early10 += 1
           } else {
@@ -648,25 +652,21 @@ export default {
       // const fileName = file.name
       // declare FileReader, temp result
       const reader = new FileReader()
-      let tmpResult = []
+      // let tmpResult = []
 
       reader.onload = () => {
         let data = reader.result
         let workbook = read(data, { type: 'binary' })
 
-        workbook.SheetNames.forEach((sheetName) => {
-          // workbook.Sheets[sheetName].A1.w = 'test1'
-          // workbook.Sheets[sheetName].B1.w = 'test2'
-          // workbook.Sheets[sheetName].C1.w = 'test3'
-          // workbook.Sheets[sheetName].D1.w = 'test4'
+        // workbook.SheetNames.forEach((sheetName) => {
+        //   const roa = utils.sheet_to_json(workbook.Sheets[sheetName])
+        //   // tmpResult = roa
+        // })
+        const tmpData = utils.sheet_to_json(
+          workbook.Sheets[workbook.SheetNames[0]]
+        )
 
-          const roa = utils.sheet_to_json(workbook.Sheets[sheetName])
-          tmpResult = roa
-        })
-        // console.log(tmpResult)
-        // console.log(this.groupOrder(tmpResult))
-        this.uploadedOrder = this.processRaw(this.groupOrder(tmpResult))
-        console.log(this.processRaw(this.groupOrder(tmpResult)))
+        this.uploadedOrder = this.processRaw(this.groupOrder(tmpData))
       }
       reader.readAsBinaryString(file)
     },
@@ -696,8 +696,7 @@ export default {
       )
     },
     groupOrder(jsonData) {
-      // let init_buyer = jsonData[0].구매자명
-      // let init_receiver = jsonData[0].수취인명
+      // 옵션 추가 시 상품주문번호는 달라지지만 주문번호는 달라지지 않기 때문에 주문번호로 같은 주문인 것 파악
       let init_buySerial = jsonData[0].주문번호
       let order = []
       let totalOrder = []
@@ -718,122 +717,200 @@ export default {
       let totalOrder = []
 
       groupedRaw.forEach((order) => {
-        // const excludeIngredients = [];
+        // order 0 인 이유는 모든 주문을 배열에 바인딩 하였기 때문
+        // 공통된 데이터는 전부 미리 빼두기
+        initOrder.serial = order[0].주문번호
+        initOrder.buyer = order[0].구매자명
+        initOrder.receiver = order[0].수취인명
+        initOrder.buyerPhone = order[0]['(구매자연락처)'] // '-'가 없는 순수 숫자만 받기
+        initOrder.receiverPhone = order[0]['(수취인연락처1)'] // '-' 가 없는 순수 숫자만 받음
 
-        initOrder.주문번호 = order[0].주문번호
-        initOrder.구매자명 = order[0].구매자명
-        initOrder.수취인명 = order[0].수취인명
-        initOrder.수취인연락처 = order[0]['(수취인연락처1)']
-        initOrder.구매자연락처 = order[0]['구매자연락처']
+        // 주소 받기
         initOrder.배송지 = order[0]['(기본주소)'] + order[0]['(상세주소)']
-        initOrder['(기본주소)'] = order[0]['(기본주소)']
-        initOrder['(상세주소)'] = order[0]['(상세주소)']
-        // ! need to change
-        initOrder['공동현관 비밀번호'] = '없음'
-        initOrder['배송메세지'] = order[0]['배송메세지']
-        initOrder.시작일 = '설정'
-        initOrder.종료일 = '설정'
-        initOrder.단백질량 = 1
-        initOrder.탄수화물량 = 1
-        initOrder['탄수화물 구성'] = '고구마'
-        initOrder.제외토핑 = []
-        initOrder.제외식재료 = []
-        // initOrder.제외식재료 = '없음'
+        initOrder.address1 = order[0]['(기본주소)']
+        initOrder.address2 = order[0]['(상세주소)']
+        initOrder['우편번호'] = order[0]['(우편번호)']
+        // 배송 메세지
+        initOrder.deliveryMessage = order[0]['배송메세지'] || '없음'
+
+        // 옵션값 초기 세팅
+        initOrder.carboType = '고구마'
+        initOrder.carboAmount = 1
+        initOrder.proteinAmount = 1
+        initOrder.excludeIngredient = []
+
         order.forEach((item) => {
-          const excludeIngredient = custom.excludeMenuList(item.상품명)
-          if (excludeIngredient) {
-            if (excludeIngredient.includes('기타')) {
-              initOrder.확인필요 = true
-              initOrder['제외식재료'].push('기타')
-            } else {
-              initOrder['제외식재료'].push(excludeIngredient)
-            }
-          }
+          // 주문 행의 상품종류가 '조합형 옵션 상품'인 경우엔 본 주문에 대한 데이터
+          // 우선 본 주문에 대한 데이터 필터링 진행
+          if (item['상품종류'] === '조합형옵션상품') {
+            // 본 주문
+            // 주문 상품 명
+            initOrder.상품명 = custom.serviceNameFormatter(item.상품명)
 
-          if (item.옵션정보.includes('단백질')) {
-            if (item.옵션정보.indexOf('50g') !== -1) {
-              initOrder.단백질량 = 1.5
-            } else if (item.옵션정보.indexOf('100g') !== -1) {
-              initOrder.단백질량 = 2
-            } else {
-              console.log(item.옵션정보)
-              initOrder.단백질량 = '확인 필요'
-            }
-          }
-          if (item.옵션정보.includes('현미밥')) {
-            const carboType = item.옵션정보.split(':')[1]
-            if (carboType !== undefined) {
-              initOrder['탄수화물 구성'] = custom.carbohydrateValueFormatter(
-                item.옵션정보.split(':')[1].trim()
-              )
-            }
-          }
-          if (item.옵션정보.includes('탄수화물')) {
-            initOrder.탄수화물량 = 1.5
-          }
-          if (item.옵션정보.includes('공동현관')) {
-            let options = item.옵션정보.split(' / ')
-            let password = ''
-            // let allergy = ''
-            let deliveryType = ''
+            const entrancePasswordIdx =
+              item.옵션정보.indexOf(
+                "공동현관 출입비밀번호 (없을 시 '없음'작성):"
+              ) + 1
 
-            if (options.length !== 2) {
-              const passwordRaw =
-                item.옵션정보.indexOf(
-                  "공동현관 출입비밀번호 (없을 시 '없음'작성):"
-                ) + 1
+            const deliveryTypeIdx = item.옵션정보.indexOf('/ 배송방법 선택: ')
 
-              const allergyAndEtc = item.옵션정보.indexOf(
-                "/ 알러지 및 기타요청 (없을 시 '없음'작성):"
-              )
-
-              const deliveryRaw = item.옵션정보.indexOf('/ 프로그램: ')
-              password = item.옵션정보.substring(
-                passwordRaw + 26,
-                allergyAndEtc
-              )
-              // allergy = item.옵션정보.substring(allergyAndEtc + 27, deliveryRaw)
-
-              deliveryType = item.옵션정보.substring(
-                deliveryRaw + 8,
-                item.옵션정보.length
-              )
-            } else {
-              password = options[0].split(':')[1]
-              // allergy = options[1].split(':')[1]
-              deliveryType = options[1].split(':')[1]
-              console.log(options)
-            }
-
-            initOrder['공동현관 비밀번호'] = password.trim()
-            // initOrder.요청사항 = allergy.trim()
-            // if (initOrder.요청사항 !== '없음') {
-            //   initOrder.제외식재료 = '확인 필요'
-            //   initOrder.확인필요 = true
-            // }
-
-            initOrder.배송 = deliveryType.includes('일반배송') ? '일반' : '새벽'
-          }
-          if (item.옵션정보.includes('토핑')) {
-            initOrder.제외토핑.push(
-              item.옵션정보
-                .split('토핑')[1]
-                .replace('제외', '')
-                .trim()
+            const password = item.옵션정보.substring(
+              entrancePasswordIdx + 26,
+              deliveryTypeIdx
             )
-          }
+            initOrder.entrancePassword = password
 
-          initOrder.상품명 = custom.serviceNameFormatter(item.상품명)
-          if (
-            !initOrder.배송 &&
-            custom.serviceNameFormatter(item.상품명.includes('새벽'))
-          ) {
-            initOrder.배송 = '새벽'
+            const deliveryType = item.옵션정보.substring(
+              deliveryTypeIdx + 11,
+              deliveryTypeIdx + 15
+            )
+            initOrder.deliveryType = deliveryType
+          } else {
+            // 옵션 값
+            const optionType = item['옵션정보'].indexOf('메뉴 변경 요청')
+
+            if (optionType !== -1) {
+              // 메뉴 변경 요청 사항
+              if (item['옵션정보'].includes('제외')) {
+                // 제외 식재료 처리
+                const excludeWordIdx = item['옵션정보'].indexOf('제외')
+                const ingredient = item['옵션정보']
+                  .substring(optionType + 9, excludeWordIdx)
+                  .trim()
+                if (ingredient === '기타') {
+                  initOrder.확인필요 = true
+                }
+                initOrder.excludeIngredient.push(ingredient)
+              } else {
+                // 탄수화물 처리
+                initOrder.carboType = item['옵션정보'].split(':')[1]
+              }
+            } else {
+              if (item['옵션정보'].includes('단백질')) {
+                // 단백질 구성
+                if (item['옵션정보'].includes('50g')) {
+                  initOrder.proteinAmount = 1.5
+                }
+                if (item['옵션정보'].includes('100g')) {
+                  initOrder.proteinAmount = 2
+                }
+              } else {
+                // 탄수화물 구성
+                if (item['옵션정보'].includes('50g')) {
+                  initOrder.carboAmount = 1.5
+                }
+                if (item['옵션정보'].includes('100g')) {
+                  initOrder.carboAmount = 2
+                }
+              }
+            }
           }
-          // 공통 정보
         })
-        initOrder.제외토핑 = initOrder.제외토핑.join(',')
-        initOrder.제외식재료 = initOrder.제외식재료.join(',')
+
+        // '추가구성상품'인 경우 옵션에 대한 데이터이다.
+
+        // initOrder.시작일 = '설정'
+        // initOrder.종료일 = '설정'
+        // initOrder.단백질량 = 1
+        // initOrder.탄수화물량 = 1
+        // initOrder['탄수화물 구성'] = '고구마'
+        // initOrder.제외토핑 = []
+        // initOrder.제외식재료 = []
+        // // initOrder.제외식재료 = '없음'
+        // order.forEach((item) => {
+        //   const excludeIngredient = custom.excludeMenuList(item.상품명)
+        //   if (excludeIngredient) {
+        //     if (excludeIngredient.includes('기타')) {
+        //       initOrder.확인필요 = true
+        //       initOrder['제외식재료'].push('기타')
+        //     } else {
+        //       initOrder['제외식재료'].push(excludeIngredient)
+        //     }
+        //   }
+
+        //   if (item.옵션정보.includes('단백질')) {
+        //     if (item.옵션정보.indexOf('50g') !== -1) {
+        //       initOrder.단백질량 = 1.5
+        //     } else if (item.옵션정보.indexOf('100g') !== -1) {
+        //       initOrder.단백질량 = 2
+        //     } else {
+        //       console.log(item.옵션정보)
+        //       initOrder.단백질량 = '확인 필요'
+        //     }
+        //   }
+        //   if (item.옵션정보.includes('현미밥')) {
+        //     const carboType = item.옵션정보.split(':')[1]
+        //     if (carboType !== undefined) {
+        //       initOrder['탄수화물 구성'] = custom.carbohydrateValueFormatter(
+        //         item.옵션정보.split(':')[1].trim()
+        //       )
+        //     }
+        //   }
+        //   if (item.옵션정보.includes('탄수화물')) {
+        //     initOrder.탄수화물량 = 1.5
+        //   }
+        //   if (item.옵션정보.includes('공동현관')) {
+        //     let options = item.옵션정보.split(' / ')
+        //     let password = ''
+        //     // let allergy = ''
+        //     let deliveryType = ''
+
+        //     if (options.length !== 2) {
+        //       const passwordRaw =
+        //         item.옵션정보.indexOf(
+        //           "공동현관 출입비밀번호 (없을 시 '없음'작성):"
+        //         ) + 1
+
+        //       const allergyAndEtc = item.옵션정보.indexOf(
+        //         "/ 알러지 및 기타요청 (없을 시 '없음'작성):"
+        //       )
+
+        //       const deliveryRaw = item.옵션정보.indexOf('/ 프로그램: ')
+        //       password = item.옵션정보.substring(
+        //         passwordRaw + 26,
+        //         allergyAndEtc
+        //       )
+        //       // allergy = item.옵션정보.substring(allergyAndEtc + 27, deliveryRaw)
+
+        //       deliveryType = item.옵션정보.substring(
+        //         deliveryRaw + 8,
+        //         item.옵션정보.length
+        //       )
+        //     } else {
+        //       password = options[0].split(':')[1]
+        //       // allergy = options[1].split(':')[1]
+        //       deliveryType = options[1].split(':')[1]
+        //       console.log(options)
+        //     }
+
+        //     initOrder['공동현관 비밀번호'] = password.trim()
+        //     // initOrder.요청사항 = allergy.trim()
+        //     // if (initOrder.요청사항 !== '없음') {
+        //     //   initOrder.제외식재료 = '확인 필요'
+        //     //   initOrder.확인필요 = true
+        //     // }
+
+        //     initOrder.배송 = deliveryType.includes('일반배송') ? '일반' : '새벽'
+        //   }
+        //   if (item.옵션정보.includes('토핑')) {
+        //     initOrder.제외토핑.push(
+        //       item.옵션정보
+        //         .split('토핑')[1]
+        //         .replace('제외', '')
+        //         .trim()
+        //     )
+        //   }
+
+        //   if (
+        //     !initOrder.배송 &&
+        //     custom.serviceNameFormatter(item.상품명.includes('새벽'))
+        //   ) {
+        //     initOrder.배송 = '새벽'
+        //   }
+        //   // 공통 정보
+        // })
+        // initOrder.제외토핑 = initOrder.제외토핑.join(',')
+        // initOrder.제외식재료 = initOrder.제외식재료.join(',')
         totalOrder.push(initOrder)
 
         initOrder = {}

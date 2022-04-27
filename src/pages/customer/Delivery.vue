@@ -23,29 +23,42 @@
         </div>
       </slot>
     </guide>
-    <divider title="배송지 정보" />
-    <div class="input-row">
-      <div class="input-title">
-        <img src="@/assets/customer/carbo.svg" alt="carbo" />
-        <h2 class="program-title">탄수화물 구성</h2>
-      </div>
-      <Select
-        :options="deliveryType"
-        name="carboType"
-        :value="selectedDeliveryType"
-      />
-      <!-- <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div> -->
-    </div>
+    <divider title="배송지 정보" style="margin-bottom:50px;" />
+    <select-with-label
+      :options="deliveryType"
+      name="carboType"
+      :value="selectedDeliveryType"
+      img="carbo"
+      title="배송 형태"
+    />
+    <hr style="width:200px; margin: 30px auto 30px; margin-top:30px;" />
+    <input-with-label
+      title="상세주소"
+      img="carbo"
+      style="margin-bottom:30px;"
+    />
+    <input-with-label
+      title="공동현관 비밀번호"
+      img="carbo"
+      style="margin-bottom:30px;"
+    />
+    <input-with-label
+      title="배송메세지"
+      img="carbo"
+      style="margin-bottom:30px;"
+    />
+    <button class="btn">저장하기</button>
   </div>
 </template>
 <script>
-import Select from '@/components/customer/Select'
 import Guide from '@/components/customer/Guide'
 import Divider from '../../components/customer/Divider.vue'
+import InputWithLabel from '../../components/customer/InputWithLabel.vue'
+import SelectWithLabel from '../../components/customer/SelectWithLabel.vue'
 
 export default {
   name: 'Delivery',
-  components: { Guide, Divider, Select },
+  components: { Guide, Divider, InputWithLabel, SelectWithLabel },
   data() {
     return {
       deliveryType: ['새벽배송', '일반배송'],

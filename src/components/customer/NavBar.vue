@@ -33,7 +33,7 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 10px;
-  font-size: 1rem;
+  font-size: 0.875rem;
 
   /* identical to box height */
 

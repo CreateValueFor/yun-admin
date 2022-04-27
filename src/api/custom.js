@@ -216,11 +216,11 @@ const orderTranslater = (item, language) => {
     } else {
         const excludeToppingList = [];
         item.excludeToppingObject.carrot && excludeToppingList.push('당근')
-        item.excludeToppingObject.bean && excludeToppingList.push('carrot')
+        item.excludeToppingObject.bean && excludeToppingList.push('콩')
 
         return {
             '(기본주소)': item.address1,
-            '(상세주소)': item.address1,
+            '(상세주소)': item.address2,
             '공동현관 비밀번호': item.entrancePassword,
             구매자명: item.buyer,
             단백질량: item.proteinAmount,

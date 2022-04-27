@@ -59,22 +59,18 @@
           />
           <!-- <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div> -->
         </div>
-        <div class="flex">
-          <div class="program-title-container">
-            <img src="@/assets/customer/carbo.svg" alt="carbo" />
-            <h2 class="program-title">탄수화물 양</h2>
-          </div>
-          <input class="yun-customer-input" type="text" disabled />
-          <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div>
-        </div>
-        <div class="flex">
-          <div class="program-title-container">
-            <img src="@/assets/customer/protein.svg" alt="carbo" />
-            <h2 class="program-title">단백질 양</h2>
-          </div>
-          <input class="yun-customer-input" type="text" disabled />
-          <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div>
-        </div>
+        <input-with-label
+          label="단순 무게 (그램/g) 기준입니다."
+          title="탄수화물 양"
+          img="carbo"
+          :disabled="true"
+        />
+        <input-with-label
+          label="단순 무게 (그램/g) 기준입니다."
+          title="단백질 양"
+          img="protein"
+          :disabled="true"
+        />
       </div>
     </div>
     <hr style="width: 100%; margin: 50px 0px;" />
@@ -93,7 +89,7 @@
         :selectedList="excludedIngredients"
       >
         <div name="header">
-          <h2 style="width:100px" class="program-title">
+          <h2 style="width:70px" class="program-title">
             알러지 및 <br />
             식재료 제외
           </h2>
@@ -122,9 +118,18 @@ import Custom from '@/api/custom'
 import InfoSelect from '../../components/customer/InfoSelect.vue'
 import Select from '@/components/customer/Select.vue'
 
+import InputWithLabel from '../../components/customer/InputWithLabel.vue'
+
 // import Divider from '../../components/customer/Divider.vue'
 export default {
-  components: { Guide, Divider, InfoSelect, Select },
+  components: {
+    Guide,
+    Divider,
+    InfoSelect,
+    Select,
+
+    InputWithLabel,
+  },
   data() {
     return {
       program: '1일 1식 20일 프로그램',
@@ -137,6 +142,9 @@ export default {
         carboType: '고구마',
         carboAmount: 100,
         proteinAmount: 100,
+      },
+      images: {
+        carbo: require('@/assets/customer/carbo.svg'),
       },
     }
   },
@@ -172,7 +180,7 @@ export default {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 400;
-  font-size: 5.5px;
+  font-size: 0.3rem;
   line-height: 10px;
 
   color: #b3b3b3;
@@ -183,7 +191,7 @@ export default {
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.75rem;
     line-height: 1.5rem;
     background: #e6e6e6;
     border: 1px solid #fff;

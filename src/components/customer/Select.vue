@@ -1,12 +1,12 @@
 <template>
   <div class="flex customer-select">
-    <select class="yun-customer-select" name="carboType" id="carboType">
+    <select class="yun-customer-select" :name="name" :id="name">
       <option v-for="option in options" :key="option">{{ option }}</option>
     </select>
     <img
       src="@/assets/customer/select.svg"
       class="ml-3"
-      style="width: 35px; height: 40px; object-fit:cover; "
+      style="width: 20px; height: 20px; object-fit:cover; "
       alt="select"
     />
   </div>
