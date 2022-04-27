@@ -1,4 +1,5 @@
 import axios from "axios";
+import qs from 'querystring'
 
 // const BASE_URL = "http://3.35.9.130:3000/"
 // const BASE_URL = "./"
@@ -15,14 +16,15 @@ const _basePostRequest = async (path, param) => {
 }
 
 
-const getOrderList = async () => {
-    const res = await _baseGetRequest('order')
+const getOrderList = async (query) => {
+    console.log(query)
+    const res = await _baseGetRequest('order?' + qs.stringify(query))
     return res.data;
 }
 
 
-const getDeliveryList = async (date) => {
-    const res = await _baseGetRequest(`order/delivery/${date}`)
+const postDeliveryList = async (date, param) => {
+    const res = await _basePostRequest(`order/delivery/${date}`, param)
     return res.data;
 }
 
@@ -31,9 +33,15 @@ const postOrderList = async (param) => {
     return res.data;
 }
 
+const getProductDetails = async (param) => {
+    const res = await _basePostRequest('product', param)
+    return res.data;
+}
+
 export default {
     getOrderList,
     postOrderList,
     //배송 불러오기
-    getDeliveryList,
+    postDeliveryList,
+    getProductDetails,
 }

@@ -37,8 +37,9 @@
         <div class="flex mb-3">
           <p class="font-semibold w-32 text-lg">업로드 날짜</p>
           <input
-            name="serch"
             type="date"
+            name="date"
+            @change="onChange"
             placeholder="Search products..."
             class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
           />
@@ -46,97 +47,25 @@
         <div class="flex mb-3">
           <p class="font-semibold w-32 text-lg">조건별 검색</p>
           <select
+            name="condition"
+            @change="onChange"
+            v-model="searchCondition.condition"
             class="bg-white h-10 w-64 mr-3 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
           >
-            <option value="white">한얀색</option>
+            <option value="name">고객명</option>
+            <option value="phone">연락처</option>
+            <option value="address">주소</option>
           </select>
           <input
-            name="serch"
             type="search"
-            placeholder="Search products..."
+            name="keyword"
+            @change="onChange"
+            v-model="searchCondition.keyword"
+            placeholder="검색어를 입력해주세요."
             class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
           />
         </div>
-        <div class="flex mb-3">
-          <p class="font-semibold w-32 text-lg">배송날짜</p>
-          <input
-            name="serch"
-            type="date"
-            placeholder="Search products..."
-            class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
-          />
-        </div>
-        <div class="flex mb-3">
-          <p class="font-semibold w-32 text-lg">제조메뉴</p>
-          <select
-            v-model="products.product1"
-            class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
-            >
-          </select>
-          <select
-            v-model="products.product2"
-            class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
-            >
-          </select>
-          <select
-            v-model="products.product3"
-            class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
-            >
-          </select>
-          <select
-            v-model="products.product4"
-            class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
-            >
-          </select>
-          <select
-            v-model="products.product5"
-            class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
-            >
-          </select>
-        </div>
-        <div class="flex mb-3">
-          <p class="font-semibold w-32 text-lg">제조토핑</p>
-          <select
-            class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option value="white">한얀색</option>
-          </select>
-        </div>
+
         <button
           class="bg-green-500 w-48	rounded-lg px-6 py-2 text-white font-semibold shadow"
           @click="search"
@@ -264,8 +193,12 @@ export default {
     },
   },
   methods: {
+    onChange(e) {
+      const { name, value } = e.target
+      this.$set(this.searchCondition, name, value)
+    },
     downloadExcel() {
-      console.log(this.searchList)
+      // console.log(this.searchList)
       const excelData = this.searchList.map((item) => {
         return {
           구매자명: item.buyer,
@@ -296,23 +229,8 @@ export default {
     },
     async search() {
       // 제조 메뉴 선택 안할 경우 불가
-      if (this.products.product1 === '') {
-        return window.alert('제조메뉴를 선택해주세요')
-      }
-      if (this.products.product2 === '') {
-        return window.alert('제조메뉴를 선택해주세요')
-      }
-      if (this.products.product3 === '') {
-        return window.alert('제조메뉴를 선택해주세요')
-      }
-      if (this.products.product4 === '') {
-        return window.alert('제조메뉴를 선택해주세요')
-      }
-      if (this.products.product5 === '') {
-        return window.alert('제조메뉴를 선택해주세요')
-      }
 
-      const res = await api.getOrderList()
+      const res = await api.getOrderList(this.searchCondition)
       const makeList = []
 
       res.map((item) => {
@@ -383,11 +301,11 @@ export default {
           for (let i = 0; saladCount - availableMenu.length > 0; i++) {
             availableMenu.push(availableMenu[i % availableCount])
           }
-          console.log(availableMenu, saladCount)
+          // console.log(availableMenu, saladCount)
         }
 
         availableMenu = availableMenu.slice(0, saladCount)
-        console.log(specialList)
+        // console.log(specialList)
 
         let productInfo = `${eatPerday}
           ${isExcludeProduct ? '-2' : isSpecial ? '-1' : ''}

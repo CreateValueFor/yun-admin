@@ -101,7 +101,7 @@
                 <td>{{ item.proteinAmount }}</td>
                 <td>{{ item.carboAmount }}</td>
                 <td>{{ item.carboType }}</td>
-                <td>{{ item.excludeIngredient.join(' , ') }}</td>
+                <td>{{ item.excludeIngredient.join(' , ') || '없음' }}</td>
                 <!-- <td>{{ item.요청사항 }}</td> -->
                 <!-- <td>
                   <div v-if="item.확인필요">
@@ -116,7 +116,7 @@
                     {{ item.제외식재료 }}
                   </div>
                 </td> -->
-                <td>{{ item.배송 }}</td>
+                <td>{{ item.deliveryType }}</td>
                 <!-- <td>{{ item.메모 }}</td> -->
                 <td>
                   <button
@@ -568,7 +568,7 @@ export default {
       this.day20 = []
       this.day10 = []
       this.uploadedOrder.map((item) => {
-        if (item.배송 === '새벽') {
+        if (item.deliveryType === '새벽배송') {
           if (item.상품명.includes('10일')) {
             this.early10.push(item)
           } else {
@@ -608,7 +608,7 @@ export default {
     },
 
     uploadOrder() {
-      // console.log(this.uploadedOrder)
+      console.log(this.uploadedOrder)
       // return
       // const isCheckedAll = this.uploadedOrder.filter((item) => item.확인필요)
       //   .length
@@ -783,7 +783,7 @@ export default {
                 initOrder.excludeIngredient.push(ingredient)
               } else {
                 // 탄수화물 처리
-                initOrder.carboType = item['옵션정보'].split(':')[1]
+                initOrder.carboType = item['옵션정보'].split(':')[1].trim()
               }
             } else {
               if (item['옵션정보'].includes('단백질')) {
@@ -806,114 +806,8 @@ export default {
             }
           }
         })
-
-        // '추가구성상품'인 경우 옵션에 대한 데이터이다.
-
-        // initOrder.시작일 = '설정'
-        // initOrder.종료일 = '설정'
-        // initOrder.단백질량 = 1
-        // initOrder.탄수화물량 = 1
-        // initOrder['탄수화물 구성'] = '고구마'
-        // initOrder.제외토핑 = []
-        // initOrder.제외식재료 = []
-        // // initOrder.제외식재료 = '없음'
-        // order.forEach((item) => {
-        //   const excludeIngredient = custom.excludeMenuList(item.상품명)
-        //   if (excludeIngredient) {
-        //     if (excludeIngredient.includes('기타')) {
-        //       initOrder.확인필요 = true
-        //       initOrder['제외식재료'].push('기타')
-        //     } else {
-        //       initOrder['제외식재료'].push(excludeIngredient)
-        //     }
-        //   }
-
-        //   if (item.옵션정보.includes('단백질')) {
-        //     if (item.옵션정보.indexOf('50g') !== -1) {
-        //       initOrder.단백질량 = 1.5
-        //     } else if (item.옵션정보.indexOf('100g') !== -1) {
-        //       initOrder.단백질량 = 2
-        //     } else {
-        //       console.log(item.옵션정보)
-        //       initOrder.단백질량 = '확인 필요'
-        //     }
-        //   }
-        //   if (item.옵션정보.includes('현미밥')) {
-        //     const carboType = item.옵션정보.split(':')[1]
-        //     if (carboType !== undefined) {
-        //       initOrder['탄수화물 구성'] = custom.carbohydrateValueFormatter(
-        //         item.옵션정보.split(':')[1].trim()
-        //       )
-        //     }
-        //   }
-        //   if (item.옵션정보.includes('탄수화물')) {
-        //     initOrder.탄수화물량 = 1.5
-        //   }
-        //   if (item.옵션정보.includes('공동현관')) {
-        //     let options = item.옵션정보.split(' / ')
-        //     let password = ''
-        //     // let allergy = ''
-        //     let deliveryType = ''
-
-        //     if (options.length !== 2) {
-        //       const passwordRaw =
-        //         item.옵션정보.indexOf(
-        //           "공동현관 출입비밀번호 (없을 시 '없음'작성):"
-        //         ) + 1
-
-        //       const allergyAndEtc = item.옵션정보.indexOf(
-        //         "/ 알러지 및 기타요청 (없을 시 '없음'작성):"
-        //       )
-
-        //       const deliveryRaw = item.옵션정보.indexOf('/ 프로그램: ')
-        //       password = item.옵션정보.substring(
-        //         passwordRaw + 26,
-        //         allergyAndEtc
-        //       )
-        //       // allergy = item.옵션정보.substring(allergyAndEtc + 27, deliveryRaw)
-
-        //       deliveryType = item.옵션정보.substring(
-        //         deliveryRaw + 8,
-        //         item.옵션정보.length
-        //       )
-        //     } else {
-        //       password = options[0].split(':')[1]
-        //       // allergy = options[1].split(':')[1]
-        //       deliveryType = options[1].split(':')[1]
-        //       console.log(options)
-        //     }
-
-        //     initOrder['공동현관 비밀번호'] = password.trim()
-        //     // initOrder.요청사항 = allergy.trim()
-        //     // if (initOrder.요청사항 !== '없음') {
-        //     //   initOrder.제외식재료 = '확인 필요'
-        //     //   initOrder.확인필요 = true
-        //     // }
-
-        //     initOrder.배송 = deliveryType.includes('일반배송') ? '일반' : '새벽'
-        //   }
-        //   if (item.옵션정보.includes('토핑')) {
-        //     initOrder.제외토핑.push(
-        //       item.옵션정보
-        //         .split('토핑')[1]
-        //         .replace('제외', '')
-        //         .trim()
-        //     )
-        //   }
-
-        //   if (
-        //     !initOrder.배송 &&
-        //     custom.serviceNameFormatter(item.상품명.includes('새벽'))
-        //   ) {
-        //     initOrder.배송 = '새벽'
-        //   }
-        //   // 공통 정보
-        // })
-        // initOrder.제외토핑 = initOrder.제외토핑.join(',')
-        // initOrder.제외식재료 = initOrder.제외식재료.join(',')
-        totalOrder.push(initOrder)
-
-        initOrder = {}
+        totalOrder.push(initOrder) // 파싱한 주문 저장
+        initOrder = {} // 주문 초기화
       })
       return totalOrder
     },

@@ -168,7 +168,7 @@
 <script>
 import TapMenu from '../components/order/TapMenu.vue'
 // import Modal from '../components/order/Modal.vue'
-import { utils, writeFile } from 'xlsx'
+// import { utils, writeFile } from 'xlsx'
 import custom from '@/api/custom.js'
 import api from '@/api/api.js'
 // import axios from 'axios'
@@ -188,6 +188,16 @@ export default {
         product5: '',
       },
       searchDate: '',
+    }
+  },
+  mounted() {
+    this.searchDate = '2022-05-02'
+    this.products = {
+      product1: 11,
+      product2: 2,
+      product3: 3,
+      product4: 5,
+      product5: 4,
     }
   },
   watch: {
@@ -231,33 +241,58 @@ export default {
     },
   },
   methods: {
-    downloadExcel() {
+    async downloadExcel() {
       console.log(this.searchList)
-      const excelData = this.searchList.map((item) => {
-        return {
-          구매자명: item.Order.buyer,
-          수취인명: item.Order.receiver,
-          수취인연락처: item.Order.receiverPhone,
-          구매자연락처: item.Order.buyerPhone,
-          배송지: item.Order.address1 + item.Order.address2 || '',
-          '(기본주소)': item.Order.address1,
-          '(상세주소)': item.Order.address2,
-          '공동현관 비밀번호': item.Order.entrancePassword,
-          배송메세지: item.Order.deliveryMessage,
-          상품정보: item.productInfo,
-          상품명: item.productName,
-          '탄수화물 구성': item.Order.CarboType.name,
-          단백질량: item.Order.carboAmount,
-          탄수화물량: item.Order.proteinAmount,
-          제외메뉴: item.excludeProduct,
-          제외토핑: item.excludeTopping,
-          배송: item.Order.deliveryType,
+      // 오늘 치 식재료에 쓰이는 메뉴 정보 불러오기
+      const products = await api.getProductDetails({
+        products: this.dailyMenuIds,
+      })
+      console.log(products)
+
+      // 새벽 팩수, 일반 팩수
+
+      // // 식재료 별 준비량
+      // let totalRoot = 0
+      // let totalRice = 0
+      // let totalToping = {
+      //   apple: 0,
+      //   carrot: 0,
+      //   bean: 0,
+      // }
+
+      this.searchList.forEach((item) => {
+        if (item.productInfo.includes('-2')) {
+          console.log(item.productInfo.split(':'))
         }
       })
-      const excelDataEarly = utils.json_to_sheet(excelData)
-      const workBook = utils.book_new()
-      utils.book_append_sheet(workBook, excelDataEarly, '제조 물량')
-      writeFile(workBook, `${this.searchDate}-제조물량.xlsx`)
+
+      return
+
+      // const excelData = this.searchList.map((item) => {
+      //   return {
+      //     구매자명: item.Order.buyer,
+      //     수취인명: item.Order.receiver,
+      //     수취인연락처: item.Order.receiverPhone,
+      //     구매자연락처: item.Order.buyerPhone,
+      //     배송지: item.Order.address1 + item.Order.address2 || '',
+      //     '(기본주소)': item.Order.address1,
+      //     '(상세주소)': item.Order.address2,
+      //     '공동현관 비밀번호': item.Order.entrancePassword,
+      //     배송메세지: item.Order.deliveryMessage,
+      //     상품정보: item.productInfo,
+      //     상품명: item.productName,
+      //     '탄수화물 구성': item.Order.CarboType.name,
+      //     단백질량: item.Order.carboAmount,
+      //     탄수화물량: item.Order.proteinAmount,
+      //     제외메뉴: item.excludeProduct,
+      //     제외토핑: item.excludeTopping,
+      //     배송: item.Order.deliveryType,
+      //   }
+      // })
+      // const excelDataEarly = utils.json_to_sheet(excelData)
+      // const workBook = utils.book_new()
+      // utils.book_append_sheet(workBook, excelDataEarly, '제조 물량')
+      // writeFile(workBook, `${this.searchDate}-제조물량.xlsx`)
     },
     async search() {
       // 제조 메뉴 선택 안할 경우 불가
@@ -277,10 +312,12 @@ export default {
         return window.alert('제조메뉴를 선택해주세요')
       }
 
-      const res = await api.getDeliveryList(this.searchDate)
+      const res = await api.postDeliveryList(this.searchDate, this.products)
+
       const makeList = []
 
-      res.map((item) => {
+      res.map((result) => {
+        const { item } = result
         let isExcludeProduct = false
         let isSpecial = false
         let specialList = []
@@ -325,9 +362,10 @@ export default {
           })
           specialList.push(toppings.join(' '))
         }
-        if (item.Order.Products.length) {
+
+        if (result.excludeProduct.length) {
           isExcludeProduct = true
-          const excludeProductIds = item.Order.Products.map((item) => item.id)
+          const excludeProductIds = result.excludeProduct.map((item) => item.id)
           availableMenu = this.dailyMenuIds.filter(
             (item) => !excludeProductIds.includes(item)
           )
@@ -348,28 +386,26 @@ export default {
           for (let i = 0; saladCount - availableMenu.length > 0; i++) {
             availableMenu.push(availableMenu[i % availableCount])
           }
-          console.log(availableMenu, saladCount)
         }
 
         availableMenu = availableMenu.slice(0, saladCount)
-        console.log(specialList)
 
         let productInfo = `${eatPerday} ${
           isExcludeProduct ? '-2' : isSpecial ? '-1' : ''
         } ${specialList.join(' / ')} ${
           availableMenu.length
-            ? ' / ' +
+            ? ' / 메뉴 :' +
               availableMenu
                 .map((item) => this.productList[item - 1].name)
                 .join(' ')
             : ''
-        }`
+        }`.replace('//', '/')
 
         // 상품 정보 추가
 
         makeList.push({
           ...item,
-          productInfo,
+          productInfo: productInfo.trim(),
           productName: item.Order.Package ? item.Order.Package.name : '오류',
           excludeProduct: item.Order.Products.map((item) => item.name).join(
             ','
