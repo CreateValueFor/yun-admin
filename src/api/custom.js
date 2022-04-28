@@ -238,12 +238,20 @@ const orderTranslater = (item, language) => {
 
 }
 
+const carboTypeFormatter = (item) => {
+    switch (item) {
+        case '고구마': return "sweetPotato"
+        case '현미밥': return 'rice'
+        default: return 'mixed'
+    }
+}
+
 export default {
     productList,
     serviceNameFormatter,
     JSDateToExcelDate,
     ExcelDateToJSDate,
-
+    carboTypeFormatter,
     ingredientList,
     proteinValueFormatter,
     carbohydrateValueFormatter,

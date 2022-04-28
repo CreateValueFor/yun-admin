@@ -115,6 +115,60 @@
         </button>
       </div>
     </div>
+    <div v-if="showSummary">
+      <div class="ingredient--summary">
+        <h2 class="summary--title bg-green-500 text-white">식재료 별 준비량</h2>
+        <div
+          v-for="ingredient in Object.keys(ingredientPreparation)"
+          :key="ingredient"
+        >
+          {{ `${ingredient} : ${ingredientPreparation[ingredient]}` }}
+        </div>
+      </div>
+      <div class="menu--summary">
+        <h2 class="summary--title bg-green-500 text-white">메뉴별 식재료</h2>
+        <div class="flex">
+          <div
+            v-for="menu in Object.keys(menuPreparation)"
+            :key="menu"
+            class="w-1/5"
+          >
+            <div>{{ menuPreparation[menu].name }}</div>
+            <div>{{ `기본 : ${menuPreparation[menu].count || 0}` }}</div>
+            <div>{{ `단150 : ${menuPreparation[menu].count15 || 0}` }}</div>
+            <div>{{ `단200 : ${menuPreparation[menu].count20 || 0} ` }}</div>
+            <div
+              v-for="igd in menuPreparation[menu].ingredients"
+              :key="menu + igd"
+            >
+              {{
+                `${igd.name}: ${igd.count || 0} / (${
+                  igd.Product_Ingredients.type
+                })`
+              }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="delivery--text-whitesummary ">
+        <h2 class="summary--title bg-green-500 text-white">배송 통계</h2>
+        <div class="flex">
+          <div class="w-1/2">
+            <h2>새벽</h2>
+            <div>{{ '1식 ' + deliveryPreparation.early1 }}</div>
+            <div>{{ '2식 ' + deliveryPreparation.early2 }}</div>
+            <div>{{ '3식 ' + deliveryPreparation.early3 }}</div>
+          </div>
+          <div class="w-1/2">
+            <h2>일반</h2>
+            <div>{{ '1식 ' + deliveryPreparation.day1 }}</div>
+            <div>{{ '2식 ' + deliveryPreparation.day2 }}</div>
+            <div>{{ '3식 ' + deliveryPreparation.day3 }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <table v-if="searchList.length">
       <thead>
         <th>구매자명</th>
@@ -152,7 +206,9 @@
 
           <td>{{ delivery.productInfo }}</td>
           <td>{{ delivery.productName }}</td>
-          <td>{{ delivery.Order.CarboType.name }}</td>
+          <td>
+            {{ delivery.Order.CarboType.name }}
+          </td>
           <td>{{ delivery.Order.carboAmount }}</td>
           <td>{{ delivery.Order.proteinAmount }}</td>
           <td>{{ delivery.excludeProduct }}</td>
@@ -188,6 +244,10 @@ export default {
         product5: '',
       },
       searchDate: '',
+      ingredientPreparation: {},
+      menuPreparation: {},
+      deliveryPreparation: {},
+      showSummary: {},
     }
   },
   mounted() {
@@ -242,12 +302,237 @@ export default {
   },
   methods: {
     async downloadExcel() {
-      console.log(this.searchList)
       // 오늘 치 식재료에 쓰이는 메뉴 정보 불러오기
       const products = await api.getProductDetails({
         products: this.dailyMenuIds,
       })
-      console.log(products)
+
+      const productInfos = {}
+
+      const ingredientPreparation = {
+        고구마: 0,
+        현미밥: 0,
+        '사과(토핑)': 0,
+        '당근(토핑)': 0,
+        '콩(토핑)': 0,
+      }
+
+      const deliveryCountPreparation = {
+        early1: 0,
+        early2: 0,
+        early3: 0,
+        day1: 0,
+        day2: 0,
+        day3: 0,
+      }
+      // const product1Preparation = {}
+      // const product2Preparation = {}
+      // const product3Preparation = {}
+      // const product4Preparation = {}
+      // const product5Preparation = {}
+
+      products.forEach((item) => {
+        productInfos[item.id] = {
+          name: item.name,
+          ingredients: item.Ingredients,
+        }
+      })
+      //제품 배정해주기
+
+      this.searchList.forEach((item) => {
+        const tmpOrder = item.Order
+        const carboAmount = item.Order.carboAmount
+        const deliveryType = item.Order.deliveryType
+        const eatPerDay = item.Order.Package.eatPerDay
+        const carboType = item.Order.CarboType.name
+        const proteinAmount = item.Order.proteinAmount
+        const excludeIngredientNames = item.Order.Ingredients.map(
+          (exclude) => exclude.name
+        )
+        // 배송, 하루 끼니 별 취합
+        if (deliveryType === '새벽배송') {
+          //새벽 배송
+          if (eatPerDay === 1) {
+            deliveryCountPreparation.early1 += 1
+          } else if (eatPerDay === 2) {
+            deliveryCountPreparation.early2 += 1
+          } else {
+            deliveryCountPreparation.early3 += 1
+          }
+        } else {
+          // 일반 배송
+          if (eatPerDay === 1) {
+            deliveryCountPreparation.day1 += 1
+          } else if (eatPerDay === 2) {
+            deliveryCountPreparation.day2 += 1
+          } else {
+            deliveryCountPreparation.day3 += 1
+          }
+        }
+
+        // const excludes = item.excldueMenus
+        const deliveryMenus = []
+        const deliveryCount = tmpOrder.Package.eatPerDay * 2
+        // 제품 순회하면서 담긴 것만 배열에 담기
+        let i = 0
+        while (deliveryMenus.length !== deliveryCount) {
+          if (item.excludeMenus.length) {
+            // 제외 메뉴가 있을 경우
+            const excludeMenuIds = item.excludeMenus.map((item) => item.id)
+            if (
+              !excludeMenuIds.includes(this.products[`product${(i % 5) + 1}`])
+            ) {
+              deliveryMenus.push(this.products[`product${(i % 5) + 1}`])
+            }
+          } else {
+            deliveryMenus.push(this.products[`product${(i % 5) + 1}`])
+          }
+
+          i += 1
+        }
+        // 메뉴 취합 완료
+        // 식재료 별 준비량 찾기
+
+        // TODO 메뉴별 1.5인분 수 1인분 수 구분 필요
+
+        deliveryMenus.forEach((item) => {
+          // 각 제품 제조 갯수 초기화
+          if (!productInfos[item].count && !productInfos[item].count15) {
+            productInfos[item].count = 0
+            productInfos[item].count15 = 0
+            productInfos[item].count20 = 0
+            // 고구마
+            productInfos[item].sweetPotato = {
+              count: 0,
+              count15: 0,
+              count20: 0,
+            }
+            // 고구마 + 현미밥
+            productInfos[item].mixed = {
+              count: 0,
+              count15: 0,
+              count20: 0,
+            }
+            // 현미밥
+            productInfos[item].rice = {
+              count: 0,
+              count15: 0,
+              count20: 0,
+            }
+          }
+
+          // 단백질 취합량
+          if (proteinAmount === 1) {
+            productInfos[item].count += 1
+          } else if (proteinAmount === 1.5) {
+            productInfos[item].count15 += 1
+          } else {
+            productInfos[item].count20 += 1
+          }
+
+          // 탄수화물 취합량
+          if (carboAmount === 1) {
+            productInfos[item][custom.carboTypeFormatter(carboType)].count += 1
+            // 식재료 별 준비량 파싱
+            if (carboType === '고구마') {
+              ingredientPreparation.고구마 += 1
+            } else if (carboType === '현미밥') {
+              ingredientPreparation.현미밥 += 1
+            } else {
+              ingredientPreparation.고구마 += 0.5
+              ingredientPreparation.현미밥 += 0.5
+            }
+          } else if (carboAmount === 1.5) {
+            productInfos[item][
+              custom.carboTypeFormatter(carboType)
+            ].count15 += 1
+
+            // 식재료 별 준비량 파싱
+            if (carboType === '고구마') {
+              ingredientPreparation.고구마 += 1.5
+            } else if (carboType === '현미밥') {
+              ingredientPreparation.현미밥 += 1.5
+            } else {
+              ingredientPreparation.고구마 += 0.75
+              ingredientPreparation.현미밥 += 0.75
+            }
+          } else {
+            productInfos[item][
+              custom.carboTypeFormatter(carboType)
+            ].carboCount20 += 1
+            // 식재료 별 준비량 파싱
+            if (carboType === '고구마') {
+              ingredientPreparation.고구마 += 2
+            } else if (carboType === '현미밥') {
+              ingredientPreparation.현미밥 += 2
+            } else {
+              ingredientPreparation.고구마 += 1
+              ingredientPreparation.현미밥 += 1
+            }
+          }
+          // 식재료 취합
+          productInfos[item].ingredients = productInfos[item].ingredients.map(
+            (igd) => {
+              if (!igd.count) {
+                igd.count = 0
+              }
+              // 초기화가 된 경우 식재료 종류에 따라 제조물량 더해주기
+              if (igd.Product_Ingredients.type === 'main') {
+                // 메인 메뉴인 경우
+                if (proteinAmount === 1) {
+                  igd.count += 1
+                } else if (proteinAmount === 1.5) {
+                  igd.count += 1.5
+                } else {
+                  igd.count += 2
+                }
+              } else if (igd.Product_Ingredients.type === 'carbo') {
+                // 탄수화물인 경우
+                if (carboAmount === 1) {
+                  igd.count += 1
+                } else if (carboAmount === 1.5) {
+                  igd.count += 1.5
+                } else {
+                  igd.count += 2
+                }
+              } else if (igd.Product_Ingredients.type === 'topping') {
+                if (
+                  excludeIngredientNames.length &&
+                  ((igd.name === '병아리콩' &&
+                    excludeIngredientNames.includes('콩')) ||
+                    excludeIngredientNames.includes(igd.name))
+                ) {
+                  console.log('토핑 제외', igd.name)
+                } else {
+                  // 식재료 별 준비량
+                  if (igd.name === '병아리콩') {
+                    ingredientPreparation['콩(토핑)'] += 1
+                  }
+                  if (igd.name === '사과') {
+                    ingredientPreparation['사과(토핑)'] += 1
+                  }
+                  if (igd.name === '당근') {
+                    ingredientPreparation['당근(토핑)'] += 1
+                  }
+
+                  igd.count += 1
+                }
+              }
+
+              // 단백질인 경우
+              return igd
+            }
+          )
+        })
+
+        // 메뉴 배정해주기
+      })
+      console.log('최종 productInfos', productInfos)
+      this.menuPreparation = productInfos
+      console.log('식재료 별 준비량', ingredientPreparation)
+      this.ingredientPreparation = ingredientPreparation
+      console.log('끼니 및 배송 종류별 준비량', deliveryCountPreparation)
+      this.deliveryPreparation = deliveryCountPreparation
 
       // 새벽 팩수, 일반 팩수
 
@@ -260,12 +545,12 @@ export default {
       //   bean: 0,
       // }
 
-      this.searchList.forEach((item) => {
-        if (item.productInfo.includes('-2')) {
-          console.log(item.productInfo.split(':'))
-        }
-      })
-
+      // this.searchList.forEach((item) => {
+      //   if (item.productInfo.includes('-2')) {
+      //     console.log(item.productInfo.split(':'))
+      //   }
+      // })
+      this.showSummary = true
       return
 
       // const excelData = this.searchList.map((item) => {
@@ -413,6 +698,7 @@ export default {
           excludeTopping: item.Order.Ingredients.map((item) => item.name).join(
             ','
           ),
+          excludeMenus: result.excludeProduct,
         })
       })
       this.searchList = makeList

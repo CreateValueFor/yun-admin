@@ -520,13 +520,13 @@ export default {
       let day20 = 0
       this.uploadedOrder.map((item) => {
         if (item.deliveryType === '새벽') {
-          if (item.상품명.includes('10일')) {
+          if (item.상품명 && item.상품명.includes('10일')) {
             early10 += 1
           } else {
             early20 += 1
           }
         } else {
-          if (item.상품명.includes('10일')) {
+          if (item.상품명 && item.상품명.includes('10일')) {
             day10 += 1
           } else {
             day20 += 1
@@ -665,7 +665,7 @@ export default {
         const tmpData = utils.sheet_to_json(
           workbook.Sheets[workbook.SheetNames[0]]
         )
-
+        console.log(this.processRaw(this.groupOrder(tmpData)))
         this.uploadedOrder = this.processRaw(this.groupOrder(tmpData))
       }
       reader.readAsBinaryString(file)
