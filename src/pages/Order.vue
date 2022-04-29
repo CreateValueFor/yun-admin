@@ -438,73 +438,6 @@ export default {
       day20: [],
     }
   },
-  watch: {
-    uploadOption: {
-      deep: true,
-      handler(value) {
-        if (
-          value.day10 !== '' &&
-          ![2, 4].includes(new Date(value.day10).getDay())
-        ) {
-          window.alert(
-            '일반배송 10일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
-          )
-          value.day10 = ''
-        }
-
-        if (
-          value.day20 !== '' &&
-          ![2, 4].includes(new Date(value.day20).getDay())
-        ) {
-          window.alert(
-            '일반배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
-          )
-          value.day20 = ''
-        }
-
-        if (value.earlyType === 'mw') {
-          if (
-            value.early10 !== '' &&
-            ![1, 3].includes(new Date(value.early10).getDay())
-          ) {
-            window.alert(
-              '새벽배송 10일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
-            )
-            value.early10 = ''
-          }
-          if (
-            value.early20 !== '' &&
-            ![1, 3].includes(new Date(value.early20).getDay())
-          ) {
-            window.alert(
-              '새벽배송 20일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
-            )
-            value.early20 = ''
-          }
-        } else if (value.earlyType === 'tt') {
-          if (
-            value.early10 !== '' &&
-            ![2, 4].includes(new Date(value.early10).getDay())
-          ) {
-            window.alert(
-              '새벽배송 10일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
-            )
-            value.early10 = ''
-          }
-          if (
-            value.early20 !== '' &&
-            ![2, 4].includes(new Date(value.early20).getDay())
-          ) {
-            window.alert(
-              '새벽배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
-            )
-            value.early20 = ''
-          }
-        }
-        return value
-      },
-    },
-  },
   computed: {
     orderCount: function() {
       if (!this.uploadedOrder) {
@@ -562,12 +495,74 @@ export default {
     },
 
     async postOrder() {
+      if (
+        this.uploadOption.day10 !== '' &&
+        ![2, 4].includes(new Date(this.uploadOption.day10).getDay())
+      ) {
+        this.uploadOption.day10 = ''
+        return window.alert(
+          '일반배송 10일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+        )
+      }
+
+      if (
+        this.uploadOption.day20 !== '' &&
+        ![2, 4].includes(new Date(this.uploadOption.day20).getDay())
+      ) {
+        this.uploadOption.day20 = ''
+        return window.alert(
+          '일반배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+        )
+      }
+
+      if (this.uploadOption.earlyType === 'mw') {
+        if (
+          this.uploadOption.early10 !== '' &&
+          ![1, 3].includes(new Date(this.uploadOption.early10).getDay())
+        ) {
+          this.uploadOption.early10 = ''
+          return window.alert(
+            '새벽배송 10일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
+          )
+        }
+        if (
+          this.uploadOption.early20 !== '' &&
+          ![1, 3].includes(new Date(this.uploadOption.early20).getDay())
+        ) {
+          this.uploadOption.early20 = ''
+          return this.uploadOption.alert(
+            '새벽배송 20일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
+          )
+        }
+      } else if (this.uploadOption.earlyType === 'tt') {
+        if (
+          this.uploadOption.early10 !== '' &&
+          ![2, 4].includes(new Date(this.uploadOption.early10).getDay())
+        ) {
+          this.uploadOption.early10 = ''
+          return window.alert(
+            '새벽배송 10일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+          )
+        }
+        if (
+          this.uploadOption.early20 !== '' &&
+          ![2, 4].includes(new Date(this.uploadOption.early20).getDay())
+        ) {
+          this.uploadOption.early20 = ''
+          return window.alert(
+            '새벽배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+          )
+        }
+      }
       this.loading = true
       this.early10 = []
       this.early20 = []
       this.day20 = []
       this.day10 = []
       this.uploadedOrder.map((item) => {
+        if (!item.상품명) {
+          return
+        }
         if (item.deliveryType === '새벽배송') {
           if (item.상품명.includes('10일')) {
             this.early10.push(item)
@@ -584,27 +579,34 @@ export default {
       })
       // this.uploadedOrder.forEach((item) => {})
       // const res = await axios.post('http://3.35.9.130:3000/order', {
-      const res = await api.postOrderList({
-        day10: {
-          data: this.day10,
-          startDate: this.uploadOption.day10,
-        },
-        day20: {
-          data: this.day20,
-          startDate: this.uploadOption.day20,
-        },
-        early10: {
-          data: this.early10,
-          startDate: this.uploadOption.early10,
-        },
-        early20: {
-          data: this.early20,
-          startDate: this.uploadOption.early20,
-        },
-      })
-      console.log(res)
-      this.loading = false
-      this.showUploadModal = false
+      try {
+        await api.postOrderList({
+          day10: {
+            data: this.day10,
+            startDate: this.uploadOption.day10,
+          },
+          day20: {
+            data: this.day20,
+            startDate: this.uploadOption.day20,
+          },
+          early10: {
+            data: this.early10,
+            startDate: this.uploadOption.early10,
+          },
+          early20: {
+            data: this.early20,
+            startDate: this.uploadOption.early20,
+          },
+        })
+        window.alert('정상적으로 업로드 되었습니다.')
+        this.loading = false
+        this.showUploadModal = false
+        return
+      } catch (error) {
+        this.loading = false
+        this.showUploadModal = false
+        return window.alert('에러가 발생하였습니다. ')
+      }
     },
 
     uploadOrder() {
@@ -742,10 +744,14 @@ export default {
         order.forEach((item) => {
           // 주문 행의 상품종류가 '조합형 옵션 상품'인 경우엔 본 주문에 대한 데이터
           // 우선 본 주문에 대한 데이터 필터링 진행
-          if (item['상품종류'] === '조합형옵션상품') {
+          if (
+            item['상품종류'] === '조합형옵션상품' ||
+            item['상품종류'] === '옵션상품'
+          ) {
             // 본 주문
             // 주문 상품 명
             initOrder.상품명 = custom.serviceNameFormatter(item.상품명)
+            console.log(custom.serviceNameFormatter(item.상품명))
 
             const entrancePasswordIdx =
               item.옵션정보.indexOf(
@@ -753,6 +759,7 @@ export default {
               ) + 1
 
             const deliveryTypeIdx = item.옵션정보.indexOf('/ 배송방법 선택: ')
+            // const alterTypeIdx = item.옵션정보.indexOf('/ ')
 
             const password = item.옵션정보.substring(
               entrancePasswordIdx + 26,
@@ -771,7 +778,10 @@ export default {
 
             if (optionType !== -1) {
               // 메뉴 변경 요청 사항
-              if (item['옵션정보'].includes('제외')) {
+              if (
+                item['옵션정보'].includes('제외') ||
+                item['옵션정보'].includes('기타')
+              ) {
                 // 제외 식재료 처리
                 const excludeWordIdx = item['옵션정보'].indexOf('제외')
                 const ingredient = item['옵션정보']

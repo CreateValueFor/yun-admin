@@ -113,7 +113,11 @@
           <td>{{ order.endDate }}</td>
           <td>{{ order.productInfo }}</td>
           <td>{{ order.productName }}</td>
-          <td>{{ order.CarboType.name }}</td>
+          <td>
+            {{
+              order.CarboType ? order.CarboType.name : '탄수화물 구성 오류 발생'
+            }}
+          </td>
           <td>{{ order.carboAmount }}</td>
           <td>{{ order.proteinAmount }}</td>
           <td>{{ order.excludeProduct }}</td>
