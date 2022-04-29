@@ -29,7 +29,7 @@
         class="bg-green-500 w-48	rounded-lg px-6 py-2 text-white font-semibold shadow"
         @click="downloadExcel"
       >
-        제조물량 다운로드
+        제조물량 간략보기
       </button>
     </div>
     <div class="flex flex-1 flex-wrap -mx-3 ">
@@ -121,6 +121,7 @@
         <div
           v-for="ingredient in Object.keys(ingredientPreparation)"
           :key="ingredient"
+          class="summary-item"
         >
           {{ `${ingredient} : ${ingredientPreparation[ingredient]}` }}
         </div>
@@ -134,18 +135,143 @@
             class="w-1/5"
           >
             <div>{{ menuPreparation[menu].name }}</div>
-            <div>{{ `기본 : ${menuPreparation[menu].count || 0}` }}</div>
-            <div>{{ `단150 : ${menuPreparation[menu].count15 || 0}` }}</div>
-            <div>{{ `단200 : ${menuPreparation[menu].count20 || 0} ` }}</div>
+            <div class="summary-item">
+              <div>{{ `기본` }}</div>
+              <div>{{ menuPreparation[menu].count || 0 }}</div>
+            </div>
+            <div class="summary-item">
+              <div>
+                {{ `단150` }}
+              </div>
+              <div>
+                {{ menuPreparation[menu].count15 || 0 }}
+              </div>
+            </div>
+            <div class="summary-item">
+              <div>
+                {{ `단200 ` }}
+              </div>
+              <div>
+                {{ menuPreparation[menu].count20 || 0 }}
+              </div>
+            </div>
+            <div v-if="menuPreparation[menu].sweetPotato">
+              <div class="summary-item">
+                <div>
+                  {{ `고구마 기본` }}
+                </div>
+                <div>
+                  {{ menuPreparation[menu].sweetPotato.count || 0 }}
+                </div>
+              </div>
+              <div class="summary-item">
+                <div>
+                  {{ `고구마 150` }}
+                </div>
+                <div>
+                  <div>
+                    {{ menuPreparation[menu].sweetPotato.count15 || 0 }}
+                  </div>
+                </div>
+              </div>
+              <div class="summary-item">
+                <div>
+                  고구마 200
+                </div>
+                <div>
+                  {{ menuPreparation[menu].sweetPotato.count20 || 0 }}
+                </div>
+              </div>
+            </div>
+            <div v-if="menuPreparation[menu].mixed">
+              <div class="summary-item">
+                <div>
+                  고구마 + 현미밥 기본
+                </div>
+                <div>
+                  {{ menuPreparation[menu].mixed.count || 0 }}
+                </div>
+              </div>
+              <div class="summary-item">
+                <div>
+                  고구마 + 현미밥 150
+                </div>
+                <div>
+                  {{ menuPreparation[menu].mixed.count15 || 0 }}
+                </div>
+              </div>
+              <div class="summary-item">
+                <div>
+                  고구마 + 현미밥 200
+                </div>
+                <div>
+                  {{ menuPreparation[menu].mixed.count20 || 0 }}
+                </div>
+              </div>
+            </div>
+            <div v-if="menuPreparation[menu].rice">
+              <div class="summary-item">
+                <div>
+                  현미밥 기본
+                </div>
+                <div>
+                  {{ menuPreparation[menu].rice.count || 0 }}
+                </div>
+              </div>
+              <div class="summary-item">
+                <div>
+                  현미밥 150
+                </div>
+                <div>
+                  {{ menuPreparation[menu].rice.count15 || 0 }}
+                </div>
+              </div>
+              <div class="summary-item">
+                <div>
+                  현미밥 200
+                </div>
+                <div>
+                  {{ menuPreparation[menu].rice.count20 || 0 }}
+                </div>
+              </div>
+            </div>
             <div
               v-for="igd in menuPreparation[menu].ingredients"
-              :key="menu + igd"
+              :key="menu + igd.name"
+              class="summary-item summary-item-detail"
             >
-              {{
-                `${igd.name}: ${igd.count || 0} / (${
-                  igd.Product_Ingredients.type
-                })`
-              }}
+              <div>
+                <div>
+                  {{ igd.name }}
+
+                  {{
+                    `(${
+                      igd.Product_Ingredients.type === 'carbo'
+                        ? '탄수화물'
+                        : igd.Product_Ingredients.type === 'topping'
+                        ? '토핑'
+                        : '메인'
+                    })`
+                  }}
+                </div>
+                <div>
+                  단위 :
+                  {{
+                    igd.Product_Ingredients.amount +
+                      igd.Product_Ingredients.unit
+                  }}
+                </div>
+              </div>
+
+              <div>
+                <div>{{ igd.count || 0 }}</div>
+                <div>
+                  {{
+                    igd.Product_Ingredients.amount * (igd.count || 0) +
+                      igd.Product_Ingredients.unit
+                  }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -312,6 +438,7 @@ export default {
       const ingredientPreparation = {
         고구마: 0,
         현미밥: 0,
+        '고구마+현미밥': 0,
         '사과(토핑)': 0,
         '당근(토핑)': 0,
         '콩(토핑)': 0,
@@ -439,8 +566,9 @@ export default {
             } else if (carboType === '현미밥') {
               ingredientPreparation.현미밥 += 1
             } else {
-              ingredientPreparation.고구마 += 0.5
-              ingredientPreparation.현미밥 += 0.5
+              // ingredientPreparation.고구마 += 0.5
+              // ingredientPreparation.현미밥 += 0.5
+              ingredientPreparation['고구마+현미밥'] += 1
             }
           } else if (carboAmount === 1.5) {
             productInfos[item][
@@ -453,8 +581,9 @@ export default {
             } else if (carboType === '현미밥') {
               ingredientPreparation.현미밥 += 1.5
             } else {
-              ingredientPreparation.고구마 += 0.75
-              ingredientPreparation.현미밥 += 0.75
+              // ingredientPreparation.고구마 += 0.75
+              // ingredientPreparation.현미밥 += 0.75
+              ingredientPreparation['고구마+현미밥'] += 1
             }
           } else {
             productInfos[item][
@@ -466,8 +595,9 @@ export default {
             } else if (carboType === '현미밥') {
               ingredientPreparation.현미밥 += 2
             } else {
-              ingredientPreparation.고구마 += 1
-              ingredientPreparation.현미밥 += 1
+              // ingredientPreparation.고구마 += 1
+              // ingredientPreparation.현미밥 += 1
+              ingredientPreparation['고구마+현미밥'] += 2
             }
           }
           // 식재료 취합
@@ -722,5 +852,13 @@ table {
     border-bottom: 1px solid #e2e8f0;
     padding: 5px 8px;
   }
+}
+.summary-item {
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 15px;
 }
 </style>
