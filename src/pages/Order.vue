@@ -639,15 +639,56 @@ export default {
     },
     downloadExcel() {
       const excelDataDay = utils.json_to_sheet(
-        this.uploadedOrder.filter((item) => item.배송 === '일반')
+        this.uploadedOrder
+          .filter((item) => item.deliveryType === '일반배송')
+          .map((item) => ({
+            상품명: item.상품명,
+            주문번호: item.serial,
+            구매자: item.buyer,
+            수취인: item.receiver,
+            구매자연락처: item.buyerPhone,
+            수취인연락처: item.receiverPhone,
+            배송지: item.배송지,
+            기본주소: item.address1,
+            상세주소: item.address2,
+            배송메세지: item.deliveryMessage,
+            탄수화물구성: item.carboType,
+            탄수화물양: item.carboAmount,
+            단백질양: item.proteinAmount,
+            제외식재료: item.excludeIngredient.join(' , '),
+            공동현관비밀번호: item.entrancePassword,
+            배송타입: item.deliveryType,
+          }))
       )
       const excelDataEarly = utils.json_to_sheet(
-        this.uploadedOrder.filter((item) => item.배송 === '새벽')
+        this.uploadedOrder
+          .filter((item) => item.deliveryType === '새벽배송')
+          .map((item) => ({
+            상품명: item.상품명,
+            주문번호: item.serial,
+            구매자: item.buyer,
+            수취인: item.receiver,
+            구매자연락처: item.buyerPhone,
+            수취인연락처: item.receiverPhone,
+            기본주소: item.address1,
+            상세주소: item.address2,
+            배송메세지: item.deliveryMessage,
+            탄수화물구성: item.carboType,
+            탄수화물양: item.carboAmount,
+            단백질양: item.proteinAmount,
+            제외식재료: item.excludeIngredient.join(' , '),
+            공동현관비밀번호: item.entrancePassword,
+            배송타입: item.deliveryType,
+          }))
       )
       const workBook = utils.book_new()
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = now.getMonth() + 1
+      const date = now.getDate()
       utils.book_append_sheet(workBook, excelDataDay, '주문 취합(일반)')
       utils.book_append_sheet(workBook, excelDataEarly, '주문 취합(새벽)')
-      writeFile(workBook, 'test.xlsx')
+      writeFile(workBook, `${year}-${month}-${date}주문 취합.xlsx`)
     },
     onChange(event) {
       const file = event.target.files[0]
@@ -726,6 +767,7 @@ export default {
         initOrder.receiver = order[0].수취인명
         initOrder.buyerPhone = order[0]['(구매자연락처)'] // '-'가 없는 순수 숫자만 받기
         initOrder.receiverPhone = order[0]['(수취인연락처1)'] // '-' 가 없는 순수 숫자만 받음
+        initOrder.naverId = order[0].구매자ID
 
         // 주소 받기
         initOrder.배송지 = order[0]['(기본주소)'] + order[0]['(상세주소)']

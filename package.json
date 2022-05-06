@@ -11,6 +11,7 @@
     "axios": "^0.26.1",
     "chart.js": "^2.9.4",
     "core-js": "^3.6.4",
+    "hooper": "^0.3.4",
     "sass-loader": "^7.1.0",
     "v-calendar": "^2.4.1",
     "vue": "^2.6.11",

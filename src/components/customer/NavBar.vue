@@ -1,25 +1,20 @@
 <template>
   <div class="flex">
-    <div class="menu-tab w-1/3">
-      <router-link to="/customer/calendar">
-        배송 일정 변경
-      </router-link>
-    </div>
-    <div class="menu-tab w-1/3">
-      <router-link to="/customer/info">
-        메뉴 구성 변경
-      </router-link>
-    </div>
-    <div class="menu-tab w-1/3">
-      <router-link to="/customer/delivery">
-        배송 주소지 변경
-      </router-link>
-    </div>
+    <router-link class="menu-tab w-1/3" to="/customer/calendar">
+      배송 일정 변경
+    </router-link>
+    <router-link class="menu-tab w-1/3" to="/customer/info">
+      메뉴 구성 변경
+    </router-link>
+    <router-link class="menu-tab w-1/3" to="/customer/delivery">
+      배송 주소지 변경
+    </router-link>
   </div>
 </template>
 <script>
 export default {
   name: 'NavBar',
+  props: ['appData'],
 }
 </script>
 <style lang="scss">

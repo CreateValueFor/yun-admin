@@ -19,13 +19,33 @@
   </div>
 </template>
 <script>
+import customer from '../../api/customer'
 export default {
   name: 'CustomerHeader',
+
+  async mounted() {
+    const res = await customer.getCustomerInfo()
+
+    const {
+      receiver,
+      receiverPhone,
+      Package: { name },
+    } = res.data
+    this.phone =
+      receiverPhone.substr(0, 3) +
+      '-' +
+      receiverPhone.substr(3, 4) +
+      '-' +
+      receiverPhone.substr(7, 4)
+    this.userName = receiver
+    this.program = name
+  },
   data() {
     return {
-      phone: '010-7179-6841',
-      program: '1일 1식 20일 새벽배송 프로그램',
-      userName: '윤식단',
+      receiverInfo: {},
+      phone: '',
+      program: '',
+      userName: '',
     }
   },
 }

@@ -2,8 +2,9 @@
   <input
     class="yun-input"
     :type="type"
-    v-model="value"
+    v-model="localValue"
     :placeholder="placeholder"
+    :name="name"
   />
 </template>
 <script>
@@ -21,6 +22,20 @@ export default {
     value: {
       type: [String, Number],
       required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+  },
+  computed: {
+    localValue: {
+      get() {
+        return this.value
+      },
+      set(newVal) {
+        this.$emit('onChange', { name: this.name, value: newVal })
+      },
     },
   },
 }

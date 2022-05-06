@@ -5,19 +5,25 @@
     </p>
     <div class="flex flex-col w-full">
       <Input
-        :value="loginData.name"
+        :value="loginData.receiver"
         placeholder="실수령자 성명을 입력해주세요."
         class="mb-6 h-16 px-3"
+        name="receiver"
+        @onChange="onChange"
       />
       <Input
-        :value="loginData.phone"
+        :value="loginData.receiverPhone"
         class="mb-6 h-16 px-3"
         placeholder="실수령자 연락처를 입력해주세요,(-표시 제외)"
+        name="receiverPhone"
+        @onChange="onChange"
       />
       <Input
         :value="loginData.naverId"
         class="h-16 px-3 mb-2"
         placeholder="네이버 아이디 앞 2자리를 입력해주세요."
+        name="naverId"
+        @onChange="onChange"
       />
       <div class="login-info" style="font-size: 6px;">
         <p>- '주문자'정보로는 로그인이 어렵습니다.</p>
@@ -62,15 +68,22 @@
 <script>
 import Input from '@/components/customer/Input.vue'
 import Button from '../../components/customer/Button.vue'
+import customer from '@/api/customer.js'
 
 export default {
   name: 'Login',
   components: { Input, Button },
+  mounted() {
+    const token = localStorage.getItem('YUN-TOKEN')
+    if (token) {
+      this.$router.push({ name: 'CustomerCalendar' })
+    }
+  },
   data() {
     return {
       loginData: {
-        name: '',
-        phone: '',
+        receiver: '',
+        receiverPhone: '',
         naverId: '',
       },
       keepLogin: false,
@@ -81,16 +94,27 @@ export default {
     }
   },
   methods: {
-    onClick() {
-      // 로그인 요청
+    onChange(event) {
+      console.log(event)
+      const { name, value } = event
+      this.$set(this.loginData, name, value)
+    },
 
+    async onClick() {
+      // 로그인 요청
+      const res = await customer.login(this.loginData)
+      if (res.success) {
+        this.$router.push({ name: 'CustomerCalendar' })
+      } else {
+        window.alert('입력하신 정보로 등록된 수령자가 없습니다.')
+      }
+      console.log(res)
       // 성공했을 경우 세션에 저장
       // if(this.keepLogin)
 
       // 로그인 정보 저장 시 세션 저장
       // else
 
-      this.$router.push({ name: 'CustomerCalendar' })
       console.log('login')
     },
   },

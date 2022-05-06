@@ -1,17 +1,17 @@
 <template>
   <div class="leading-normal tracking-normal" id="main-body">
     <div style="max-width: 800px; margin: 0 auto;">
-      <Header v-if="header" />
+      <Header v-if="header" :receiverInfo="receiverInfo" />
 
       <!-- <div
         class="w-full flex flex-col bg-gray-100 pl-0 lg:pl-64 min-h-screen"
         :class="sideBarOpen ? 'overlay' : ''"
         id="main-content"
       > -->
-      <NavBar v-if="header" />
+      <NavBar v-if="header" :receiverInfo="receiverInfo" />
 
       <!-- <div class="p-6 bg-gray-100 mb-20 flex-1 flex flex-col"> -->
-      <router-view />
+      <router-view :receiverInfo="receiverInfo" />
       <!-- </div> -->
 
       <!-- <Footer /> -->
@@ -33,10 +33,10 @@ export default {
   data() {
     return {
       header: false,
+      receiverInfo: {},
     }
   },
-  mounted() {
-    console.log(window.location.pathname.includes('login'))
+  async mounted() {
     if (window.location.pathname.includes('login')) {
       this.header = false
     } else {

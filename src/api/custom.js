@@ -95,6 +95,8 @@ const ingredientList = [
     '당근', '사과', '견과류', '오이', '소', '닭', '오리', '해산물', '치즈', '유부', '두부', '밀가루', '토마토'
 ]
 
+const dayTranslate = ['월', '화', '수', '목', '금', '토', '일']
+
 const excludeMenuList = (menu) => {
     const menuList = [
         '당근', '사과', '견과류', '오이', '소', '닭', '오리', '해산물', '치즈', '유부', '두부', '밀가루', '토마토', '기타(배송메세지에 남겨주세요)'
@@ -249,6 +251,7 @@ const carboTypeFormatter = (item) => {
 
 export default {
     productList,
+    dayTranslate,
     serviceNameFormatter,
     JSDateToExcelDate,
     ExcelDateToJSDate,

@@ -28,23 +28,22 @@
       :options="deliveryType"
       name="carboType"
       :value="selectedDeliveryType"
-      img="carbo"
+      img="bus"
       title="배송 형태"
     />
     <hr style="width:200px; margin: 30px auto 30px; margin-top:30px;" />
-    <input-with-label
-      title="상세주소"
-      img="carbo"
-      style="margin-bottom:30px;"
-    />
+    <input-with-label title="상세주소" img="home" style="margin-bottom:30px;" />
     <input-with-label
       title="공동현관 비밀번호"
-      img="carbo"
+      img="home"
       style="margin-bottom:30px;"
+      label="새벽배송 시 문 앞까지 원활히 배송되기 위한 필수 기입사항입니다.
+정확한 비밀번호 입력 순서 혹은 자세한 출입 방법을 적어주세요.
+없을 시 ‘없음'으로 작성해주세요."
     />
     <input-with-label
       title="배송메세지"
-      img="carbo"
+      img="message"
       style="margin-bottom:30px;"
     />
     <button class="btn">저장하기</button>
