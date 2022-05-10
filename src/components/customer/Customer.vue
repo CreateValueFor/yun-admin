@@ -40,12 +40,17 @@ export default {
     if (window.location.pathname.includes('login')) {
       this.header = false
     } else {
+      if (!window.localStorage.getItem('YUN-TOKEN')) {
+        this.$router.push({ name: 'Login' })
+        this.header = false
+        return
+      }
       this.header = true
     }
   },
   watch: {
     $route(to, from) {
-      console.log(to, from)
+      from
       if (to.name !== 'Login') {
         this.header = true
       }

@@ -8,7 +8,12 @@
       />
       <h2 style="width: 63px" class="program-title">{{ title }}</h2>
     </div>
-    <Select :options="options" :name="name" :value="value" />
+    <Select
+      @onChange="$emit('onChange', $event)"
+      :options="options"
+      :name="name"
+      :value="localValue"
+    />
     <div class="yun-label">{{ label }}</div>
   </div>
 </template>
@@ -47,9 +52,14 @@ export default {
       default: false,
     },
   },
-  methods: {
-    onKeyUp() {
-      this.$emit({ name: this.name, value: this.value })
+  computed: {
+    localValue: {
+      get() {
+        return this.value
+      },
+      // set(newVal) {
+      //   this.$emit('onChange', { name: this.name, value: newVal })
+      // },
     },
   },
 }

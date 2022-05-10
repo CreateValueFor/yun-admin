@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const customer = axios.create({
     baseURL: BASE_URL + 'customer/'
+    // baseURL: BASE_URL
 })
 
 customer.interceptors.request.use(
@@ -55,9 +56,44 @@ const putReservation = async (reservationData) => {
     return data;
 }
 
+const getCompose = async () => {
+    const { data } = await customer.get('compose')
+    const ingredients = data.data.ingredients.map(item => item.name);
+    const products = data.data.products.map(item => item.name);
+    return [ingredients, products];
+}
+
+const getExcludes = async () => {
+    const { data } = await customer.get('exclude');
+    return {
+        excludeIngredients: data.data.ingredients.map(item => item.name),
+        excludeProducts: data.data.products.map(item => item.name)
+    }
+}
+
+const patchCarboType = async (carboType) => {
+    const { data } = await customer.patch('carboType', { carboType });
+    return data;
+}
+
+const putExcludes = async (excludeData) => {
+    const { data } = await customer.put("exclude", excludeData);
+    return data
+}
+
+const postDelivery = async (deliveryData) => {
+    const { data } = await customer.post('delivery', deliveryData);
+    return data
+}
+
 export default {
     login,
     check,
     getCustomerInfo,
-    putReservation
+    putReservation,
+    getCompose,
+    getExcludes,
+    patchCarboType,
+    putExcludes,
+    postDelivery
 }

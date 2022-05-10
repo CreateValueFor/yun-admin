@@ -47,27 +47,28 @@
       class="carbo-protein-type program-container flex flex-col align-items:center;"
     >
       <div>
-        <div class="flex">
-          <div class="program-title-container">
-            <img src="@/assets/customer/carbo.svg" alt="carbo" />
-            <h2 class="program-title">탄수화물 구성</h2>
-          </div>
-          <Select
-            :options="carboType"
-            name="carboType"
-            :value="carboAndProteinInfo.carboType"
-          />
-          <!-- <div class="yun-label">단순 무게 (그램/g) 기준입니다.</div> -->
-        </div>
+        <select-with-label
+          title="탄수화물 구성"
+          img="carbo"
+          name="carboType"
+          @onChange="onChangeCarboType"
+          :value="carboAndProteinInfo.carboType"
+          :options="carboType"
+        />
+
+        <!-- label="단순 무게 (그램/g) 기준입니다." -->
         <input-with-label
-          label="단순 무게 (그램/g) 기준입니다."
           title="탄수화물 양"
           img="carbo"
+          name="carboAmount"
+          :value="carboAndProteinInfo.carboAmount * 100 + 'g'"
           :disabled="true"
         />
+        <!-- label="단순 무게 (그램/g) 기준입니다." -->
         <input-with-label
-          label="단순 무게 (그램/g) 기준입니다."
           title="단백질 양"
+          name="proteinAmount"
+          :value="carboAndProteinInfo.proteinAmount * 100 + 'g'"
           img="protein"
           :disabled="true"
         />
@@ -79,46 +80,45 @@
         메뉴별 구성 식재료 보기
       </button>
       <InfoSelect
-        title="메뉴 제외"
-        :options="products"
-        type="메뉴"
-        label="제외 된 메뉴를 뺀 식단 구성으로
-자율적 / 가능한 순차적으로
-식단이 랜덤 제공됩니다."
+        title="알러지 및 식재료 제외"
+        :options="ingredients"
+        type="식재료"
+        name="ingredient"
+        label="해당 식재료를 포함하는 메뉴가 전체 제외됩니다."
         :userName="userName"
         :selectedList="excludedIngredients"
-      >
-        <div name="header">
-          <h2 style="width:70px" class="program-title">
-            알러지 및 <br />
-            식재료 제외
-          </h2>
-        </div>
-      </InfoSelect>
+        @add="onAdd"
+        @remove="onRemove"
+      />
+
       <hr class="w-full" />
       <InfoSelect
         title="메뉴 제외"
         :options="products"
         type="메뉴"
+        name="menu"
         label="제외 된 메뉴를 뺀 식단 구성으로
 자율적 / 가능한 순차적으로
 식단이 랜덤 제공됩니다."
         :userName="userName"
-        :selectedList="excludedIngredients"
+        :selectedList="excludeMenus"
+        @add="onAdd"
+        @remove="onRemove"
       />
     </div>
     <hr class="w-full" />
-    <button class="btn">저장하기</button>
+    <button class="btn" @click="onSave">저장하기</button>
   </div>
 </template>
 <script>
 import Guide from '@/components/customer/Guide'
 import Divider from '@/components/customer/Divider.vue'
-import Custom from '@/api/custom'
+
 import InfoSelect from '../../components/customer/InfoSelect.vue'
-import Select from '@/components/customer/Select.vue'
 
 import InputWithLabel from '../../components/customer/InputWithLabel.vue'
+import customer from '../../api/customer'
+import SelectWithLabel from '../../components/customer/SelectWithLabel.vue'
 
 // import Divider from '../../components/customer/Divider.vue'
 export default {
@@ -126,31 +126,134 @@ export default {
     Guide,
     Divider,
     InfoSelect,
-    Select,
 
     InputWithLabel,
+    SelectWithLabel,
+  },
+  async mounted() {
+    // 고객 정보 불러오기
+    const {
+      data: { carboAmount, proteinAmount, CarboType },
+    } = await customer.getCustomerInfo()
+
+    this.carboAndProteinInfo = {
+      carboAmount,
+      proteinAmount,
+      carboType: CarboType.name,
+    }
+    const [ingredients, products] = await customer.getCompose()
+    this.ingredients = ingredients
+    this.products = products
+
+    const { excludeIngredients, excludeProducts } = await customer.getExcludes()
+    console.log(excludeIngredients, excludeProducts)
+    this.excludedIngredients = excludeIngredients
+    this.excludeMenus = excludeProducts
   },
   data() {
     return {
       program: '1일 1식 20일 프로그램',
-      ingredients: Custom.ingredientList,
-      products: Custom.productList,
+      ingredients: [],
+      products: [],
       userName: '윤식단',
       excludedIngredients: ['당근'],
-      carboType: ['고구마', '고구마+현미밥', '현미밥'],
+      excludeMenus: [],
+      carboType: ['고구마', '고구마 + 현미밥', '현미밥'],
       carboAndProteinInfo: {
-        carboType: '고구마',
-        carboAmount: 100,
-        proteinAmount: 100,
+        carboType: '',
+        carboAmount: 0,
+        proteinAmount: 0,
       },
       images: {
         carbo: require('@/assets/customer/carbo.svg'),
       },
     }
   },
+  methods: {
+    onChangeCarboType(e) {
+      const { name, value } = e
+      this.$set(this.carboAndProteinInfo, name, value)
+    },
+    onAdd(e) {
+      const { name, value } = e
+      if (name === 'menu') {
+        if (this.excludeMenus.includes(value)) {
+          return
+        }
+        this.excludeMenus.push(value)
+      } else {
+        if (this.excludedIngredients.includes(value)) {
+          return
+        }
+        this.excludedIngredients.push(value)
+      }
+    },
+    onRemove(e) {
+      const { name, value } = e
+      if (name === 'menu') {
+        this.excludeMenus = this.excludeMenus.filter((item) => item !== value)
+      } else {
+        this.excludedIngredients = this.excludedIngredients.filter(
+          (item) => item !== value
+        )
+      }
+    },
+    async onSave() {
+      await customer.patchCarboType(this.carboAndProteinInfo.carboType)
+      await customer.putExcludes({
+        excludeIngredients: this.excludedIngredients,
+        excludeProducts: this.excludeMenus,
+      })
+      window.alert('정상적으로 저장되었습니다.')
+    },
+  },
 }
 </script>
 <style lang="scss">
+.program {
+  margin: 50px auto;
+  width: 80%;
+}
+.program-container {
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: #000000;
+  margin: 10px auto;
+
+  align-items: center;
+  .program-title {
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .program-contents {
+    font-weight: 300;
+    font-size: 10px;
+  }
+  .program-label {
+    color: #fff;
+    display: inline;
+    padding: 3px 5px;
+    border-radius: 5px;
+    font-size: 10px;
+    line-height: 10px;
+    &.early {
+      background: #002a5b;
+    }
+    &.day {
+      background: #26331e;
+    }
+  }
+}
+.btn {
+  margin-top: 20px;
+  width: 100px;
+  float: right;
+  height: 30px;
+  background: #26331e;
+  color: #fff;
+  border-radius: 5px;
+  margin-bottom: 50px;
+}
 .carbo-protein-type {
   .program-title-container {
     width: 110px;

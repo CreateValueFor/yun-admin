@@ -14,7 +14,8 @@
         class="yun-customer-input"
         type="text"
         :disabled="disabled"
-        style="width: 50%"
+        style="width: 50%; font-size: 10px; padding-left: 10px"
+        v-model="localValue"
       />
     </div>
     <div class="yun-label">{{ label }}</div>
@@ -36,7 +37,7 @@ export default {
       type: String,
     },
     value: {
-      type: String,
+      type: [String, Number],
       require: true,
     },
     name: {
@@ -48,6 +49,16 @@ export default {
       default: false,
     },
   },
+  computed: {
+    localValue: {
+      get() {
+        return this.value
+      },
+      set(newVal) {
+        this.$emit('onChange', { name: this.name, value: newVal })
+      },
+    },
+  },
   methods: {
     onKeyUp() {
       this.$emit({ name: this.name, value: this.value })
@@ -55,8 +66,8 @@ export default {
   },
 }
 </script>
-<style lang="scss">
+<style lang="scss" scope>
 .program-title {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
 }
 </style>

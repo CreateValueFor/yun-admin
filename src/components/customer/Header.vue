@@ -2,7 +2,7 @@
   <div>
     <div class="flex w-full justify-between px-8 py-10">
       <div class="flex items-center">
-        <img src="@/assets/greenLogo.svg" alt="greenLogo" class="mr-12" />
+        <img src="@/assets/greenLogo.svg" alt="greenLogo" class="mr-4" />
         <h2>{{ userName }}님</h2>
       </div>
       <div>

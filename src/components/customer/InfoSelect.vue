@@ -1,47 +1,53 @@
 <template>
-  <div style="padding-top: 50px; padding-bottom:100px;">
-    <div class="flex items-center">
-      <div class="flex items-center">
+  <div class="w-full" style="padding-top: 50px; padding-bottom:100px;">
+    <div class=" items-center">
+      <div class="flex items-center justify-center" style="margin-bottom:26px">
         <img
-          src="@/assets/customer/exclude.svg"
+          src="@/assets/customer/excludeIcon.svg"
           alt="exclude"
           class="mr-3"
-          style="width:15px; height:15px; object-fit:none;"
         />
-        <slot>
-          <h2 style="width:70px" class="program-title">{{ title }}</h2>
-        </slot>
+        <h2 class="program-title">{{ title }}</h2>
       </div>
-      <div class="mr-3" style="position:relative; width:50%">
-        <!-- <select class="yun-customer-select" name="allergy" id="allergy">
-          <option v-for="(item, idx) in ingredients" :key="idx">
-            {{ item }}
-          </option>
-        </select> -->
-        <Select :options="selectedList" :name="name" :value="value" />
-        <div style="font-size:12px;position:absolute; top:50px;width: 100%;">
-          <h2 class="program-title">
+      <div
+        class="yun-label text-center"
+        style="margin: 0px auto 10px; max-width: 194px; "
+      >
+        {{ label }}
+      </div>
+      <div class="w-full" style="position:relative;">
+        <div class="flex justify-center" style="transform: translateX(47px)">
+          <Select
+            :options="options"
+            :name="name"
+            :value="value"
+            @onChange="value = $event.value"
+          />
+          <button
+            style="height:20px; border: 1px solid #e6e6e6; "
+            class="input-button"
+            @click="$emit('add', { name, value })"
+          >
+            추가
+          </button>
+        </div>
+        <div style="font-size:12px;width: 100%;margin-top: 60px;">
+          <h2 class="program-title text-center">
             {{ userName }}님이 제외하는 {{ type }}에요!
           </h2>
-          <div>
-            <div v-for="item in selectedList" :key="item" class="selected-item">
+          <div
+            style="margin: 14px auto 0px;max-width:300px;"
+            class="flex flex-wrap justify-center"
+          >
+            <div
+              v-for="item in selectedList"
+              :key="item"
+              class="selected-item"
+              @click="$emit('remove', { name, value: item })"
+            >
               # {{ item }}
             </div>
           </div>
-        </div>
-      </div>
-      <div style="position:relative; margin-top: -10px;">
-        <button
-          style="height:30px; border: 1px solid #e6e6e6; "
-          class="input-button"
-        >
-          추가
-        </button>
-        <div
-          class="yun-label"
-          style="width:50px; line-height: .75rem; margin-left:0; position:absolute; top: 35px"
-        >
-          {{ label }}
         </div>
       </div>
     </div>
@@ -87,12 +93,29 @@ export default {
   },
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .selected-item {
   background: #000;
   color: #fff;
-  padding: 4px 10px;
+  padding: 0px 10px;
+  margin: 2px;
+  font-size: 10px;
   border-radius: 15px;
   display: inline;
+  position: relative;
+}
+.input-button {
+  margin-left: 10px;
+  padding: 0px 10px;
+  display: flex;
+  align-items: center;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1.5rem;
+  background: #e6e6e6;
+  border: 1px solid #fff;
+  color: #555555;
 }
 </style>
