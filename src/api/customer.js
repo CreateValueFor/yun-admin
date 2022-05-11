@@ -2,8 +2,8 @@ import { BASE_URL } from './host'
 import axios from 'axios';
 
 const customer = axios.create({
-    baseURL: BASE_URL + 'customer/'
-    // baseURL: BASE_URL
+    // baseURL: BASE_URL + 'customer/'
+    baseURL: BASE_URL
 })
 
 customer.interceptors.request.use(

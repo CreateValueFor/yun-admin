@@ -95,7 +95,7 @@
         <th>제외메뉴</th>
         <th>제외토핑</th>
         <th>배송</th>
-        <th>요청사항</th>
+        <th>수정</th>
       </thead>
       <tbody>
         <tr v-for="(order, idx) in searchList" :key="idx">
@@ -123,10 +123,25 @@
           <td>{{ order.excludeProduct }}</td>
           <td>{{ order.excludeTopping }}</td>
           <td>{{ order.deliveryType }}</td>
-          <td>{{ order.request }}</td>
+
+          <td>
+            <button
+              class="bg-green-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
+              @click="openUpdateModal(idx)"
+            >
+              수정
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
+    <OrderUpdateDialog
+      v-if="showUpdateModal"
+      :modalData="selectedOrder"
+      :show="showUpdateModal"
+      @close="showUpdateModal = false"
+      @submit="updateSingleOrder"
+    />
   </div>
 </template>
 
@@ -136,11 +151,12 @@ import TapMenu from '../components/order/TapMenu.vue'
 import { utils, writeFile } from 'xlsx'
 import custom from '@/api/custom.js'
 import api from '@/api/api.js'
+import OrderUpdateDialog from '@/components/order/OrderUpdateDialog.vue'
 // import axios from 'axios'
 
 export default {
   name: 'DashboardHome',
-  components: { TapMenu },
+  components: { TapMenu, OrderUpdateDialog },
   data() {
     return {
       searchList: [],
@@ -153,6 +169,8 @@ export default {
         product5: '',
       },
       searchCondition: {},
+      selectedOrder: {},
+      showUpdateModal: false,
     }
   },
   watch: {
@@ -197,6 +215,31 @@ export default {
     },
   },
   methods: {
+    openUpdateModal(idx) {
+      this.selectedOrder = this.searchList[idx]
+      this.selectedOrder = {
+        ...this.selectedOrder,
+        package: this.selectedOrder.Package.name,
+        excludeToppingObject: {
+          carrot: this.selectedOrder.excludeTopping
+            .split(',')
+            .includes('토핑당근'),
+          bean: this.selectedOrder.excludeTopping.split(',').includes('콩'),
+        },
+        carboType: this.selectedOrder.CarboType.name,
+      }
+      this.showUpdateModal = true
+    },
+    async updateSingleOrder(e) {
+      console.log(e.excludeToppingObject)
+      const res = await api.putSingleOrder(e, e.id)
+      console.log(res)
+      if (res.success) {
+        window.alert('수정 완료')
+        this.showUpdateModal = false
+      }
+      await this.search()
+    },
     onChange(e) {
       const { name, value } = e.target
       this.$set(this.searchCondition, name, value)
@@ -317,10 +360,15 @@ export default {
           availableMenu.length
             ? ' / ' +
               availableMenu
-                .map((item) => this.productList[item - 1].name)
+                // .map((item) => (this.productList[item - 1].name))
+                .map((item) => item)
                 .join(' ')
             : ''
         }`
+        // 배송 종료일 설정
+        if (item.Reservations) {
+          item.endDate = item.Reservations[0].deliveryDate
+        }
 
         // 상품 정보 추가
 

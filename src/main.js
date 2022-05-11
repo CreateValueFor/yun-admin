@@ -14,7 +14,8 @@ import Home from '@/pages/Home'
 import Order from '@/pages/Order'
 import Calendar from '@/pages/Calendar'
 import AddProduct from '@/pages/AddProduct'
-import ViewProduct from '@/pages/ViewProduct'
+// import ViewProduct from '@/pages/ViewProduct'
+import ManageProduct from '@/pages/ManageProduct'
 import OrderList from "@/pages/OrderList"
 import DeliveryList from '@/pages/DeliveryList'
 
@@ -55,7 +56,7 @@ const routes = [
 
       { path: 'calendar', name: 'Calendar', component: Calendar },
       { path: 'addProduct', name: 'AddProduct', component: AddProduct },
-      { path: 'manageProduct', name: 'ManageProduct', component: ViewProduct }
+      { path: 'manageProduct', name: 'ManageProduct', component: ManageProduct }
     ]
   }
 
