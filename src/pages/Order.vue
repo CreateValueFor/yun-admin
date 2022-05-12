@@ -104,15 +104,15 @@
                 <!-- <td>{{ item.excludeIngredient.join(' , ') || '없음' }}</td> -->
                 <!-- <td>{{ item.요청사항 }}</td> -->
                 <td>
-                  <div v-if="item.확인필요">
+                  <div>
                     <button
                       class="bg-green-500 shadow rounded-lg px-6 py-2 text-white"
                       @click="checkOrder(item, idx)"
                     >
-                      등록
+                      제외
                     </button>
-                  </div>
-                  <div v-else>
+                    <!-- </div> -->
+                    <!-- <div v-else> -->
                     <!-- {{ item.제외식재료 }} -->
                     {{
                       (item.excludeIngredientName &&
@@ -141,7 +141,7 @@
                     수정
                   </button>
                   <button
-                    @click="postOrder"
+                    @click="deleteOrder(idx)"
                     class="bg-red-500 shadow rounded-lg px-6 py-2 text-white"
                   >
                     삭제
@@ -153,174 +153,13 @@
         </div>
       </div>
     </div>
-    <modal
-      v-if="showUpdateModal"
-      @close="showUpdateModal = false"
-      @submit="updateOrder"
-    >
-      <h3 slot="header">주문 수정</h3>
-      <div slot="body">
-        <div class="flex">
-          <div class="w-1/3 px-3">
-            구매자명
-            <input
-              v-model="modalData.buyer"
-              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-              type="text"
-              id="buyer"
-            />
-          </div>
-          <div class="w-1/3 px-3">
-            수취인명
-            <input
-              v-model="modalData.receiver"
-              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-              type="text"
-              id="receiver"
-            />
-          </div>
-          <div class="w-1/3 px-3">
-            수취인연락처
-            <input
-              v-model="modalData.receiverPhone"
-              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-              type="text"
-              id="buyer"
-            />
-          </div>
-          <div class="w-1/3 px-3">
-            구매자연락처
-            <input
-              v-model="modalData.buyerPhone"
-              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-              type="text"
-              id="buyer"
-            />
-          </div>
-        </div>
-        <div class="flex mt-3">
-          <div class="w-1/2  px-3">
-            기본주소
-            <input
-              v-model="modalData.address1"
-              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-              type="text"
-              id="address1"
-            />
-          </div>
-          <div class="w-1/2  px-3">
-            상세주소
-            <input
-              v-model="modalData.address2"
-              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-              type="text"
-              id="address2"
-            />
-          </div>
-        </div>
-        <div class="flex mt-3">
-          <div class="w-1/2 px-3">
-            공동현관 비밀번호
-            <input
-              v-model="modalData.entrancePassword"
-              class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-              type="text"
-              id="entrancePassword"
-            />
-          </div>
-          <div class="w-1/2 px-3">
-            <div>상품명</div>
-            <select
-              v-model="modalData.package"
-              class="mt-3 bg-white h-10 w-full  px-5 rounded-lg border text-sm focus:outline-none"
-            >
-              <option>1일 1식 10일 프로그램</option>
-              <option>1일 2식 10일 프로그램</option>
-              <option>1일 3식 10일 프로그램</option>
-              <option>1일 1식 20일 프로그램</option>
-              <option>1일 2식 20일 프로그램</option>
-              <option>1일 3식 20일 프로그램</option>
-              <option>1일 4식 20일 프로그램</option>
-            </select>
-          </div>
-        </div>
 
-        <div class="flex mt-3">
-          <div class="w-1/2 px-3">
-            제외토핑
-            <div>
-              <label for="excludeCarrotTopping">당근</label>
-              <input
-                v-model="modalData.excludeToppingObject.carrot"
-                class=" mx-3 bg-white rounded-lg border text-sm focus:outline-none"
-                type="checkbox"
-                id="excludeCarrotTopping"
-              />
-              <label for="excludeBeanTopping">콩</label>
-              <input
-                v-model="modalData.excludeToppingObject.bean"
-                class=" ml-3 bg-white rounded-lg border text-sm focus:outline-none"
-                type="checkbox"
-                id="excludeBeanTopping"
-              />
-            </div>
-          </div>
-          <div class="w-1/2 ">
-            탄수화물구성
-            <div>
-              <label for="sweetPotato">고구마</label>
-              <input
-                v-model="modalData.carboType"
-                value="고구마"
-                class=" mx-1 bg-white rounded-lg border text-sm focus:outline-none"
-                type="radio"
-                id="sweetPotato"
-              />
-              <label for="mixed">고구마 + 현미밥</label>
-              <input
-                v-model="modalData.carboType"
-                value="고구마 + 현미밥"
-                class=" mx-1 bg-white rounded-lg border text-sm focus:outline-none"
-                type="radio"
-                id="mixed"
-              />
-              <label for="rice">현미밥</label>
-              <input
-                v-model="modalData.carboType"
-                value="현미밥"
-                class=" ml-1 bg-white rounded-lg border text-sm focus:outline-none"
-                type="radio"
-                id="rice"
-              />
-            </div>
-          </div>
-        </div>
-        <div class="flex mt-3">
-          <div class="w-1/2">
-            단백질량
-            <select
-              v-model="modalData.proteinAmount"
-              class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-            >
-              <option value="1">1</option>
-              <option value="1.5">1.5</option>
-              <option value="2">2</option>
-            </select>
-          </div>
-          <div class="w-1/2">
-            탄수화물량
-            <select
-              v-model="modalData.carboAmount"
-              class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-            >
-              <option value="1">1</option>
-              <option value="1.5">1.5</option>
-              <option value="2">2</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </modal>
+    <update-single-order-dialog
+      @submit="updateOrder"
+      @close="showUpdateModal = false"
+      :show="showUpdateModal"
+      :modalData="modalData"
+    />
     <modal
       v-if="showModal"
       @close="showModal = false"
@@ -338,92 +177,8 @@
       :uploadOption="uploadOption"
       :loading="loading"
       @submit="postOrder"
+      @close="showUploadModal = false"
     />
-    <!-- <modal v-if="showUploadModal">
-      <h3 slot="header">주문 업로드 설정</h3>
-      <div slot="body" class="flex">
-        <div class="w-1/2 p-3 border-r">
-          <h3>새벽배송</h3>
-          <div class="mt-3">
-            <input
-              type="radio"
-              v-model="uploadOption.earlyType"
-              name="deliveryDate"
-              value="mw"
-              id="mw-date"
-            />
-            <label for="mw-date" class="mr-3">월/수</label>
-            <input
-              type="radio"
-              v-model="uploadOption.earlyType"
-              name="deliveryDate"
-              value="tt"
-              id="tt-date"
-            />
-            <label for="tt-date">화/목</label>
-          </div>
-          <div class="mt-3">10일 프로그램 - {{ orderCount.early10 }}개</div>
-          <input
-            v-model="uploadOption.early10"
-            class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-            type="date"
-            max="9999-12-31"
-            id="program-10-early"
-          />
-          <div class="mt-3">20일 프로그램 - {{ orderCount.early20 }}개</div>
-          <input
-            v-model="uploadOption.early20"
-            class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-            type="date"
-            max="9999-12-31"
-            id="program-20-early"
-          />
-        </div>
-        <div class="w-1/2 p-3">
-          <h3>일반배송(화, 목 배송)</h3>
-          <div class="mt-3">10일 프로그램 - {{ orderCount.day10 }}개</div>
-          <input
-            v-model="uploadOption.day10"
-            class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-            type="date"
-            max="9999-12-31"
-            id="program-10-day"
-          />
-          <div class="mt-3">20일 프로그램 - {{ orderCount.day20 }}개</div>
-          <input
-            v-model="uploadOption.day20"
-            class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-            type="date"
-            max="9999-12-31"
-            id="program-20-day"
-          />
-        </div>
-      </div>
-      <div slot="footer" class="flex justify-end">
-        <button
-          class="bg-white shadow border rounded-lg px-6 py-2 mr-3"
-          @click="showUploadModal = false"
-        >
-          취소
-        </button>
-        <button
-          @click="postOrder"
-          :disabled="loading"
-          class="bg-green-500 shadow rounded-lg px-6 py-2 text-white"
-        >
-          <svg
-            v-if="loading"
-            class="animate-spin h-5 w-5 mr-3 ..."
-            viewBox="0 0 24 24"
-          >
-           
-    </svg>
-          <span v-else>
-            업로드
-          </span>
-        </button>
-      </div>
-    </modal> -->
   </div>
 </template>
 
@@ -434,10 +189,11 @@ import { read, utils, writeFile } from 'xlsx'
 import custom from '@/api/custom.js'
 import api from '@/api/api.js'
 import OrderUploadModal from '../components/order/OrderUploadModal.vue'
+import UpdateSingleOrderDialog from '../components/order/UpdateSingleOrderDialog.vue'
 
 export default {
   name: 'DashboardHome',
-  components: { TapMenu, Modal, OrderUploadModal },
+  components: { TapMenu, Modal, OrderUploadModal, UpdateSingleOrderDialog },
   data() {
     return {
       uploadedOrder: [],
@@ -506,18 +262,54 @@ export default {
   },
   methods: {
     openUpdateModal(item, idx) {
+      console.log(item, idx)
       this.selectedIndex = idx
-      this.modalData = custom.orderTranslater(item, 'korean')
+      this.modalData = item
+      this.modalData = {
+        ...this.modalData,
+        excludeToppingObject: {
+          carrot: item.excludeIngredientName.includes('당근'),
+          bean: item.excludeIngredientName.includes('콩'),
+        },
+      }
       console.log(this.modalData)
       this.showUpdateModal = true
     },
     updateOrder() {
-      const data = {
-        ...this.uploadedOrder[this.selectedIndex],
-        ...custom.orderTranslater(this.modalData, 'english'),
+      const carrot = this.ingredients.find((item) => item.name === '당근')
+      const bean = this.ingredients.find((item) => item.name === '콩')
+      if (this.modalData.excludeToppingObject.carrot) {
+        if (!this.modalData.excludeIngredients.includes(carrot.id)) {
+          this.modalData.excludeIngredients.push(carrot.id)
+          this.modalData.excludeIngredientName.push(carrot.name)
+        }
+      } else {
+        console.log('당근 토핑 제외 안함')
+        this.modalData.excludeIngredients = this.modalData.excludeIngredients.filter(
+          (item) => item !== carrot.id
+        )
+        this.modalData.excludeIngredientName = this.modalData.excludeIngredientName.filter(
+          (item) => item !== carrot.name
+        )
       }
-      this.selectedIndex
-      this.$set(this.uploadedOrder, this.selectedIndex, data)
+
+      if (this.modalData.excludeToppingObject.bean) {
+        if (!this.modalData.excludeIngredients.includes(bean.id)) {
+          this.modalData.excludeIngredients.push(bean.id)
+          this.modalData.excludeIngredientName.push(bean.name)
+        }
+      } else {
+        this.modalData.excludeIngredients = this.modalData.excludeIngredients.filter(
+          (item) => item !== bean.id
+        )
+        this.modalData.excludeIngredientName = this.modalData.excludeIngredientName.filter(
+          (item) => item !== bean.name
+        )
+      }
+
+      console.log(this.modalData)
+
+      this.$set(this.uploadedOrder, this.selectedIndex, this.modalData)
       this.showUpdateModal = false
     },
 
@@ -907,6 +699,9 @@ export default {
               } else {
                 // 탄수화물 처리
                 initOrder.carboType = item['옵션정보'].split(':')[1].trim()
+                if (initOrder.carboType === '현미밥만') {
+                  initOrder.carboType = '현미밥'
+                }
               }
             } else {
               if (item['옵션정보'].includes('단백질')) {

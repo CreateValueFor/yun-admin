@@ -62,7 +62,7 @@
     <div slot="footer" class="flex justify-end">
       <button
         class="bg-white shadow border rounded-lg px-6 py-2 mr-3"
-        @click="showUploadModal = false"
+        @click="$emit('close')"
       >
         취소
       </button>
