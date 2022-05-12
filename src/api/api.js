@@ -6,6 +6,10 @@ const _baseGetRequest = async (path) => {
     const res = await axios.get(BASE_URL + path)
     return res.data;
 }
+const _baseDeleteRequest = async (path) => {
+    const res = await axios.delete(BASE_URL + path)
+    return res.data;
+}
 
 const _basePostRequest = async (path, param) => {
     const res = await axios.post(BASE_URL + path, param)
@@ -71,7 +75,20 @@ const createProductIngredient = async (param) => {
     const res = await _basePutRequest('product', param);
     return res;
 }
+// 배송 불가일 관리
+const getHolidays = async () => {
+    const res = await _baseGetRequest('holiday');
+    return res;
+}
+const postHoliday = async (param) => {
+    const res = await _basePostRequest('holiday', param)
+    return res;
+}
 
+const deleteHoliday = async (date) => {
+    const res = await _baseDeleteRequest('holiday/' + date);
+    return res;
+}
 
 export default {
     getOrderList,
@@ -88,5 +105,9 @@ export default {
     createProduct,
     //제품 세트 추가
     createProductIngredient,
+    // 공휴일 
+    getHolidays,
+    postHoliday,
+    deleteHoliday,
 
 }
