@@ -275,6 +275,9 @@ export default {
       console.log(this.modalData)
       this.showUpdateModal = true
     },
+    deleteOrder(idx) {
+      this.uploadedOrder.splice(idx, 1)
+    },
     updateOrder() {
       const carrot = this.ingredients.find((item) => item.name === '당근')
       const bean = this.ingredients.find((item) => item.name === '콩')
