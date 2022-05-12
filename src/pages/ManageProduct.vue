@@ -268,7 +268,10 @@ export default {
       const res = await api.createProductIngredient(this.selectedProductDetail)
 
       if (res.success) {
+        window.alert('입력하신 내용이 저장되었습니다.')
         this.initialize()
+      } else {
+        window.alert('시스템 에러 발생')
       }
     },
   },

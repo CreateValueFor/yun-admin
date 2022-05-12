@@ -11,27 +11,37 @@
 
           <div class="modal-body">
             <slot name="body">
-              <table class="w-full">
-                <thead>
-                  <th>
-                    제품명
-                  </th>
-                  <th>
-                    메인 재료
-                  </th>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="(item, idx) in products"
-                    :key="idx"
-                    @click="checkItem(idx)"
-                    :class="{ checked: item.checked }"
+              <div class="flex overflow-scroll h-64">
+                <div class="w-1/2">
+                  <div>제품명</div>
+                  <div
+                    v-for="prd in products"
+                    :key="prd.name"
+                    class="px-5 py-2 border rounded-lg my-1 cursor-pointer"
+                    @click="excludeProductAction(prd.id)"
+                    :class="{
+                      'bg-red-300': excludeProduct.includes(prd.id),
+                    }"
                   >
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.mainIngredient }}</td>
-                  </tr>
-                </tbody>
-              </table>
+                    {{ prd.name }}
+                  </div>
+                </div>
+                <div class="w-1/2">
+                  <div>식재료명</div>
+                  <div
+                    class="px-5 py-2 border rounded-lg my-1 cursor-pointer"
+                    v-for="igd in ingredients"
+                    :key="igd.name"
+                    :class="{
+                      'bg-red-300': excludeIngredient.includes(igd.id),
+                    }"
+                    @click="excludeIngredientAction(igd.id)"
+                  >
+                    {{ igd.name }}
+                  </div>
+                </div>
+              </div>
+
               <input
                 type="text"
                 name="serch"
@@ -65,6 +75,8 @@
 </template>
 <script>
 import custom from '../../api/custom'
+import api from '@/api/api'
+
 export default {
   name: 'order-modal',
   props: {
@@ -75,13 +87,21 @@ export default {
   data() {
     return {
       products: [...custom.productList],
+      ingredients: [],
+      excludeProduct: [],
+      excludeIngredient: [],
       memo: '',
     }
   },
-  mounted() {
+  async mounted() {
     if (this.order) {
       this.memo = this.order.memo
     }
+    this.products = await api.getAllProducts()
+    this.ingredients = await api.getAllIngredients()
+    this.excludeIngredient = this.order.excludeIngredients.map(
+      (item) => this.ingredients.filter((igd) => igd.name === item)[0].id
+    )
     this.products = this.products.map((item) => ({ ...item, checked: false }))
   },
   methods: {
@@ -90,11 +110,35 @@ export default {
       this.$set(this.products[idx], 'checked', !this.products[idx].checked)
     },
     submitClicked() {
-      const checked = this.products
-        .filter((item) => item.checked)
-        .map((item) => item.name)
-      this.$emit('submit', { product: checked, memo: this.memo })
-      console.log(checked)
+      this.$emit('submit', {
+        excludeProducts: this.excludeProduct,
+        excludeIngredients: this.excludeIngredient,
+        excludeProductName: this.excludeProduct.map(
+          (item) => this.products.filter((prd) => prd.id === item)[0].name
+        ),
+        excludeIngredientName: this.excludeIngredient.map(
+          (item) => this.ingredients.filter((prd) => prd.id === item)[0].name
+        ),
+        memo: this.memo,
+      })
+    },
+    excludeProductAction(productId) {
+      if (!this.excludeProduct.includes(productId)) {
+        this.excludeProduct.push(productId)
+      } else {
+        this.excludeProduct = this.excludeProduct.filter(
+          (item) => item !== productId
+        )
+      }
+    },
+    excludeIngredientAction(ingredientId) {
+      if (!this.excludeIngredient.includes(ingredientId)) {
+        this.excludeIngredient.push(ingredientId)
+      } else {
+        this.excludeIngredient = this.excludeIngredient.filter(
+          (item) => item !== ingredientId
+        )
+      }
     },
   },
 }

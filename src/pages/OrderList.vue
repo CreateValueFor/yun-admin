@@ -366,7 +366,7 @@ export default {
             : ''
         }`
         // 배송 종료일 설정
-        if (item.Reservations) {
+        if (item.Reservations.length !== 0) {
           item.endDate = item.Reservations[0].deliveryDate
         }
 

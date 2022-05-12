@@ -73,8 +73,8 @@
               <th>탄수화물량</th>
               <th>탄수화물 구성</th>
               <th>제외 식재료</th>
+              <th>제외 메뉴</th>
               <!-- <th>요청사항</th> -->
-              <!-- <th>제외식재료</th> -->
               <th>배송</th>
               <!-- <th>메모</th> -->
               <th></th>
@@ -101,9 +101,9 @@
                 <td>{{ item.proteinAmount }}</td>
                 <td>{{ item.carboAmount }}</td>
                 <td>{{ item.carboType }}</td>
-                <td>{{ item.excludeIngredient.join(' , ') || '없음' }}</td>
+                <!-- <td>{{ item.excludeIngredient.join(' , ') || '없음' }}</td> -->
                 <!-- <td>{{ item.요청사항 }}</td> -->
-                <!-- <td>
+                <td>
                   <div v-if="item.확인필요">
                     <button
                       class="bg-green-500 shadow rounded-lg px-6 py-2 text-white"
@@ -113,9 +113,24 @@
                     </button>
                   </div>
                   <div v-else>
-                    {{ item.제외식재료 }}
+                    <!-- {{ item.제외식재료 }} -->
+                    {{
+                      (item.excludeIngredientName &&
+                        item.excludeIngredientName.join(' , ')) ||
+                        item.excludeIngredients.join(' , ') ||
+                        '없음'
+                    }}
                   </div>
-                </td> -->
+                </td>
+                <td>
+                  {{
+                    (item.excludeProductName &&
+                      item.excludeProductName.join(' , ')) ||
+                      (item.excludeProducts &&
+                        item.excludeProducts.join(' , ')) ||
+                      '없음'
+                  }}
+                </td>
                 <td>{{ item.deliveryType }}</td>
                 <!-- <td>{{ item.메모 }}</td> -->
                 <td>
@@ -314,10 +329,17 @@
     >
       <div slot="header">
         <h3>{{ selectedOrder.구매자명 }} - 제외식재료 설정</h3>
-        <p>요청사항 : {{ selectedOrder.요청사항 }}</p>
+        <p>요청사항 : {{ selectedOrder.deliveryMessage }}</p>
       </div>
     </modal>
-    <modal v-if="showUploadModal">
+    <order-upload-modal
+      :show="showUploadModal"
+      :orderCount="orderCount"
+      :uploadOption="uploadOption"
+      :loading="loading"
+      @submit="postOrder"
+    />
+    <!-- <modal v-if="showUploadModal">
       <h3 slot="header">주문 업로드 설정</h3>
       <div slot="body" class="flex">
         <div class="w-1/2 p-3 border-r">
@@ -394,14 +416,14 @@
             class="animate-spin h-5 w-5 mr-3 ..."
             viewBox="0 0 24 24"
           >
-            <!-- ... -->
-          </svg>
+           
+    </svg>
           <span v-else>
             업로드
           </span>
         </button>
       </div>
-    </modal>
+    </modal> -->
   </div>
 </template>
 
@@ -411,10 +433,11 @@ import Modal from '../components/order/Modal.vue'
 import { read, utils, writeFile } from 'xlsx'
 import custom from '@/api/custom.js'
 import api from '@/api/api.js'
+import OrderUploadModal from '../components/order/OrderUploadModal.vue'
 
 export default {
   name: 'DashboardHome',
-  components: { TapMenu, Modal },
+  components: { TapMenu, Modal, OrderUploadModal },
   data() {
     return {
       uploadedOrder: [],
@@ -436,6 +459,7 @@ export default {
       early20: [],
       day10: [],
       day20: [],
+      ingredients: [],
     }
   },
   computed: {
@@ -476,6 +500,9 @@ export default {
         error,
       }
     },
+  },
+  async mounted() {
+    this.ingredients = await api.getAllIngredients()
   },
   methods: {
     openUpdateModal(item, idx) {
@@ -621,10 +648,26 @@ export default {
     },
 
     changeOrder(e) {
+      console.log(e)
       this.$set(
         this.uploadedOrder[this.selectedIndex],
-        '제외식재료',
-        e.product.join(',')
+        'excludeProducts',
+        e.excludeProducts
+      )
+      this.$set(
+        this.uploadedOrder[this.selectedIndex],
+        'excludeProductName',
+        e.excludeProductName
+      )
+      this.$set(
+        this.uploadedOrder[this.selectedIndex],
+        'excludeIngredients',
+        e.excludeIngredients
+      )
+      this.$set(
+        this.uploadedOrder[this.selectedIndex],
+        'excludeIngredientName',
+        e.excludeIngredientName
       )
       this.$set(this.uploadedOrder[this.selectedIndex], '메모', e.memo)
       this.$set(this.uploadedOrder[this.selectedIndex], '확인필요', false)
@@ -655,7 +698,7 @@ export default {
             탄수화물구성: item.carboType,
             탄수화물양: item.carboAmount,
             단백질양: item.proteinAmount,
-            제외식재료: item.excludeIngredient.join(' , '),
+            제외식재료: item.excludeIngredients.join(' , '),
             공동현관비밀번호: item.entrancePassword,
             배송타입: item.deliveryType,
           }))
@@ -676,7 +719,7 @@ export default {
             탄수화물구성: item.carboType,
             탄수화물양: item.carboAmount,
             단백질양: item.proteinAmount,
-            제외식재료: item.excludeIngredient.join(' , '),
+            제외식재료: item.excludeIngredients.join(' , '),
             공동현관비밀번호: item.entrancePassword,
             배송타입: item.deliveryType,
           }))
@@ -765,14 +808,35 @@ export default {
         initOrder.serial = order[0].주문번호
         initOrder.buyer = order[0].구매자명
         initOrder.receiver = order[0].수취인명
-        initOrder.buyerPhone = order[0]['(구매자연락처)'] // '-'가 없는 순수 숫자만 받기
-        initOrder.receiverPhone = order[0]['(수취인연락처1)'] // '-' 가 없는 순수 숫자만 받음
+        initOrder.buyerPhone =
+          order[0]['(구매자연락처)'] ||
+          order[0].구매자연락처.replaceAll('-', '') // '-'가 없는 순수 숫자만 받기
+        initOrder.receiverPhone =
+          order[0]['(수취인연락처1)'] ||
+          order[0].수취인연락처1.replaceAll('-', '') // '-' 가 없는 순수 숫자만 받음
         initOrder.naverId = order[0].구매자ID
+        initOrder.excludeProducts = []
+        initOrder.excludeProductName = []
 
         // 주소 받기
-        initOrder.배송지 = order[0]['(기본주소)'] + order[0]['(상세주소)']
-        initOrder.address1 = order[0]['(기본주소)']
-        initOrder.address2 = order[0]['(상세주소)']
+
+        // 배송지 v2
+        // initOrder.배송지 = order[0]['(기본주소)'] + order[0]['(상세주소)']
+        // initOrder.address1 = order[0]['(기본주소)']
+        // initOrder.address2 = order[0]['(상세주소)']
+        initOrder.배송지 = order[0].배송지
+        if (initOrder.배송지.split(') ').length === 2) {
+          initOrder.address1 = initOrder.배송지.split(') ')[0] + ')'
+          initOrder.address2 = initOrder.배송지.split(') ')[1]
+        } else {
+          initOrder.address1 = initOrder.배송지
+            .split(' ')
+            .splice(0, initOrder.배송지.split(' ').length - 2)
+            .join(' ')
+          initOrder.address2 = initOrder.배송지.split(' ')[
+            initOrder.배송지.split(' ').length - 1
+          ]
+        }
         initOrder['우편번호'] = order[0]['(우편번호)']
         // 배송 메세지
         initOrder.deliveryMessage = order[0]['배송메세지'] || '없음'
@@ -781,7 +845,8 @@ export default {
         initOrder.carboType = '고구마'
         initOrder.carboAmount = 1
         initOrder.proteinAmount = 1
-        initOrder.excludeIngredient = []
+        initOrder.excludeIngredients = []
+        initOrder.excludeIngredientName = []
 
         order.forEach((item) => {
           // 주문 행의 상품종류가 '조합형 옵션 상품'인 경우엔 본 주문에 대한 데이터
@@ -826,13 +891,19 @@ export default {
               ) {
                 // 제외 식재료 처리
                 const excludeWordIdx = item['옵션정보'].indexOf('제외')
-                const ingredient = item['옵션정보']
-                  .substring(optionType + 9, excludeWordIdx)
-                  .trim()
-                if (ingredient === '기타') {
+                if (excludeWordIdx === -1) {
+                  // 기타인 경우
                   initOrder.확인필요 = true
+                } else {
+                  const ingredient = item['옵션정보']
+                    .substring(optionType + 9, excludeWordIdx)
+                    .trim()
+                  const xigd = this.ingredients.find(
+                    (igd) => igd.name === ingredient
+                  )
+                  initOrder.excludeIngredients.push(xigd.id)
+                  initOrder.excludeIngredientName.push(xigd.name)
                 }
-                initOrder.excludeIngredient.push(ingredient)
               } else {
                 // 탄수화물 처리
                 initOrder.carboType = item['옵션정보'].split(':')[1].trim()
