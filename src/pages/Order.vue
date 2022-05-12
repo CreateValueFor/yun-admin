@@ -696,8 +696,12 @@ export default {
                   const xigd = this.ingredients.find(
                     (igd) => igd.name === ingredient
                   )
-                  initOrder.excludeIngredients.push(xigd.id)
-                  initOrder.excludeIngredientName.push(xigd.name)
+                  if (xigd) {
+                    initOrder.excludeIngredients.push(xigd.id)
+                    initOrder.excludeIngredientName.push(xigd.name)
+                  } else {
+                    console.log('문제가 발생', xigd, ingredient)
+                  }
                 }
               } else {
                 // 탄수화물 처리

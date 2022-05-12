@@ -86,6 +86,11 @@ const postDelivery = async (deliveryData) => {
     return data
 }
 
+const getHolidays = async () => {
+    const { data } = await customer.get('holiday');
+    return data;
+}
+
 export default {
     login,
     check,
@@ -95,5 +100,6 @@ export default {
     getExcludes,
     patchCarboType,
     putExcludes,
-    postDelivery
+    postDelivery,
+    getHolidays
 }

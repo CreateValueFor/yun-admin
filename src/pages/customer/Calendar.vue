@@ -100,7 +100,9 @@
                     ([1, 3].includes(secondIdx) &&
                       date[secondIdx + 1].locked) ||
                     ([2, 4].includes(secondIdx) && date[secondIdx - 1].locked)
-                      ? 'Lock'
+                      ? holidaies.includes(day.fullDay)
+                        ? '공휴일'
+                        : 'Lock'
                       : '배송일'
                   }}
                   <div
@@ -116,6 +118,7 @@
                         : '',
                     }"
                     @click="lockDelivery(monthIdx - 1, idx, secondIdx)"
+                    :disabled="holidaies.includes(day.fullDay)"
                     v-if="
                       ([1, 2, 3, 4].includes(secondIdx) &&
                         reserveDates.includes(date[1].fullDay)) ||
@@ -188,6 +191,7 @@ export default {
       months: [],
       reservations: [],
       reserveDates: [],
+      holidaies: [],
       lockDates: ['2022-05-23'],
     }
   },
@@ -202,11 +206,17 @@ export default {
   async created() {
     // 네트워크 호출해서 초기데이터 세팅
     const res = await customer.getCustomerInfo()
+    this.holidaies = (await customer.getHolidays()).data.map(
+      (item) => item.date
+    )
+    console.log(this.holidaies)
     const {
       Package: { name },
       Reservations,
+      deliveryType,
     } = res.data
     this.program = name
+    this.isEarly = deliveryType === '새벽배송'
     this.reservations = Reservations
     this.reserveDates = Reservations.map((item) => item.deliveryDate)
     this.lockDates = Reservations.filter((item) => item.locked).map(
@@ -237,6 +247,13 @@ export default {
   },
   methods: {
     lockDelivery(monthIdx, idx, secondIdx) {
+      //공휴일일 경우 해제 불가
+      if (
+        this.holidaies.includes(this.dates[monthIdx][idx][secondIdx].fullDay)
+      ) {
+        return window.alert('공휴일은 잠금 해제가 불가능합니다.')
+      }
+
       // 잠금 처리
       if (this.dates[monthIdx][idx][secondIdx].locked) {
         //잠금 해제
@@ -260,15 +277,27 @@ export default {
       this.lockDates.push(this.dates[monthIdx][idx][secondIdx].fullDay)
 
       // 새로운 배송 일정 생성
+      // const newReserveDateObj = new Date(
+      //   this.reserveDates[this.reserveDates.length - 1]
+      // )
       const newReserveDateObj = new Date(
-        this.reserveDates[this.reserveDates.length - 1]
+        this.dates[monthIdx][idx][secondIdx].fullDay
       )
-
-      const newReserveDay = newReserveDateObj.getDay()
-      if ([1, 2].includes(newReserveDay)) {
-        newReserveDateObj.setDate(newReserveDateObj.getDate() + 2)
-      } else {
-        newReserveDateObj.setDate(newReserveDateObj.getDate() + 5)
+      let notFlag = true
+      while (notFlag) {
+        const newReserveDay = newReserveDateObj.getDay()
+        if ([1, 2].includes(newReserveDay)) {
+          newReserveDateObj.setDate(newReserveDateObj.getDate() + 2)
+        } else {
+          newReserveDateObj.setDate(newReserveDateObj.getDate() + 5)
+        }
+        if (
+          !this.reserveDates.includes(
+            newReserveDateObj.toISOString().split('T')[0]
+          )
+        ) {
+          notFlag = false
+        }
       }
 
       this.reserveDates.push(
