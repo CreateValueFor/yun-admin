@@ -2,8 +2,8 @@ import { BASE_URL } from './host'
 import axios from 'axios';
 
 const customer = axios.create({
-    // baseURL: BASE_URL + 'customer/'
-    baseURL: BASE_URL
+    baseURL: BASE_URL + 'customer/'
+    // baseURL: BASE_URL
 })
 
 customer.interceptors.request.use(
@@ -50,7 +50,20 @@ const getCustomerInfo = async () => {
     const res = await _baseGetRequest('reservation')
     return res;
 }
+const getCustomerInfoAdmin = async (id) => {
+    const res = await _baseGetRequest(`admin/reservation/${id}`)
+    return res;
+}
 
+const getHolidaysAdmin = async (id) => {
+    const { data } = await customer.get(`admin/holiday/${id}`);
+    return data;
+}
+
+const putReservationAdmin = async (reservationData, id) => {
+    const { data } = await customer.put(`admin/reservation/${id}`, reservationData);
+    return data;
+}
 const putReservation = async (reservationData) => {
     const { data } = await customer.put('reservation', reservationData);
     return data;
@@ -101,5 +114,9 @@ export default {
     patchCarboType,
     putExcludes,
     postDelivery,
-    getHolidays
+    getHolidays,
+    //관리자 페이지
+    getCustomerInfoAdmin,
+    putReservationAdmin,
+    getHolidaysAdmin,
 }

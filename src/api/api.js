@@ -57,6 +57,12 @@ const putSingleOrder = async (param, orderId) => {
     const res = await _basePutRequest(`order/${orderId}`, param);
     return res;
 }
+
+const deleteSingleOrder = async (orderId) => {
+    const res = await _baseDeleteRequest(`order/${orderId}`);
+    return res;
+}
+
 // 식재료 부분
 const getIngredientsBySearch = async (keyword) => {
     const res = await _baseGetRequest(`product/ingredient/${keyword}`);
@@ -99,6 +105,7 @@ export default {
     getAllProducts,
     getAllIngredients,
     putSingleOrder,
+    deleteSingleOrder,
     //식재료 
     getIngredientsBySearch,
     createIngredient,

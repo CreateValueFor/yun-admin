@@ -120,9 +120,19 @@
           </td>
           <td>{{ order.carboAmount }}</td>
           <td>{{ order.proteinAmount }}</td>
-          <td>{{ order.excludeProduct }}</td>
-          <td>{{ order.excludeTopping }}</td>
-          <td>{{ order.deliveryType }}</td>
+          <td>{{ order.excludeProducts }}</td>
+          <td>
+            {{
+              order.Ingredients &&
+                order.Ingredients.map((item) => item.name).join(',')
+            }}
+          </td>
+          <td>
+            {{
+              order.Products &&
+                order.Products.map((item) => item.name).join(',')
+            }}
+          </td>
 
           <td>
             <button
@@ -130,6 +140,20 @@
               @click="openUpdateModal(idx)"
             >
               수정
+            </button>
+            <button
+              class="bg-red-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
+              @click="deleteSingleOrder(order.id)"
+            >
+              삭제
+            </button>
+          </td>
+          <td>
+            <button
+              class="bg-green-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
+              @click="selectedOrderId = order.id"
+            >
+              배송변경
             </button>
           </td>
         </tr>
@@ -142,6 +166,20 @@
       @close="showUpdateModal = false"
       @submit="updateSingleOrder"
     />
+    <div
+      v-if="selectedOrderId !== -1"
+      class="
+        flex justify-center items-center
+      fixed top-0 h-screen w-screen bottom-0 right-0 left-0 z-50"
+      style="background:rgba(0,0,0,.3)"
+    >
+      <div class="bg-white w-2/3 border rounded-lg">
+        <reserve-change
+          :orderId="selectedOrderId"
+          @close="selectedOrderId = -1"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -152,11 +190,13 @@ import { utils, writeFile } from 'xlsx'
 import custom from '@/api/custom.js'
 import api from '@/api/api.js'
 import OrderUpdateDialog from '@/components/order/OrderUpdateDialog.vue'
+import ReserveChange from '../components/ReserveChange.vue'
+
 // import axios from 'axios'
 
 export default {
   name: 'DashboardHome',
-  components: { TapMenu, OrderUpdateDialog },
+  components: { TapMenu, OrderUpdateDialog, ReserveChange },
   data() {
     return {
       searchList: [],
@@ -171,6 +211,7 @@ export default {
       searchCondition: {},
       selectedOrder: {},
       showUpdateModal: false,
+      selectedOrderId: -1,
     }
   },
   watch: {
@@ -239,6 +280,16 @@ export default {
         this.showUpdateModal = false
       }
       await this.search()
+    },
+    async deleteSingleOrder(orderId) {
+      if (window.confirm('해당 주문을 삭제하시겠습니까?')) {
+        const res = await api.deleteSingleOrder(orderId)
+        if (res.success) {
+          window.alert('주문이 삭제되었습니다.')
+          await this.search()
+        }
+      }
+      console.log(orderId)
     },
     onChange(e) {
       const { name, value } = e.target
@@ -320,6 +371,7 @@ export default {
               case 37:
                 return toppings.push('당근x')
               case 4:
+              case 42:
                 return toppings.push('콩x')
             }
           })

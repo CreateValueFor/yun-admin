@@ -86,6 +86,17 @@
           </select>
         </div>
       </div>
+      <div class="flex mt-3">
+        <div class="w-full px-3">
+          배송메세지
+          <input
+            v-model="modalData.deliveryMessage"
+            class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+            type="text"
+            id="deliveryMessage"
+          />
+        </div>
+      </div>
 
       <div class="flex mt-3">
         <div class="w-1/2 px-3">
