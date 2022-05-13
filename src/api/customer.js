@@ -2,11 +2,30 @@ import { BASE_URL } from './host'
 import axios from 'axios';
 
 const customer = axios.create({
+    // baseURL: BASE_URL + 'customer/'
+    baseURL: BASE_URL
+})
+
+const admin = axios.create({
     baseURL: BASE_URL + 'customer/'
-    // baseURL: BASE_URL
 })
 
 customer.interceptors.request.use(
+    (config) => {
+        if (!config.headers.Authorization) {
+            const token = localStorage.getItem('YUN-TOKEN');
+            if (token && token.length > 0) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+        }
+        return config;
+    },
+    (error) => {
+        Promise.reject(error);
+    }
+);
+
+admin.interceptors.request.use(
     (config) => {
         if (!config.headers.Authorization) {
             const token = localStorage.getItem('YUN-TOKEN');
@@ -51,17 +70,17 @@ const getCustomerInfo = async () => {
     return res;
 }
 const getCustomerInfoAdmin = async (id) => {
-    const res = await _baseGetRequest(`admin/reservation/${id}`)
-    return res;
+    const { data } = await admin.get(`admin/reservation/${id}`)
+    return data;
 }
 
 const getHolidaysAdmin = async (id) => {
-    const { data } = await customer.get(`admin/holiday/${id}`);
+    const { data } = await admin.get(`admin/holiday/${id}`);
     return data;
 }
 
 const putReservationAdmin = async (reservationData, id) => {
-    const { data } = await customer.put(`admin/reservation/${id}`, reservationData);
+    const { data } = await admin.put(`admin/reservation/${id}`, reservationData);
     return data;
 }
 const putReservation = async (reservationData) => {
