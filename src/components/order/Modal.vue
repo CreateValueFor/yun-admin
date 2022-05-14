@@ -74,7 +74,6 @@
   </transition>
 </template>
 <script>
-import custom from '../../api/custom'
 import api from '@/api/api'
 
 export default {
@@ -86,7 +85,7 @@ export default {
   },
   data() {
     return {
-      products: [...custom.productList],
+      products: [],
       ingredients: [],
       excludeProduct: [],
       excludeIngredient: [],

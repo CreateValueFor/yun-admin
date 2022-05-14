@@ -120,7 +120,19 @@
           </td>
           <td>{{ order.carboAmount }}</td>
           <td>{{ order.proteinAmount }}</td>
-          <td>{{ order.excludeProducts }}</td>
+          <!-- <td>{{ order.excludeProducts }}</td> -->
+          <td>
+            <button
+              class="bg-green-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
+              @click="excludeProductAndIngredient(order)"
+            >
+              제외
+            </button>
+            {{
+              order.Products &&
+                order.Products.map((item) => item.name).join(',')
+            }}
+          </td>
           <td>
             {{
               order.Ingredients &&
@@ -128,10 +140,7 @@
             }}
           </td>
           <td>
-            {{
-              order.Products &&
-                order.Products.map((item) => item.name).join(',')
-            }}
+            {{ order.deliveryType }}
           </td>
 
           <td>
@@ -159,6 +168,12 @@
         </tr>
       </tbody>
     </table>
+    <exclude-menu-and-ingredient
+      v-if="showExcludeModal"
+      :order="selectedOrder"
+      @close="showExcludeModal = false"
+      @submit="postExcludes"
+    />
     <OrderUpdateDialog
       v-if="showUpdateModal"
       :modalData="selectedOrder"
@@ -191,12 +206,18 @@ import custom from '@/api/custom.js'
 import api from '@/api/api.js'
 import OrderUpdateDialog from '@/components/order/OrderUpdateDialog.vue'
 import ReserveChange from '../components/ReserveChange.vue'
+import ExcludeMenuAndIngredient from '../components/order/ExcludeMenuAndIngredient.vue'
 
 // import axios from 'axios'
 
 export default {
   name: 'DashboardHome',
-  components: { TapMenu, OrderUpdateDialog, ReserveChange },
+  components: {
+    TapMenu,
+    OrderUpdateDialog,
+    ReserveChange,
+    ExcludeMenuAndIngredient,
+  },
   data() {
     return {
       searchList: [],
@@ -212,6 +233,7 @@ export default {
       selectedOrder: {},
       showUpdateModal: false,
       selectedOrderId: -1,
+      showExcludeModal: false,
     }
   },
   watch: {
@@ -433,6 +455,20 @@ export default {
         })
       })
       this.searchList = makeList
+    },
+    excludeProductAndIngredient(order) {
+      this.selectedOrder = order
+      this.showExcludeModal = true
+      console.log(order)
+    },
+    async postExcludes(e) {
+      const res = await api.putExcludes(e, this.selectedOrder.id)
+      console.log(res)
+      if (res.success) {
+        await this.search()
+        this.showExcludeModal = false
+      }
+      console.log(e)
     },
   },
 }

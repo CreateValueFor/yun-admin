@@ -96,6 +96,11 @@ const deleteHoliday = async (date) => {
     return res;
 }
 
+const putExcludes = async (param, id) => {
+    const res = await _basePutRequest(`order/exclude/${id}`, param);
+    return res;
+}
+
 export default {
     getOrderList,
     postOrderList,
@@ -116,5 +121,7 @@ export default {
     getHolidays,
     postHoliday,
     deleteHoliday,
+    //제품 제외
+    putExcludes
 
 }
