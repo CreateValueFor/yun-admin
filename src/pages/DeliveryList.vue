@@ -26,8 +26,14 @@
 
     <div class="flex justify-end mb-3">
       <button
-        class="bg-green-500 w-48	rounded-lg px-6 py-2 text-white font-semibold shadow"
+        class="bg-gray-500 w-48 mr-3	rounded-lg px-6 py-2 text-white font-semibold shadow"
         @click="downloadExcel"
+      >
+        배송리스트 다운로드
+      </button>
+      <button
+        class="bg-green-500 w-48	rounded-lg px-6 py-2 text-white font-semibold shadow"
+        @click="deliverySummary"
       >
         제조물량 간략보기
       </button>
@@ -350,7 +356,7 @@
 <script>
 import TapMenu from '../components/order/TapMenu.vue'
 // import Modal from '../components/order/Modal.vue'
-// import { utils, writeFile } from 'xlsx'
+import { utils, writeFile } from 'xlsx'
 import custom from '@/api/custom.js'
 import api from '@/api/api.js'
 // import axios from 'axios'
@@ -427,7 +433,7 @@ export default {
     },
   },
   methods: {
-    async downloadExcel() {
+    async deliverySummary() {
       // 오늘 치 식재료에 쓰이는 메뉴 정보 불러오기
       const products = await api.getProductDetails({
         products: this.dailyMenuIds,
@@ -682,32 +688,34 @@ export default {
       // })
       this.showSummary = true
       return
-
-      // const excelData = this.searchList.map((item) => {
-      //   return {
-      //     구매자명: item.Order.buyer,
-      //     수취인명: item.Order.receiver,
-      //     수취인연락처: item.Order.receiverPhone,
-      //     구매자연락처: item.Order.buyerPhone,
-      //     배송지: item.Order.address1 + item.Order.address2 || '',
-      //     '(기본주소)': item.Order.address1,
-      //     '(상세주소)': item.Order.address2,
-      //     '공동현관 비밀번호': item.Order.entrancePassword,
-      //     배송메세지: item.Order.deliveryMessage,
-      //     상품정보: item.productInfo,
-      //     상품명: item.productName,
-      //     '탄수화물 구성': item.Order.CarboType.name,
-      //     단백질량: item.Order.carboAmount,
-      //     탄수화물량: item.Order.proteinAmount,
-      //     제외메뉴: item.excludeProduct,
-      //     제외토핑: item.excludeTopping,
-      //     배송: item.Order.deliveryType,
-      //   }
-      // })
-      // const excelDataEarly = utils.json_to_sheet(excelData)
-      // const workBook = utils.book_new()
-      // utils.book_append_sheet(workBook, excelDataEarly, '제조 물량')
-      // writeFile(workBook, `${this.searchDate}-제조물량.xlsx`)
+    },
+    downloadExcel() {
+      const excelData = this.searchList.map((item) => {
+        return {
+          구매자명: item.Order.buyer,
+          수취인명: item.Order.receiver,
+          수취인연락처: item.Order.receiverPhone,
+          구매자연락처: item.Order.buyerPhone,
+          배송지: item.Order.address1 + item.Order.address2 || '',
+          '(기본주소)': item.Order.address1,
+          '(상세주소)': item.Order.address2,
+          '공동현관 비밀번호': item.Order.entrancePassword,
+          배송메세지: item.Order.deliveryMessage,
+          배송일: item.deliveryDate,
+          상품정보: item.productInfo,
+          상품명: item.productName,
+          '탄수화물 구성': item.Order.CarboType.name,
+          단백질량: item.Order.carboAmount,
+          탄수화물량: item.Order.proteinAmount,
+          제외메뉴: item.excludeProduct,
+          제외토핑: item.excludeTopping,
+          배송: item.Order.deliveryType,
+        }
+      })
+      const excelDataEarly = utils.json_to_sheet(excelData)
+      const workBook = utils.book_new()
+      utils.book_append_sheet(workBook, excelDataEarly, '제조 물량')
+      writeFile(workBook, `${this.searchDate}-제조물량.xlsx`)
     },
     async search() {
       // 제조 메뉴 선택 안할 경우 불가
@@ -731,106 +739,119 @@ export default {
 
       const makeList = []
 
-      res.map((result) => {
-        const { item } = result
-        let isExcludeProduct = false
-        let isSpecial = false
-        let specialList = []
-        let availableMenu = []
+      res
+        // .filter((item) => item !== false)
+        .map((result) => {
+          const { item } = result
 
-        if (item.Order.carboAmount !== 1) {
-          isSpecial = true
-          if (item.Order.carboAmount === 1.5) {
-            specialList.push('탄150')
-          } else if (item.Order.carboAmount === 2) {
-            specialList.push('탄200')
-          }
-        }
-        if (item.Order.carboType !== 1) {
-          isSpecial = true
-          if (item.Order.carboType === 2) {
-            specialList.push('고구마 + 현미밥')
-          } else if (item.Order.carboType === 3) {
-            specialList.push('현미밥만')
-          }
-        }
-        if (item.Order.proteinAmount !== 1) {
-          isSpecial = true
-          if (item.Order.proteinAmount === 1.5) {
-            specialList.push('단150')
-          } else if (item.Order.proteinAmount === 2) {
-            specialList.push('단200')
-          }
-        }
-        if (item.Order.Ingredients.length) {
-          isSpecial = true
-          const toppings = []
-          item.Order.Ingredients.map((item) => {
-            switch (item.id) {
-              case 3:
-                return
-              case 37:
-                return toppings.push('당근x')
-              case 4:
-                return toppings.push('콩x')
+          let isSpecial = false
+          let specialList = []
+          let availableMenu = []
+
+          if (item.Order.carboAmount !== 1) {
+            isSpecial = true
+            if (item.Order.carboAmount === 1.5) {
+              specialList.push('탄150')
+            } else if (item.Order.carboAmount === 2) {
+              specialList.push('탄200')
             }
-          })
-          specialList.push(toppings.join(' '))
-        }
-
-        if (result.excludeProduct.length) {
-          isExcludeProduct = true
-          const excludeProductIds = result.excludeProduct.map((item) => item.id)
-          availableMenu = this.dailyMenuIds.filter(
-            (item) => !excludeProductIds.includes(item)
-          )
-        }
-
-        let eatPerday
-        if (item.Order.Package) {
-          eatPerday = item.Order.Package.eatPerDay
-        } else {
-          eatPerday = 'something wrong'
-        }
-
-        // 메뉴 구성 만들기
-        const saladCount = eatPerday * 2
-        const availableCount = availableMenu.length
-
-        if (availableMenu.length && availableMenu.length < saladCount) {
-          for (let i = 0; saladCount - availableMenu.length > 0; i++) {
-            availableMenu.push(availableMenu[i % availableCount])
           }
-        }
+          if (item.Order.carboType !== 1) {
+            isSpecial = true
+            if (item.Order.carboType === 2) {
+              specialList.push('고구마 + 현미밥')
+            } else if (item.Order.carboType === 3) {
+              specialList.push('현미밥만')
+            }
+          }
+          if (item.Order.proteinAmount !== 1) {
+            isSpecial = true
+            if (item.Order.proteinAmount === 1.5) {
+              specialList.push('단150')
+            } else if (item.Order.proteinAmount === 2) {
+              specialList.push('단200')
+            }
+          }
+          if (item.Order.Ingredients.length) {
+            isSpecial = true
+            const toppings = []
+            item.Order.Ingredients.map((item) => {
+              switch (item.id) {
+                case 3:
+                  return
+                case 37:
+                  return toppings.push('당근x')
+                case 4:
+                  return toppings.push('콩x')
+              }
+            })
+            specialList.push(toppings.join(' '))
+          }
 
-        availableMenu = availableMenu.slice(0, saladCount)
+          if (result.excludeProduct.length) {
+            const excludeProductIds = result.excludeProduct.map(
+              (item) => item.id
+            )
+            availableMenu = this.dailyMenuIds.filter(
+              (item) => !excludeProductIds.includes(item)
+            )
+          }
 
-        let productInfo = `${eatPerday} ${
-          isExcludeProduct ? '-2' : isSpecial ? '-1' : ''
-        } ${specialList.join(' / ')} ${
-          availableMenu.length
-            ? ' / 메뉴 :' +
-              availableMenu
-                .map((item) => this.productList[item - 1].name)
-                .join(' ')
-            : ''
-        }`.replace('//', '/')
+          let eatPerday
+          if (item.Order.Package) {
+            eatPerday = item.Order.Package.eatPerDay
+          } else {
+            eatPerday = 'something wrong'
+          }
 
-        // 상품 정보 추가
+          // 메뉴 구성 만들기
+          const saladCount = eatPerday * 2
+          const availableCount = availableMenu.length
 
-        makeList.push({
-          ...item,
-          productInfo: productInfo.trim(),
-          productName: item.Order.Package ? item.Order.Package.name : '오류',
-          excludeProduct: item.Order.Products.map((item) => item.name).join(
-            ','
-          ),
-          excludeTopping: item.Order.Ingredients.map((item) => item.name).join(
-            ','
-          ),
-          excludeMenus: result.excludeProduct,
+          const firstProduct = this.products.product1
+          const secondProduct = this.products.product2
+          console.log('first', firstProduct, 'second', secondProduct)
+
+          const isNotExcluded =
+            !availableMenu.length ||
+            (availableMenu.includes(firstProduct) &&
+              availableMenu.includes(secondProduct))
+
+          if (availableMenu.length && availableMenu.length < saladCount) {
+            for (let i = 0; saladCount - availableMenu.length > 0; i++) {
+              availableMenu.push(availableMenu[i % availableCount])
+            }
+          }
+
+          availableMenu = availableMenu.slice(0, saladCount)
+          console.log('availble', availableMenu)
+
+          let productInfo = `${eatPerday} ${
+            !isNotExcluded ? '-2' : isSpecial ? '-1' : ''
+          } ${specialList.join(' / ')} ${
+            !isNotExcluded
+              ? ' / 메뉴 :' +
+                availableMenu
+                  .map((item) => this.productList[item - 1].name)
+                  .join(' ')
+              : ''
+          }`.replace('//', '/')
+
+          // 상품 정보 추가
+
+          makeList.push({
+            ...item,
+            productInfo: productInfo.trim(),
+            productName: item.Order.Package ? item.Order.Package.name : '오류',
+            excludeProduct: item.Order.Products.map((item) => item.name).join(
+              ','
+            ),
+            excludeTopping: item.Order.Ingredients.map(
+              (item) => item.name
+            ).join(','),
+            excludeMenus: result.excludeProduct,
+          })
         })
-      })
       this.searchList = makeList
     },
   },
