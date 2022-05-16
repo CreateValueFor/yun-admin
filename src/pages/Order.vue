@@ -653,7 +653,6 @@ export default {
             // 본 주문
             // 주문 상품 명
             initOrder.상품명 = custom.serviceNameFormatter(item.상품명)
-            console.log(custom.serviceNameFormatter(item.상품명))
 
             const entrancePasswordIdx =
               item.옵션정보.indexOf(

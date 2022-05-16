@@ -63,6 +63,7 @@
             v-model="searchCondition.keyword"
             placeholder="검색어를 입력해주세요."
             class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
+            @keyup="onEnter"
           />
         </div>
 
@@ -455,6 +456,11 @@ export default {
         })
       })
       this.searchList = makeList
+    },
+    onEnter(e) {
+      if (e.key === 'Enter') {
+        this.search()
+      }
     },
     excludeProductAndIngredient(order) {
       this.selectedOrder = order

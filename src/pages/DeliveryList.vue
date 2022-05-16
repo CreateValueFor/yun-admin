@@ -116,8 +116,9 @@
         <button
           class="bg-green-500 w-48	rounded-lg px-6 py-2 text-white font-semibold shadow"
           @click="search"
+          :disabled="loading"
         >
-          검색하기
+          {{ loading ? '로딩 중...' : '검색하기' }}
         </button>
       </div>
     </div>
@@ -263,7 +264,7 @@
                 <div>
                   단위 :
                   {{
-                    igd.Product_Ingredients.amount +
+                    igd.Product_Ingredients.amount.toFixed(2) +
                       igd.Product_Ingredients.unit
                   }}
                 </div>
@@ -273,8 +274,9 @@
                 <div>{{ igd.count || 0 }}</div>
                 <div>
                   {{
-                    igd.Product_Ingredients.amount * (igd.count || 0) +
-                      igd.Product_Ingredients.unit
+                    (igd.Product_Ingredients.amount * (igd.count || 0)).toFixed(
+                      2
+                    ) + igd.Product_Ingredients.unit
                   }}
                 </div>
               </div>
@@ -287,17 +289,101 @@
         <div class="flex">
           <div class="w-1/2">
             <h2>새벽</h2>
-            <div>{{ '1식 ' + deliveryPreparation.early1 }}</div>
-            <div>{{ '2식 ' + deliveryPreparation.early2 }}</div>
-            <div>{{ '3식 ' + deliveryPreparation.early3 }}</div>
+            <div>{{ '1식 ' + deliveryPreparation.early1 }}건</div>
+            <div>{{ '2식 ' + deliveryPreparation.early2 }}건</div>
+            <div>{{ '3식 ' + deliveryPreparation.early3 }}건</div>
+            <div>{{ '총 팩수 ' + deliveryPreparation.earlyTotal }}개</div>
           </div>
           <div class="w-1/2">
             <h2>일반</h2>
-            <div>{{ '1식 ' + deliveryPreparation.day1 }}</div>
-            <div>{{ '2식 ' + deliveryPreparation.day2 }}</div>
-            <div>{{ '3식 ' + deliveryPreparation.day3 }}</div>
+            <div>{{ '1식 ' + deliveryPreparation.day1 }}건</div>
+            <div>{{ '2식 ' + deliveryPreparation.day2 }}건</div>
+            <div>{{ '3식 ' + deliveryPreparation.day3 }}건</div>
+            <div>{{ '총 팩수 ' + deliveryPreparation.dayTotal }}개</div>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="flex" v-if="showSummary">
+      <div class="w-1/2">
+        <h2>새벽배송</h2>
+        <table>
+          <thead>
+            <th>
+              A
+            </th>
+            <th>
+              B
+            </th>
+            <th>
+              C
+            </th>
+            <th>
+              D
+            </th>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(productInfo, idx) in Object.keys(requestTableEarly)"
+              :key="`${productInfo}-${idx}`"
+            >
+              <td>{{ idx + 1 }}</td>
+              <td>
+                {{
+                  `${requestTableEarly[productInfo][0].Order.receiver} ${
+                    requestTableEarly[productInfo].length > 1
+                      ? requestTableEarly[productInfo][
+                          requestTableEarly[productInfo].length - 1
+                        ].Order.receiver
+                      : ''
+                  }`
+                }}
+              </td>
+              <td>{{ productInfo }}</td>
+              <td>{{ requestTableEarly[productInfo].length }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="w-1/2">
+        <h2>일반배송</h2>
+        <table>
+          <thead>
+            <th>
+              A
+            </th>
+            <th>
+              B
+            </th>
+            <th>
+              C
+            </th>
+            <th>
+              D
+            </th>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(productInfo, idx) in Object.keys(requestTableDay)"
+              :key="`${productInfo}-${idx}`"
+            >
+              <td>{{ idx + 1 }}</td>
+              <td>
+                {{
+                  `${requestTableDay[productInfo][0].Order.receiver} ${
+                    requestTableDay[productInfo].length > 1
+                      ? requestTableDay[productInfo][
+                          requestTableDay[productInfo].length - 1
+                        ].Order.receiver
+                      : ''
+                  }`
+                }}
+              </td>
+              <td>{{ productInfo }}</td>
+              <td>{{ requestTableDay[productInfo].length }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -379,7 +465,10 @@ export default {
       ingredientPreparation: {},
       menuPreparation: {},
       deliveryPreparation: {},
-      showSummary: {},
+      showSummary: false,
+      requestTableEarly: {},
+      requestTableDay: {},
+      loading: false,
     }
   },
   mounted() {
@@ -416,8 +505,6 @@ export default {
             }
           }
         })
-
-        // console.log(newVal)
       },
     },
   },
@@ -433,6 +520,13 @@ export default {
     },
   },
   methods: {
+    initialize() {
+      this.ingredientPreparation = {}
+      this.menuPreparation = {}
+      this.deliveryPreparation = {}
+      this.requestTableEarly = {}
+      this.requestTableDay = {}
+    },
     async deliverySummary() {
       // 오늘 치 식재료에 쓰이는 메뉴 정보 불러오기
       const products = await api.getProductDetails({
@@ -457,6 +551,8 @@ export default {
         day1: 0,
         day2: 0,
         day3: 0,
+        earlyTotal: 0,
+        dayTotal: 0,
       }
       // const product1Preparation = {}
       // const product2Preparation = {}
@@ -509,6 +605,19 @@ export default {
         // 제품 순회하면서 담긴 것만 배열에 담기
         let i = 0
         while (deliveryMenus.length !== deliveryCount) {
+          if (i > 100) {
+            break
+          }
+          if (i > 10) {
+            console.log(item)
+            console.log(
+              'deliveryMenus',
+              deliveryMenus.length,
+              'deliveryCount',
+              deliveryCount,
+              'excl'
+            )
+          }
           if (item.excludeMenus.length) {
             // 제외 메뉴가 있을 경우
             const excludeMenuIds = item.excludeMenus.map((item) => item.id)
@@ -522,6 +631,14 @@ export default {
           }
 
           i += 1
+          if (i > 10) {
+            console.log(
+              'deliveryMenus',
+              deliveryMenus.length,
+              'deliveryCount',
+              deliveryCount
+            )
+          }
         }
         // 메뉴 취합 완료
         // 식재료 별 준비량 찾기
@@ -638,7 +755,7 @@ export default {
                     excludeIngredientNames.includes('콩')) ||
                     excludeIngredientNames.includes(igd.name))
                 ) {
-                  console.log('토핑 제외', igd.name)
+                  console.log('')
                 } else {
                   // 식재료 별 준비량
                   if (igd.name === '병아리콩') {
@@ -663,11 +780,19 @@ export default {
 
         // 메뉴 배정해주기
       })
-      console.log('최종 productInfos', productInfos)
+
       this.menuPreparation = productInfos
-      console.log('식재료 별 준비량', ingredientPreparation)
+
       this.ingredientPreparation = ingredientPreparation
-      console.log('끼니 및 배송 종류별 준비량', deliveryCountPreparation)
+      deliveryCountPreparation.earlyTotal =
+        deliveryCountPreparation.early1 * 2 +
+        deliveryCountPreparation.early2 * 4 +
+        deliveryCountPreparation.early3 * 6
+      deliveryCountPreparation.dayTotal =
+        deliveryCountPreparation.day1 * 2 +
+        deliveryCountPreparation.day2 * 4 +
+        deliveryCountPreparation.day3 * 6
+
       this.deliveryPreparation = deliveryCountPreparation
 
       // 새벽 팩수, 일반 팩수
@@ -712,12 +837,60 @@ export default {
           배송: item.Order.deliveryType,
         }
       })
+
+      const requestTableEarlyJson = []
+      const requestTableDayJson = []
+
+      Object.keys(this.requestTableEarly).forEach((item, idx) => {
+        requestTableEarlyJson.push({
+          A: idx + 1,
+          B: `${this.requestTableEarly[item][0].Order.receiver} ${
+            this.requestTableEarly[item].length > 1
+              ? this.requestTableEarly[item][
+                  this.requestTableEarly[item].length - 1
+                ].Order.receiver
+              : ''
+          }`,
+          C: item,
+          D: this.requestTableEarly[item].length,
+        })
+      })
+
+      Object.keys(this.requestTableDay).forEach((item, idx) => {
+        requestTableDayJson.push({
+          A: idx + 1,
+          B: `${this.requestTableDay[item][0].Order.receiver} ${
+            this.requestTableDay[item].length > 1
+              ? this.requestTableDay[item][
+                  this.requestTableDay[item].length - 1
+                ].Order.receiver
+              : ''
+          }`,
+          C: item,
+          D: this.requestTableDay[item].length,
+        })
+      })
+
       const excelDataEarly = utils.json_to_sheet(excelData)
+      const requestTableEarlyExcel = utils.json_to_sheet(requestTableEarlyJson)
+      const requestTableDayExcel = utils.json_to_sheet(requestTableDayJson)
       const workBook = utils.book_new()
       utils.book_append_sheet(workBook, excelDataEarly, '제조 물량')
-      writeFile(workBook, `${this.searchDate}-제조물량.xlsx`)
+      utils.book_append_sheet(
+        workBook,
+        requestTableEarlyExcel,
+        '요청사항표-새벽배송'
+      )
+      utils.book_append_sheet(
+        workBook,
+        requestTableDayExcel,
+        '요청사항표-일반배송'
+      )
+      writeFile(workBook, `${this.searchDate}-제조물량/요청사항표.xlsx`)
     },
     async search() {
+      this.initialize()
+      this.loading = true
       // 제조 메뉴 선택 안할 경우 불가
       if (this.products.product1 === '') {
         return window.alert('제조메뉴를 선택해주세요')
@@ -746,24 +919,18 @@ export default {
 
           let isSpecial = false
           let specialList = []
+          let carboType = []
           let availableMenu = []
 
-          if (item.Order.carboAmount !== 1) {
-            isSpecial = true
-            if (item.Order.carboAmount === 1.5) {
-              specialList.push('탄150')
-            } else if (item.Order.carboAmount === 2) {
-              specialList.push('탄200')
-            }
-          }
           if (item.Order.carboType !== 1) {
             isSpecial = true
             if (item.Order.carboType === 2) {
-              specialList.push('고구마 + 현미밥')
+              carboType.push('고구마 + 현미밥')
             } else if (item.Order.carboType === 3) {
-              specialList.push('현미밥만')
+              carboType.push('현미밥만')
             }
           }
+
           if (item.Order.proteinAmount !== 1) {
             isSpecial = true
             if (item.Order.proteinAmount === 1.5) {
@@ -772,19 +939,40 @@ export default {
               specialList.push('단200')
             }
           }
-          if (item.Order.Ingredients.length) {
+          if (item.Order.carboAmount !== 1) {
             isSpecial = true
+            if (item.Order.carboAmount === 1.5) {
+              specialList.push('탄150')
+            } else if (item.Order.carboAmount === 2) {
+              specialList.push('탄200')
+            }
+          }
+
+          if (item.Order.Ingredients.length) {
             const toppings = []
             item.Order.Ingredients.map((item) => {
               switch (item.id) {
+                case 6:
+                  return toppings.push('아몬드x')
                 case 3:
-                  return
                 case 37:
-                  return toppings.push('당근x')
+                  if (!toppings.includes('당근x')) {
+                    return toppings.push('당근x')
+                  }
+                  return
                 case 4:
-                  return toppings.push('콩x')
+                case 42:
+                  if (!toppings.includes('콩x')) {
+                    return toppings.push('콩x')
+                  }
+                  return
+                case 41:
+                  return toppings.push('토마토x')
               }
             })
+            if (toppings.length) {
+              isSpecial = true
+            }
             specialList.push(toppings.join(' '))
           }
 
@@ -810,7 +998,6 @@ export default {
 
           const firstProduct = this.products.product1
           const secondProduct = this.products.product2
-          console.log('first', firstProduct, 'second', secondProduct)
 
           const isNotExcluded =
             !availableMenu.length ||
@@ -824,18 +1011,25 @@ export default {
           }
 
           availableMenu = availableMenu.slice(0, saladCount)
-          console.log('availble', availableMenu)
 
-          let productInfo = `${eatPerday} ${
-            !isNotExcluded ? '-2' : isSpecial ? '-1' : ''
-          } ${specialList.join(' / ')} ${
+          let productInfo = `${eatPerday}${
+            item.Order.Package.name.includes('2일') ? '단품' : ''
+          }${!isNotExcluded ? '-2' : isSpecial ? '-1' : ''} ${
             !isNotExcluded
-              ? ' / 메뉴 :' +
-                availableMenu
+              ? availableMenu
                   .map((item) => this.productList[item - 1].name)
+                  .map((item) => custom.productAbbreviator(item))
                   .join(' ')
               : ''
-          }`.replace('//', '/')
+          } ${carboType.length ? `/ ${carboType}` : ''} ${(specialList.filter(
+            (item) => item != false
+          ).length > 0
+            ? '/ '
+            : '') +
+            specialList
+              .filter((item) => item != false)
+              .reverse()
+              .join(' / ')} `
 
           // 상품 정보 추가
 
@@ -852,7 +1046,28 @@ export default {
             excludeMenus: result.excludeProduct,
           })
         })
-      this.searchList = makeList
+
+      makeList.forEach((item) => {
+        if (item.Order.deliveryType === '새벽배송') {
+          if (!this.requestTableEarly[item.productInfo]) {
+            this.requestTableEarly[item.productInfo] = []
+          }
+          this.requestTableEarly[item.productInfo].push(item)
+        } else {
+          if (!this.requestTableDay[item.productInfo]) {
+            this.requestTableDay[item.productInfo] = []
+          }
+          this.requestTableDay[item.productInfo].push(item)
+        }
+      })
+      Object.keys(this.requestTableEarly).forEach((key) => {
+        this.searchList = [...this.searchList, ...this.requestTableEarly[key]]
+      })
+      Object.keys(this.requestTableDay).forEach((key) => {
+        this.searchList = [...this.searchList, ...this.requestTableDay[key]]
+      })
+      console.log(this.requestTableEarly)
+      this.loading = false
     },
   },
 }

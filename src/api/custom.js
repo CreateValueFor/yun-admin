@@ -249,6 +249,35 @@ const carboTypeFormatter = (item) => {
     }
 }
 
+const productAbbreviator = (product) => {
+    switch (product) {
+        case '꽃맛살':
+            return "꽃맛"
+        case '닭가슴살':
+            return "닭"
+        case '두부참치':
+            return "두참"
+        case '들깨닭':
+            return "들깨"
+        case '소고기':
+            return "소"
+        case '스테이크':
+            return "스"
+        case '에그코타':
+            return "에그"
+        case '유부닭':
+            return "유닭"
+        case '유부두부':
+            return "유부"
+        case '훈제오리':
+            return "오리"
+        default:
+            return product;
+
+    }
+
+}
+
 export default {
     productList,
     dayTranslate,
@@ -261,4 +290,5 @@ export default {
     carbohydrateValueFormatter,
     orderTranslater,
     excludeMenuList,
+    productAbbreviator,
 }
