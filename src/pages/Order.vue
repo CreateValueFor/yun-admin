@@ -626,7 +626,7 @@ export default {
         } else {
           initOrder.address1 = initOrder.배송지
             .split(' ')
-            .splice(0, initOrder.배송지.split(' ').length - 2)
+            .splice(0, initOrder.배송지.split(' ').length - 1)
             .join(' ')
           initOrder.address2 = initOrder.배송지.split(' ')[
             initOrder.배송지.split(' ').length - 1

@@ -261,17 +261,17 @@
                     })`
                   }}
                 </div>
-                <div>
+                <!-- <div>
                   단위 :
                   {{
                     igd.Product_Ingredients.amount.toFixed(2) +
                       igd.Product_Ingredients.unit
                   }}
-                </div>
+                </div> -->
               </div>
 
               <div>
-                <div>{{ igd.count || 0 }}</div>
+                <!-- <div>{{ igd.count || 0 }}</div> -->
                 <div>
                   {{
                     (igd.Product_Ingredients.amount * (igd.count || 0)).toFixed(
@@ -425,7 +425,7 @@
           <td>{{ delivery.productInfo }}</td>
           <td>{{ delivery.productName }}</td>
           <td>
-            {{ delivery.Order.CarboType.name }}
+            {{ delivery.Order.CarboType.name.replaceAll(' ', '') }}
           </td>
           <td>{{ delivery.Order.carboAmount }}</td>
           <td>{{ delivery.Order.proteinAmount }}</td>
@@ -606,6 +606,7 @@ export default {
         let i = 0
         while (deliveryMenus.length !== deliveryCount) {
           if (i > 100) {
+            window.alert()
             break
           }
           if (i > 10) {
@@ -968,6 +969,8 @@ export default {
                   return
                 case 41:
                   return toppings.push('토마토x')
+                case 43:
+                  return toppings.push('파슬리x')
               }
             })
             if (toppings.length) {
