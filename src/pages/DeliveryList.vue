@@ -142,6 +142,46 @@
             class="w-1/5"
           >
             <div>{{ menuPreparation[menu].name }}</div>
+
+            <div
+              v-for="igd in menuPreparation[menu].ingredients"
+              :key="menu + igd.name"
+              class="summary-item summary-item-detail"
+            >
+              <div>
+                <div>
+                  {{ igd.name }}
+
+                  {{
+                    `(${
+                      igd.Product_Ingredients.type === 'carbo'
+                        ? '탄수화물'
+                        : igd.Product_Ingredients.type === 'topping'
+                        ? '토핑'
+                        : '메인'
+                    })`
+                  }}
+                </div>
+                <!-- <div>
+                  단위 :
+                  {{
+                    igd.Product_Ingredients.amount.toFixed(2) +
+                      igd.Product_Ingredients.unit
+                  }}
+                </div> -->
+              </div>
+
+              <div>
+                <!-- <div>{{ igd.count || 0 }}</div> -->
+                <div>
+                  {{
+                    (igd.Product_Ingredients.amount * (igd.count || 0)).toFixed(
+                      2
+                    ) + igd.Product_Ingredients.unit
+                  }}
+                </div>
+              </div>
+            </div>
             <div class="summary-item">
               <div>{{ `기본` }}</div>
               <div>{{ menuPreparation[menu].count || 0 }}</div>
@@ -239,45 +279,6 @@
                 </div>
                 <div>
                   {{ menuPreparation[menu].rice.count20 || 0 }}
-                </div>
-              </div>
-            </div>
-            <div
-              v-for="igd in menuPreparation[menu].ingredients"
-              :key="menu + igd.name"
-              class="summary-item summary-item-detail"
-            >
-              <div>
-                <div>
-                  {{ igd.name }}
-
-                  {{
-                    `(${
-                      igd.Product_Ingredients.type === 'carbo'
-                        ? '탄수화물'
-                        : igd.Product_Ingredients.type === 'topping'
-                        ? '토핑'
-                        : '메인'
-                    })`
-                  }}
-                </div>
-                <!-- <div>
-                  단위 :
-                  {{
-                    igd.Product_Ingredients.amount.toFixed(2) +
-                      igd.Product_Ingredients.unit
-                  }}
-                </div> -->
-              </div>
-
-              <div>
-                <!-- <div>{{ igd.count || 0 }}</div> -->
-                <div>
-                  {{
-                    (igd.Product_Ingredients.amount * (igd.count || 0)).toFixed(
-                      2
-                    ) + igd.Product_Ingredients.unit
-                  }}
                 </div>
               </div>
             </div>
@@ -606,19 +607,13 @@ export default {
         let i = 0
         while (deliveryMenus.length !== deliveryCount) {
           if (i > 100) {
-            window.alert()
+            console.log(item.Order.receiver)
+            window.alert(
+              `${item.Order.receiver}님께 배송 가능한 메뉴가 없어 식재료 준비량에 합산되지 않습니다.`
+            )
             break
           }
-          if (i > 10) {
-            console.log(item)
-            console.log(
-              'deliveryMenus',
-              deliveryMenus.length,
-              'deliveryCount',
-              deliveryCount,
-              'excl'
-            )
-          }
+
           if (item.excludeMenus.length) {
             // 제외 메뉴가 있을 경우
             const excludeMenuIds = item.excludeMenus.map((item) => item.id)
@@ -971,6 +966,9 @@ export default {
                   return toppings.push('토마토x')
                 case 43:
                   return toppings.push('파슬리x')
+                case 5:
+                case 38:
+                  return toppings.push('사과x')
               }
             })
             if (toppings.length) {
