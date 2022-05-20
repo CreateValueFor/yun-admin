@@ -49,6 +49,7 @@
           class="bg-white h-10 w-48 mr-3 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
         />
         <button
+          @click="createIngredient"
           class="bg-green-500 w-24	rounded-lg px-6 py-2 text-white font-semibold shadow"
         >
           생성

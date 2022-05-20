@@ -130,7 +130,11 @@
           :key="ingredient"
           class="summary-item"
         >
-          {{ `${ingredient} : ${ingredientPreparation[ingredient]}` }}
+          {{
+            `${ingredient} : ${ingredientPreparation[ingredient].amount.toFixed(
+              2
+            )} ${ingredientPreparation[ingredient].unit}`
+          }}
         </div>
       </div>
       <div class="menu--summary">
@@ -325,7 +329,9 @@
           </thead>
           <tbody>
             <tr
-              v-for="(productInfo, idx) in Object.keys(requestTableEarly)"
+              v-for="(productInfo, idx) in Object.keys(
+                requestTableEarly
+              ).sort()"
               :key="`${productInfo}-${idx}`"
             >
               <td>{{ idx + 1 }}</td>
@@ -365,7 +371,7 @@
           </thead>
           <tbody>
             <tr
-              v-for="(productInfo, idx) in Object.keys(requestTableDay)"
+              v-for="(productInfo, idx) in Object.keys(requestTableDay).sort()"
               :key="`${productInfo}-${idx}`"
             >
               <td>{{ idx + 1 }}</td>
@@ -527,6 +533,7 @@ export default {
       this.deliveryPreparation = {}
       this.requestTableEarly = {}
       this.requestTableDay = {}
+      this.searchList = []
     },
     async deliverySummary() {
       // 오늘 치 식재료에 쓰이는 메뉴 정보 불러오기
@@ -777,9 +784,85 @@ export default {
         // 메뉴 배정해주기
       })
 
-      this.menuPreparation = productInfos
+      // TODO 식재료 타입이 메인인 것으로 소팅하려다가 실패함
+      Object.keys(productInfos).forEach((menu) => {
+        productInfos[menu].ingredients = productInfos[menu].ingredients.sort(
+          function(a, b) {
+            console.log(a.Product_Ingredients.type === 'main')
+            if (a.Product_Ingredients.type === 'main') {
+              return 1
+            }
+            if (
+              a.Product_Ingredients.type === 'topping' &&
+              b.Product_Ingredients.type != 'main'
+            ) {
+              return 1
+            }
+            return 0
+          }
+        )
+        console.log(
+          productInfos[menu].ingredients.sort(function(a, b) {
+            if (a.Product_Ingredients.type === 'main') {
+              return 1
+            }
+            if (
+              a.Product_Ingredients.type === 'topping' &&
+              b.Product_Ingredients.type != 'main'
+            ) {
+              return 1
+            }
+            return 0
+          })
+        )
+      })
 
-      this.ingredientPreparation = ingredientPreparation
+      this.menuPreparation = productInfos
+      console.log('menuPreparation', this.menuPreparation)
+      const filteredIngredientPreparation = {}
+
+      Object.keys(productInfos).forEach((menu) => {
+        productInfos[menu].ingredients.forEach((igd) => {
+          if (!filteredIngredientPreparation[igd.name]) {
+            if (igd.Product_Ingredients.type === 'carbo') {
+              filteredIngredientPreparation[igd.name] = {
+                name: igd.name,
+                amount: igd.count * igd.Product_Ingredients.amount,
+                priority: 1,
+                unit: igd.Product_Ingredients.unit,
+                // amount: igd.Product_Ingredients.amount,
+                duplicate: false,
+              }
+            } else if (igd.Product_Ingredients.type === 'topping') {
+              filteredIngredientPreparation[igd.name] = {
+                name: igd.name,
+
+                priority: 2,
+                unit: igd.Product_Ingredients.unit,
+                amount: igd.count * igd.Product_Ingredients.amount,
+                duplicate: false,
+              }
+            } else {
+              filteredIngredientPreparation[igd.name] = {
+                name: igd.name,
+
+                priority: 3,
+                unit: igd.Product_Ingredients.unit,
+                amount: igd.count * igd.Product_Ingredients.amount,
+                duplicate: false,
+              }
+            }
+          } else {
+            filteredIngredientPreparation[igd.name].duplicate = true
+            filteredIngredientPreparation[igd.name].amount +=
+              igd.count * igd.Product_Ingredients.amount
+          }
+        })
+      })
+
+      this.ingredientPreparation = filteredIngredientPreparation
+      // this.ingredientPreparation = ingredientPreparation
+
       deliveryCountPreparation.earlyTotal =
         deliveryCountPreparation.early1 * 2 +
         deliveryCountPreparation.early2 * 4 +
@@ -968,7 +1051,9 @@ export default {
                   return toppings.push('파슬리x')
                 case 5:
                 case 38:
-                  return toppings.push('사과x')
+                  if (!toppings.includes('사과x')) {
+                    return toppings.push('사과x')
+                  }
               }
             })
             if (toppings.length) {
@@ -1012,16 +1097,39 @@ export default {
           }
 
           availableMenu = availableMenu.slice(0, saladCount)
+          const menuProvideObject = {}
+          availableMenu.forEach((item) => {
+            const name = this.productList[item - 1].name
+            if (menuProvideObject[name]) {
+              menuProvideObject[name].count += 1
+            } else {
+              menuProvideObject[name] = {
+                name: name,
+                count: 1,
+              }
+            }
+          })
 
           let productInfo = `${eatPerday}${
             item.Order.Package.name.includes('2일') ? '단품' : ''
           }${!isNotExcluded ? '-2' : isSpecial ? '-1' : ''} ${
             !isNotExcluded
-              ? availableMenu
-                  .map((item) => this.productList[item - 1].name)
-                  .map((item) => custom.productAbbreviator(item))
+              ? Object.keys(menuProvideObject)
+                  .map((item) =>
+                    `${custom.productAbbreviator(
+                      menuProvideObject[item].name
+                    )} ${
+                      menuProvideObject[item].count > 1
+                        ? menuProvideObject[item].count
+                        : ''
+                    }`.trim()
+                  )
                   .join(' ')
-              : ''
+              : // ? availableMenu
+                //     .map((item) => this.productList[item - 1].name)
+                //     .map((item) => custom.productAbbreviator(item))
+                //     .join(' ')
+                ''
           } ${carboType.length ? `/ ${carboType}` : ''} ${(specialList.filter(
             (item) => item != false
           ).length > 0
@@ -1061,12 +1169,16 @@ export default {
           this.requestTableDay[item.productInfo].push(item)
         }
       })
-      Object.keys(this.requestTableEarly).forEach((key) => {
-        this.searchList = [...this.searchList, ...this.requestTableEarly[key]]
-      })
-      Object.keys(this.requestTableDay).forEach((key) => {
-        this.searchList = [...this.searchList, ...this.requestTableDay[key]]
-      })
+      Object.keys(this.requestTableEarly)
+        .sort()
+        .forEach((key) => {
+          this.searchList = [...this.searchList, ...this.requestTableEarly[key]]
+        })
+      Object.keys(this.requestTableDay)
+        .sort()
+        .forEach((key) => {
+          this.searchList = [...this.searchList, ...this.requestTableDay[key]]
+        })
       console.log(this.requestTableEarly)
       this.loading = false
     },
