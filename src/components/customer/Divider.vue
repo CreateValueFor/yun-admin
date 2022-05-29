@@ -18,7 +18,7 @@ export default {
 </script>
 <style lang="scss">
 .guide-title {
-  font-size: 12px;
+  font-size: 0.875rem;
   line-height: 1rem;
 
   color: #999999;
@@ -36,10 +36,11 @@ export default {
     left: 50%;
     top: 50%;
     width: 33%;
+    min-width: 160px;
     height: 30px;
     border: 1px solid #e6e6e6;
     background: #fff;
-    border-radius: 18px;
+    border-radius: 7px;
     transform: translate(-50%, -50%);
   }
 }

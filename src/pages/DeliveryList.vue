@@ -452,6 +452,7 @@ import TapMenu from '../components/order/TapMenu.vue'
 import { utils, writeFile } from 'xlsx'
 import custom from '@/api/custom.js'
 import api from '@/api/api.js'
+
 // import axios from 'axios'
 
 export default {
@@ -478,7 +479,8 @@ export default {
       loading: false,
     }
   },
-  mounted() {
+  async mounted() {
+    this.productList = await api.getAllProducts()
     this.searchDate = '2022-05-02'
     this.products = {
       product1: 11,
@@ -894,6 +896,9 @@ export default {
       return
     },
     downloadExcel() {
+      if (!this.showSummary) {
+        window.alert('먼저 제조물량 간략보기 버튼을 눌러주세요.')
+      }
       const excelData = this.searchList.map((item) => {
         return {
           구매자명: item.Order.buyer,
@@ -917,44 +922,67 @@ export default {
         }
       })
 
+      const ingredientPreparationExcel = Object.keys(
+        this.ingredientPreparation
+      ).map((item) => {
+        return {
+          name: item,
+          amount: `${this.ingredientPreparation[item].amount.toFixed(2)} ${
+            this.ingredientPreparation[item].unit
+          }`,
+        }
+      })
+
       const requestTableEarlyJson = []
       const requestTableDayJson = []
 
-      Object.keys(this.requestTableEarly).forEach((item, idx) => {
-        requestTableEarlyJson.push({
-          A: idx + 1,
-          B: `${this.requestTableEarly[item][0].Order.receiver} ${
-            this.requestTableEarly[item].length > 1
-              ? this.requestTableEarly[item][
-                  this.requestTableEarly[item].length - 1
-                ].Order.receiver
-              : ''
-          }`,
-          C: item,
-          D: this.requestTableEarly[item].length,
+      Object.keys(this.requestTableEarly)
+        .sort()
+        .forEach((item, idx) => {
+          requestTableEarlyJson.push({
+            A: idx + 1,
+            B: `${this.requestTableEarly[item][0].Order.receiver} ${
+              this.requestTableEarly[item].length > 1
+                ? this.requestTableEarly[item][
+                    this.requestTableEarly[item].length - 1
+                  ].Order.receiver
+                : ''
+            }`,
+            C: item,
+            D: this.requestTableEarly[item].length,
+          })
         })
-      })
 
-      Object.keys(this.requestTableDay).forEach((item, idx) => {
-        requestTableDayJson.push({
-          A: idx + 1,
-          B: `${this.requestTableDay[item][0].Order.receiver} ${
-            this.requestTableDay[item].length > 1
-              ? this.requestTableDay[item][
-                  this.requestTableDay[item].length - 1
-                ].Order.receiver
-              : ''
-          }`,
-          C: item,
-          D: this.requestTableDay[item].length,
+      Object.keys(this.requestTableDay)
+        .sort()
+        .forEach((item, idx) => {
+          requestTableDayJson.push({
+            A: idx + 1,
+            B: `${this.requestTableDay[item][0].Order.receiver} ${
+              this.requestTableDay[item].length > 1
+                ? this.requestTableDay[item][
+                    this.requestTableDay[item].length - 1
+                  ].Order.receiver
+                : ''
+            }`,
+            C: item,
+            D: this.requestTableDay[item].length,
+          })
         })
-      })
 
       const excelDataEarly = utils.json_to_sheet(excelData)
+      const ingredientPreparation = utils.json_to_sheet(
+        ingredientPreparationExcel
+      )
       const requestTableEarlyExcel = utils.json_to_sheet(requestTableEarlyJson)
       const requestTableDayExcel = utils.json_to_sheet(requestTableDayJson)
       const workBook = utils.book_new()
       utils.book_append_sheet(workBook, excelDataEarly, '제조 물량')
+      utils.book_append_sheet(
+        workBook,
+        ingredientPreparation,
+        '식재료 별 준비량'
+      )
       utils.book_append_sheet(
         workBook,
         requestTableEarlyExcel,
@@ -1098,8 +1126,11 @@ export default {
 
           availableMenu = availableMenu.slice(0, saladCount)
           const menuProvideObject = {}
+          // console.log(this.productList)
           availableMenu.forEach((item) => {
-            const name = this.productList[item - 1].name
+            // console.log(item)
+
+            const name = this.productList.find((pr) => pr.id === item).name
             if (menuProvideObject[name]) {
               menuProvideObject[name].count += 1
             } else {

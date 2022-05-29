@@ -1,8 +1,7 @@
 <template>
-  <div class="flex items-center justify-center">
+  <div class="flex flex-col items-center justify-center">
     <div class="program-title-container flex mr-3">
-      <img :src="require(`@/assets/customer/${img}.svg`)" :alt="img" />
-      <h2 style="width: 63px; white-space:nowrap;" class="program-title">
+      <h2 style="width: 63px; white-space:nowrap;" class="select-title">
         {{ title }}
       </h2>
     </div>
@@ -62,4 +61,16 @@ export default {
   },
 }
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+.select-title {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 14px;
+  /* identical to box height */
+
+  color: #000000;
+  margin-bottom: 6px;
+}
+</style>

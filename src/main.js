@@ -38,7 +38,7 @@ Vue.use(VCalendar)
 
 const routes = [
   {
-    path: "/customer", component: Customer, children: [
+    path: "/", component: Customer, children: [
       { path: "login", component: Login, name: "Login" },
       { path: "calendar", component: CustomerCalendar, name: "CustomerCalendar" },
       { path: "info", component: Info, name: "Info" },
@@ -47,7 +47,7 @@ const routes = [
   },
 
   {
-    path: '/', component: Dashboard, children: [
+    path: '/545f7b3a', component: Dashboard, children: [
       { path: '/', redirect: { name: 'Home' } },
       { path: 'home', name: 'Home', component: Home },
       { path: 'order', name: 'Order', component: Order },

@@ -24,7 +24,8 @@
       </slot>
     </guide>
     <divider title="배송지 정보" style="margin-bottom:50px;" />
-    <select-with-label
+
+    <select-with-label-no-img
       :options="deliveryType"
       name="carboType"
       :value="selectedDeliveryType"
@@ -34,7 +35,7 @@
     />
     <hr style="width:200px; margin: 30px auto 30px; margin-top:30px;" />
     <div class="relative">
-      <input-with-label
+      <input-with-label-no-img
         name="address1"
         :value="deliveryInfo.address1"
         title="기본주소"
@@ -45,12 +46,12 @@
       <img
         @click="execDaumPostcode()"
         class="absolute"
-        style="right: calc(10% - 23px); top: 0;"
+        style="right: calc(10% - 23px); top: 20px"
         src="@/assets/customer/searchAddress.svg"
         alt="searchAddress"
       />
     </div>
-    <input-with-label
+    <input-with-label-no-img
       name="address2"
       :value="deliveryInfo.address2"
       @onChange="onChange"
@@ -58,7 +59,8 @@
       img="home"
       style="margin-bottom:30px;"
     />
-    <input-with-label
+
+    <input-with-label-no-img
       name="entrancePassword"
       :value="deliveryInfo.entrancePassword"
       @onChange="onChange"
@@ -68,22 +70,25 @@
     />
     <div
       style="font-family: 'Roboto';
-        font-size: 8px;
-        line-height: 9px;
+        font-size: 12px;
+        line-height: 12px;
         color: #B3B3B3;
-        width: calc(50%);
+        width:80%
+        
+        
         display: flex;
         justify-content: center;
         margin: 0 auto;
-        transform: translateX(48px);
+        margin-top:6px;
+        
         margin-bottom:30px;
         "
     >
       새벽배송 시 문 앞까지 원활히 배송되기 위한 필수 기입사항입니다. 정확한
-      비밀번호 입력 순서 혹은 자세한 출입 방법을 적어주세요. 없을 시 ‘없음'으로
-      작성해주세요.
+      비밀번호 입력 순서 혹은 자세한 출입 방법을 적어주세요.<br />
+      없을 시 ‘없음'으로 작성해주세요.
     </div>
-    <input-with-label
+    <input-with-label-no-img
       title="배송메세지"
       img="message"
       @onChange="onChange"
@@ -97,13 +102,20 @@
 <script>
 import Guide from '@/components/customer/Guide'
 import Divider from '../../components/customer/Divider.vue'
-import InputWithLabel from '../../components/customer/InputWithLabel.vue'
-import SelectWithLabel from '../../components/customer/SelectWithLabel.vue'
+
 import customer from '../../api/customer'
+import InputWithLabelNoImg from '../../components/customer/InputWithLabelNoImg.vue'
+import SelectWithLabelNoImg from '../../components/customer/SelectWithLabelNoImg.vue'
 
 export default {
   name: 'Delivery',
-  components: { Guide, Divider, InputWithLabel, SelectWithLabel },
+  components: {
+    Guide,
+    Divider,
+
+    InputWithLabelNoImg,
+    SelectWithLabelNoImg,
+  },
   async mounted() {
     const {
       data: {

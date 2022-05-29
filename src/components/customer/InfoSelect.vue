@@ -7,11 +7,11 @@
           alt="exclude"
           class="mr-3"
         />
-        <h2 class="program-title">{{ title }}</h2>
+        <h2 class="program-title" style="font-size:14px;">{{ title }}</h2>
       </div>
       <div
         class="yun-label text-center"
-        style="margin: 0px auto 10px; max-width: 194px; "
+        style="margin: 0px auto 10px; max-width: 230px; font-size:12px; line-height: 12px"
       >
         {{ label }}
       </div>

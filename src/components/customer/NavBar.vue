@@ -3,20 +3,20 @@
     <router-link
       class="menu-tab w-1/3"
       :class="{ selected: currentRoutes === 'calendar' }"
-      to="/customer/calendar"
+      to="/calendar"
     >
       배송 일정 변경
     </router-link>
     <router-link
       class="menu-tab w-1/3"
-      to="/customer/info"
+      to="/info"
       :class="{ selected: currentRoutes === 'info' }"
     >
       메뉴 구성 변경
     </router-link>
     <router-link
       class="menu-tab w-1/3"
-      to="/customer/delivery"
+      to="/delivery"
       :class="{ selected: currentRoutes === 'delivery' }"
     >
       배송 주소지 변경
@@ -33,11 +33,11 @@ export default {
     }
   },
   async mounted() {
-    this.currentRoutes = window.location.pathname.split('/')[2]
+    this.currentRoutes = window.location.pathname.split('/')[1]
   },
   watch: {
     $route(to, from) {
-      this.currentRoutes = to.path.split('/')[2]
+      this.currentRoutes = to.path.split('/')[1]
       from
     },
   },

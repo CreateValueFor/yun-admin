@@ -222,12 +222,12 @@ export default {
 
   align-items: center;
   .program-title {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
   }
   .program-contents {
     font-weight: 300;
-    font-size: 10px;
+    font-size: 12px;
   }
   .program-label {
     color: #fff;
