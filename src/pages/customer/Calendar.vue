@@ -55,15 +55,21 @@
       <Slide style="height: 550px" v-for="monthIdx in 4" :key="monthIdx">
         <table class="table text-centere w-full">
           <thead>
-            <th class="text-center" v-for="day in days" :key="day">
+            <th
+              width="14.17%"
+              class="text-center"
+              v-for="day in days"
+              :key="day"
+            >
               {{ day }}
             </th>
           </thead>
           <tbody>
             <tr class="month-row">
-              <td colspan="6">
+              <td colspan="1" class="text-center">
                 {{ `${months[monthIdx - 1]}월` }}
               </td>
+              <td colspan="6"></td>
             </tr>
             <tr
               v-for="(date, idx) in dates[monthIdx - 1]"
@@ -234,11 +240,13 @@ export default {
 
     // 달력 만들기
     const date = new Date()
+    date.setDate(15)
     this.years.push(date.getFullYear())
     this.months.push(date.getMonth() + 1)
 
     for (let i = 0; i < 3; i++) {
       date.setMonth(date.getMonth() + 1)
+
       this.years.push(date.getFullYear())
       this.months.push(date.getMonth() + 1)
     }
@@ -247,6 +255,21 @@ export default {
   },
   methods: {
     lockDelivery(monthIdx, idx, secondIdx) {
+      const compareDate = new Date()
+      compareDate.setDate(compareDate.getDate() + 1)
+      compareDate.setHours(17)
+      compareDate.setMinutes(0)
+      compareDate.setSeconds(0)
+
+      const selectedDate = new Date(
+        this.dates[monthIdx][idx][secondIdx].fullDay
+      )
+
+      if (compareDate > selectedDate) {
+        return window.alert(
+          '배송일 이전 오후 5시가 지나면 배송을 수정할 수 없습니다.'
+        )
+      }
       //공휴일일 경우 해제 불가
       if (
         this.holidaies.includes(this.dates[monthIdx][idx][secondIdx].fullDay)
@@ -505,7 +528,7 @@ table {
       vertical-align: middle;
       border-bottom: 1px solid #e2e8f0;
       td {
-        text-align: end;
+        text-align: center;
         font-size: 1rem;
         color: #000;
         border-right: none;

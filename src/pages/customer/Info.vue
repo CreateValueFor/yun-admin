@@ -76,7 +76,7 @@
     </div>
     <hr style="width: 100%; margin: 50px 0px;" />
     <div class="allergy-container program-container flex flex-col w-full">
-      <button class="input-button ml-auto">
+      <button class="input-button ml-auto" @click="showIngredients = true">
         메뉴별 구성 식재료 보기
       </button>
       <InfoSelect
@@ -108,6 +108,10 @@
     </div>
     <hr class="w-full" />
     <button class="btn" @click="onSave">저장하기</button>
+    <ingredient-modal
+      :show="showIngredients"
+      @close="showIngredients = false"
+    />
   </div>
 </template>
 <script>
@@ -119,6 +123,7 @@ import InfoSelect from '../../components/customer/InfoSelect.vue'
 import InputWithLabel from '../../components/customer/InputWithLabel.vue'
 import customer from '../../api/customer'
 import SelectWithLabel from '../../components/customer/SelectWithLabel.vue'
+import IngredientModal from '../../components/customer/IngredientModal.vue'
 
 // import Divider from '../../components/customer/Divider.vue'
 export default {
@@ -129,7 +134,9 @@ export default {
 
     InputWithLabel,
     SelectWithLabel,
+    IngredientModal,
   },
+
   async mounted() {
     // 고객 정보 불러오기
     const {
@@ -167,6 +174,7 @@ export default {
       images: {
         carbo: require('@/assets/customer/carbo.svg'),
       },
+      showIngredients: false,
     }
   },
   methods: {
