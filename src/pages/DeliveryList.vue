@@ -481,14 +481,14 @@ export default {
   },
   async mounted() {
     this.productList = await api.getAllProducts()
-    this.searchDate = '2022-05-02'
-    this.products = {
-      product1: 11,
-      product2: 2,
-      product3: 3,
-      product4: 5,
-      product5: 4,
-    }
+    // this.searchDate = '2022-06-01'
+    // this.products = {
+    //   product1: 19,
+    //   product2: 3,
+    //   product3: 8,
+    //   product4: 1,
+    //   product5: 2,
+    // }
   },
   watch: {
     products: {
@@ -564,11 +564,6 @@ export default {
         earlyTotal: 0,
         dayTotal: 0,
       }
-      // const product1Preparation = {}
-      // const product2Preparation = {}
-      // const product3Preparation = {}
-      // const product4Preparation = {}
-      // const product5Preparation = {}
 
       products.forEach((item) => {
         productInfos[item.id] = {
@@ -616,7 +611,6 @@ export default {
         let i = 0
         while (deliveryMenus.length !== deliveryCount) {
           if (i > 100) {
-            console.log(item.Order.receiver)
             window.alert(
               `${item.Order.receiver}님께 배송 가능한 메뉴가 없어 식재료 준비량에 합산되지 않습니다.`
             )
@@ -626,25 +620,20 @@ export default {
           if (item.excludeMenus.length) {
             // 제외 메뉴가 있을 경우
             const excludeMenuIds = item.excludeMenus.map((item) => item.id)
+
             if (
               !excludeMenuIds.includes(this.products[`product${(i % 5) + 1}`])
             ) {
               deliveryMenus.push(this.products[`product${(i % 5) + 1}`])
             }
           } else {
+            // 제외메뉴 없을 경우 그냥 하나씩 넣어주기
             deliveryMenus.push(this.products[`product${(i % 5) + 1}`])
           }
 
           i += 1
-          if (i > 10) {
-            console.log(
-              'deliveryMenus',
-              deliveryMenus.length,
-              'deliveryCount',
-              deliveryCount
-            )
-          }
         }
+
         // 메뉴 취합 완료
         // 식재료 별 준비량 찾기
 
@@ -755,13 +744,13 @@ export default {
                 }
               } else if (igd.Product_Ingredients.type === 'topping') {
                 if (
-                  excludeIngredientNames.length &&
-                  ((igd.name === '병아리콩' &&
-                    excludeIngredientNames.includes('콩')) ||
-                    excludeIngredientNames.includes(igd.name))
+                  !(
+                    excludeIngredientNames.length &&
+                    ((igd.name === '병아리콩' &&
+                      excludeIngredientNames.includes('콩')) ||
+                      excludeIngredientNames.includes(igd.name))
+                  )
                 ) {
-                  console.log('')
-                } else {
                   // 식재료 별 준비량
                   if (igd.name === '병아리콩') {
                     ingredientPreparation['콩(토핑)'] += 1
@@ -790,7 +779,6 @@ export default {
       Object.keys(productInfos).forEach((menu) => {
         productInfos[menu].ingredients = productInfos[menu].ingredients.sort(
           function(a, b) {
-            console.log(a.Product_Ingredients.type === 'main')
             if (a.Product_Ingredients.type === 'main') {
               return 1
             }
@@ -802,20 +790,6 @@ export default {
             }
             return 0
           }
-        )
-        console.log(
-          productInfos[menu].ingredients.sort(function(a, b) {
-            if (a.Product_Ingredients.type === 'main') {
-              return 1
-            }
-            if (
-              a.Product_Ingredients.type === 'topping' &&
-              b.Product_Ingredients.type != 'main'
-            ) {
-              return 1
-            }
-            return 0
-          })
         )
       })
 
@@ -876,22 +850,6 @@ export default {
 
       this.deliveryPreparation = deliveryCountPreparation
 
-      // 새벽 팩수, 일반 팩수
-
-      // // 식재료 별 준비량
-      // let totalRoot = 0
-      // let totalRice = 0
-      // let totalToping = {
-      //   apple: 0,
-      //   carrot: 0,
-      //   bean: 0,
-      // }
-
-      // this.searchList.forEach((item) => {
-      //   if (item.productInfo.includes('-2')) {
-      //     console.log(item.productInfo.split(':'))
-      //   }
-      // })
       this.showSummary = true
       return
     },
@@ -1109,14 +1067,40 @@ export default {
           // 메뉴 구성 만들기
           const saladCount = eatPerday * 2
           const availableCount = availableMenu.length
+          let isNotExcluded
 
           const firstProduct = this.products.product1
           const secondProduct = this.products.product2
+          const thirdProduct = this.products.product3
+          const fourthProduct = this.products.product4
+          const fifthProduct = this.products.product5
 
-          const isNotExcluded =
-            !availableMenu.length ||
-            (availableMenu.includes(firstProduct) &&
-              availableMenu.includes(secondProduct))
+          if (saladCount === 2) {
+            isNotExcluded =
+              !availableMenu.length ||
+              (availableMenu.includes(firstProduct) &&
+                availableMenu.includes(secondProduct))
+          } else if (saladCount === 4) {
+            isNotExcluded =
+              !availableMenu.length ||
+              (availableMenu.includes(firstProduct) &&
+                availableMenu.includes(secondProduct) &&
+                availableMenu.includes(thirdProduct) &&
+                availableMenu.includes(fourthProduct))
+          } else {
+            isNotExcluded =
+              !availableMenu.length ||
+              (availableMenu.includes(firstProduct) &&
+                availableMenu.includes(secondProduct) &&
+                availableMenu.includes(thirdProduct) &&
+                availableMenu.includes(fourthProduct) &&
+                availableMenu.includes(fifthProduct))
+          }
+
+          // const isNotExcluded =
+          //   !availableMenu.length ||
+          //   (availableMenu.includes(firstProduct) &&
+          //     availableMenu.includes(secondProduct))
 
           if (availableMenu.length && availableMenu.length < saladCount) {
             for (let i = 0; saladCount - availableMenu.length > 0; i++) {
@@ -1126,10 +1110,8 @@ export default {
 
           availableMenu = availableMenu.slice(0, saladCount)
           const menuProvideObject = {}
-          // console.log(this.productList)
-          availableMenu.forEach((item) => {
-            // console.log(item)
 
+          availableMenu.forEach((item) => {
             const name = this.productList.find((pr) => pr.id === item).name
             if (menuProvideObject[name]) {
               menuProvideObject[name].count += 1
@@ -1205,12 +1187,13 @@ export default {
         .forEach((key) => {
           this.searchList = [...this.searchList, ...this.requestTableEarly[key]]
         })
+      console.log(this.requestTableEarly)
       Object.keys(this.requestTableDay)
         .sort()
         .forEach((key) => {
           this.searchList = [...this.searchList, ...this.requestTableDay[key]]
         })
-      console.log(this.requestTableEarly)
+
       this.loading = false
     },
   },
