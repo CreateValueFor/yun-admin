@@ -66,10 +66,11 @@
           </thead>
           <tbody>
             <tr class="month-row">
+              <td colspan="3"></td>
               <td colspan="1" class="text-center">
                 {{ `${months[monthIdx - 1]}월` }}
               </td>
-              <td colspan="6"></td>
+              <td colspan="3"></td>
             </tr>
             <tr
               v-for="(date, idx) in dates[monthIdx - 1]"
@@ -162,11 +163,21 @@
       </Slide>
     </hooper>
 
-    <img
-      src="@/assets/customer/notice.svg"
-      alt="notice"
-      style="width: 224px; height : 20p;"
-    />
+    <div class="flex items-center">
+      <img class="mr-3" src="@/assets/notice.svg" alt="notice" />
+      <span
+        style="font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 14px;
+
+color: #9A1111;
+"
+        >ex. 5월 05일 ~ 06일 어린이날 택배사 휴무로 인해 일반배송이
+        중단됩니다.</span
+      >
+    </div>
     <button class="btn" @click="onSave">저장하기</button>
   </div>
 </template>

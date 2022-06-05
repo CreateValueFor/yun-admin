@@ -146,6 +146,16 @@
             class="w-1/5"
           >
             <div>{{ menuPreparation[menu].name }}</div>
+            <div class="summary-item">
+              <div>{{ `단백질 총합` }}</div>
+              <div>
+                {{
+                  (menuPreparation[menu].count || 0) +
+                    (menuPreparation[menu].count15 * 1.5 || 0) +
+                    (menuPreparation[menu].count20 * 2 || 0)
+                }}
+              </div>
+            </div>
 
             <div
               v-for="igd in menuPreparation[menu].ingredients"
@@ -186,6 +196,7 @@
                 </div>
               </div>
             </div>
+
             <div class="summary-item">
               <div>{{ `기본` }}</div>
               <div>{{ menuPreparation[menu].count || 0 }}</div>
@@ -775,22 +786,16 @@ export default {
         // 메뉴 배정해주기
       })
 
-      // TODO 식재료 타입이 메인인 것으로 소팅하려다가 실패함
       Object.keys(productInfos).forEach((menu) => {
-        productInfos[menu].ingredients = productInfos[menu].ingredients.sort(
-          function(a, b) {
-            if (a.Product_Ingredients.type === 'main') {
-              return 1
-            }
-            if (
-              a.Product_Ingredients.type === 'topping' &&
-              b.Product_Ingredients.type != 'main'
-            ) {
-              return 1
-            }
-            return 0
-          }
-        )
+        console.log(productInfos[menu].ingredients)
+        productInfos[menu].ingredients = [
+          ...productInfos[menu].ingredients.filter(
+            (igd) => igd.Product_Ingredients.type === 'main'
+          ),
+          ...productInfos[menu].ingredients.filter(
+            (igd) => igd.Product_Ingredients.type !== 'main'
+          ),
+        ]
       })
 
       this.menuPreparation = productInfos
@@ -880,6 +885,7 @@ export default {
         }
       })
 
+      // 식재료 취합
       const ingredientPreparationExcel = Object.keys(
         this.ingredientPreparation
       ).map((item) => {
@@ -890,6 +896,27 @@ export default {
           }`,
         }
       })
+
+      // 메뉴 취합
+      const menuPreparationExcel = Object.keys(this.menuPreparation).map(
+        (key) => {
+          const item = this.menuPreparation[key]
+
+          const menu = {
+            name: item.name,
+            기본: item.count,
+            단백질150g: item.count15,
+            단백질200g: item.count20,
+          }
+          item.ingredients.forEach((igd) => {
+            menu[igd.name] =
+              igd.count * igd.Product_Ingredients.amount +
+              igd.Product_Ingredients.unit
+          })
+
+          return [menu]
+        }
+      )
 
       const requestTableEarlyJson = []
       const requestTableDayJson = []
@@ -941,6 +968,11 @@ export default {
         ingredientPreparation,
         '식재료 별 준비량'
       )
+      menuPreparationExcel.forEach((excel) => {
+        const excelJson = utils.json_to_sheet(excel)
+        utils.book_append_sheet(workBook, excelJson, excel[0].name)
+      })
+
       utils.book_append_sheet(
         workBook,
         requestTableEarlyExcel,

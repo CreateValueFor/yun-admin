@@ -11,7 +11,7 @@
 
           <div class="modal-body">
             <slot name="body">
-              <div class="flex overflow-scroll h-64">
+              <div class="flex overflow-scroll h-64" style="height: 600px">
                 <div class="w-1/2">
                   <div>제품명</div>
                   <div

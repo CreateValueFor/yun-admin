@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="p-3">
     <div class="h-12 flex justify-end items-end">
       <button
         class="bg-orange-100 px-5 py-1 rounded-lg  mr-3 border"
@@ -9,14 +9,21 @@
       </button>
       <button
         @click="addReserve"
-        class="bg-orange-100 px-5 py-1 rounded-lg  border"
+        class="bg-orange-100 px-5 py-1 rounded-lg  mr-3 border"
       >
         추가
       </button>
+      <button
+        @click="changeReserveDate"
+        class="bg-orange-100 px-5 py-1 rounded-lg  border"
+      >
+        배송 요일 변경
+      </button>
     </div>
+    <h2 style="font-weight:500; font-size:1.25rem">{{ deliveryDay }}배송</h2>
 
     <hooper :vertical="true" style="height: 550px; margin-top: 50px;">
-      <Slide style="height: 550px" v-for="monthIdx in 4" :key="monthIdx">
+      <Slide style="height: 550px" v-for="monthIdx in 6" :key="monthIdx">
         <table class="table text-centere w-full">
           <thead>
             <th class="text-center" v-for="day in days" :key="day">
@@ -128,6 +135,7 @@
 import 'hooper/dist/hooper.css'
 import { Hooper, Slide } from 'hooper'
 import customer from '@/api/customer'
+import api from '@/api/api'
 import custom from '@/api/custom'
 
 export default {
@@ -143,6 +151,8 @@ export default {
         1: [],
         2: [],
         3: [],
+        4: [],
+        5: [],
       },
       years: [],
       months: [],
@@ -150,6 +160,7 @@ export default {
       reserveDates: [],
       holidaies: [],
       lockDates: ['2022-05-23'],
+      deliveryDay: '',
     }
   },
   computed: {
@@ -164,50 +175,72 @@ export default {
   },
 
   async created() {
-    console.log(this.orderId)
-    // 네트워크 호출해서 초기데이터 세팅
-    const res = await customer.getCustomerInfoAdmin(this.orderId)
-    this.holidaies = (await customer.getHolidaysAdmin(this.orderId)).data.map(
-      (item) => item.date
-    )
-    console.log(this.holidaies)
-    const {
-      Package: { name },
-      Reservations,
-      deliveryType,
-    } = res.data
-    this.program = name
-    this.isEarly = deliveryType === '새벽배송'
-    this.reservations = Reservations
-    this.reserveDates = Reservations.map((item) => item.deliveryDate)
-    console.log(this.reserveDates)
-    this.lockDates = Reservations.filter((item) => item.locked).map(
-      (item) => item.deliveryDate
-    )
-    const lastReservation = this.reservations[this.reservations.length - 1]
-
-    const lastReserveTime = new Date(lastReservation.deliveryDate)
-    const lastReserveYear = lastReserveTime.getFullYear()
-    const lastReserveMonth = lastReserveTime.getMonth() + 1
-    const lastReserveDate = lastReserveTime.getDate() + 1
-    const lastReserveDay = custom.dayTranslate[lastReserveTime.getDay()]
-
-    this.endDate = `${lastReserveYear}년 ${lastReserveMonth}월 ${lastReserveDate}일 ${lastReserveDay}요일`
-
-    // 달력 만들기
-    const date = new Date()
-    this.years.push(date.getFullYear())
-    this.months.push(date.getMonth() + 1)
-
-    for (let i = 0; i < 3; i++) {
-      date.setMonth(date.getMonth() + 1)
-      this.years.push(date.getFullYear())
-      this.months.push(date.getMonth() + 1)
-    }
-
-    this.calendarData()
+    await this.init()
   },
   methods: {
+    async init() {
+      // 네트워크 호출해서 초기데이터 세팅
+      const res = await customer.getCustomerInfoAdmin(this.orderId)
+      this.holidaies = (await customer.getHolidaysAdmin(this.orderId)).data.map(
+        (item) => item.date
+      )
+
+      const {
+        Package: { name },
+        Reservations,
+        deliveryType,
+      } = res.data
+      this.program = name
+      this.isEarly = deliveryType === '새벽배송'
+      this.reservations = Reservations
+      this.reserveDates = Reservations.map((item) => item.deliveryDate)
+
+      this.lockDates = Reservations.filter((item) => item.locked).map(
+        (item) => item.deliveryDate
+      )
+      const lastReservation = this.reservations[this.reservations.length - 1]
+
+      const lastReserveTime = new Date(lastReservation.deliveryDate)
+      const lastReserveYear = lastReserveTime.getFullYear()
+      const lastReserveMonth = lastReserveTime.getMonth() + 1
+      const lastReserveDate = lastReserveTime.getDate() + 1
+      const lastReserveDay = custom.dayTranslate[lastReserveTime.getDay()]
+
+      this.endDate = `${lastReserveYear}년 ${lastReserveMonth}월 ${lastReserveDate}일 ${lastReserveDay}요일`
+
+      // 달력 만들기
+      const date = new Date()
+      date.setMonth(date.getMonth() - 2)
+      this.years.push(date.getFullYear())
+      this.months.push(date.getMonth() + 1)
+
+      for (let i = 0; i < 6; i++) {
+        date.setMonth(date.getMonth() + 1)
+        this.years.push(date.getFullYear())
+        this.months.push(date.getMonth() + 1)
+      }
+
+      this.calendarData()
+
+      const lastDeliveryDate = new Date(
+        this.reservations[this.reservations.length - 1].deliveryDate
+      )
+      const day = await lastDeliveryDate.getDay()
+      if ([1, 3].includes(day)) {
+        this.deliveryDay = '월/수'
+      } else {
+        this.deliveryDay = '화/목'
+      }
+    },
+    async changeReserveDate() {
+      const confirm = window.confirm('배송 요일을 변경하시겠습니까?')
+      if (!confirm) {
+        return
+      }
+
+      await api.patchDeliveryDay(this.orderId)
+      await this.init()
+    },
     removeReserve() {
       console.log('remove')
       const reserves = this.reserveDates.sort().reverse()
@@ -301,7 +334,7 @@ export default {
       // this.$set(this.dates[monthIdx][idx][secondIdx], 'deliveryCandidate', true)
     },
     calendarData() {
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 6; i++) {
         const [
           monthFirstDay,
           monthLastDate,

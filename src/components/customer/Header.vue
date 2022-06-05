@@ -14,6 +14,9 @@
           <img src="@/assets/customer/salad.svg" alt="salad" class="mr-3" />
           <p>{{ program }}</p>
         </div>
+        <div id="customer-logout" @click="logout">
+          로그아웃
+        </div>
       </div>
     </div>
   </div>
@@ -48,6 +51,24 @@ export default {
       userName: '',
     }
   },
+  methods: {
+    logout() {
+      localStorage.removeItem('YUN-TOKEN')
+      window.location.reload()
+    },
+  },
 }
 </script>
-<style lang=""></style>
+<style lang="scss">
+#customer-logout {
+  background: #26331e;
+  color: #fff;
+  display: block;
+  border-radius: 5px;
+  padding: 5px 8px;
+  /* width: 80px; */
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+}
+</style>

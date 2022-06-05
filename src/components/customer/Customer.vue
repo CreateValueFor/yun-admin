@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import customer from '../../api/customer'
 import Header from './Header.vue'
 import NavBar from './NavBar.vue'
 
@@ -44,6 +45,13 @@ export default {
         this.$router.push({ name: 'Login' })
         this.header = false
         return
+      } else {
+        try {
+          await customer.check()
+        } catch (error) {
+          localStorage.removeItem('YUN-TOKEN')
+          window.location.reload()
+        }
       }
       this.header = true
     }

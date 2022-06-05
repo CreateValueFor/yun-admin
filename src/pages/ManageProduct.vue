@@ -108,7 +108,7 @@
     <div class="flex">
       <div class="w-1/5">
         <div
-          class="border px-5 py-2 mx-3 rounded-lg mb-2 cursor-pointer hover:bg-blue-100"
+          class="border px-5 py-2 mx-3 rounded-lg mb-2 cursor-pointer hover:bg-blue-100 flex justify-between"
           :class="{ 'bg-blue-200': selectedItemIdx === idx }"
           v-for="(product, idx) in productList"
           :key="`product-${idx}`"
@@ -116,6 +116,12 @@
           @click="selectProduct(idx)"
         >
           {{ product.name }}
+          <button
+            @click="removeProduct($event, product)"
+            class="hover:opacity-50 bg-red-500 w-6 h-6 rounded-full mr-3 text-white"
+          >
+            x
+          </button>
         </div>
       </div>
       <div class="w-4/5">
@@ -192,6 +198,14 @@ export default {
     this.initialize()
   },
   methods: {
+    async removeProduct(event, product) {
+      event.preventDefault()
+      event.stopPropagation()
+      if (window.confirm('해당 제품을 정말 삭제하시겠습니까?')) {
+        await api.deleteProduct(product.id)
+        await this.initialize()
+      }
+    },
     async initialize() {
       this.ingredientList = await api.getAllIngredients()
       this.productList = await api.getAllProducts()

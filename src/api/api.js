@@ -19,6 +19,10 @@ const _basePutRequest = async (path, param) => {
     const res = await axios.put(BASE_URL + path, param)
     return res.data;
 }
+const _basePatchRequest = async (path, param) => {
+    const res = await axios.patch(BASE_URL + path, param)
+    return res.data;
+}
 
 
 const getOrderList = async (query) => {
@@ -101,6 +105,16 @@ const putExcludes = async (param, id) => {
     return res;
 }
 
+const deleteProduct = async (productId) => {
+    const res = await _baseDeleteRequest(`product/${productId}`)
+    return res;
+}
+// 배송 일정 변경
+const patchDeliveryDay = async (orderId) => {
+    const res = await _basePatchRequest(`reservation/deliveryDay/${orderId}`);
+    return res;
+}
+
 export default {
     getOrderList,
     postOrderList,
@@ -122,6 +136,11 @@ export default {
     postHoliday,
     deleteHoliday,
     //제품 제외
-    putExcludes
+    putExcludes,
+    // 제품 삭제
+    deleteProduct,
+    //배송 요일 변경
+    patchDeliveryDay
+
 
 }
