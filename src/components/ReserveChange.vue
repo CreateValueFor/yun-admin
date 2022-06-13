@@ -221,9 +221,12 @@ export default {
       }
 
       this.calendarData()
+      const validReservations = this.reservations.filter(
+        (reserve) => !reserve.holiday
+      )
 
       const lastDeliveryDate = new Date(
-        this.reservations[this.reservations.length - 1].deliveryDate
+        validReservations[validReservations.length - 1].deliveryDate
       )
       const day = await lastDeliveryDate.getDay()
       if ([1, 3].includes(day)) {
@@ -259,8 +262,35 @@ export default {
     },
 
     addReserve() {
-      console.log('add')
-      const newReserveDateObj = new Date(this.reserveDates.sort()[0])
+      const validReserves = this.reservations
+        .filter((reserve) => !reserve.holiday)
+        .sort()
+
+      const newReserveDateObj = new Date(
+        validReserves[validReserves.length - 1].deliveryDate
+      )
+
+      console.log(this.holidaies)
+      // 휴일 주간 날짜 다 배출
+      const getHolidayTerm = () => {
+        console.log(this.holidaies)
+        const holidaies = []
+        this.holidaies.forEach((item) => {
+          holidaies.push(item)
+          const curDate = new Date(item)
+          if ([1, 3].includes(curDate.getDay())) {
+            // 월 수 인 경우
+            curDate.setDate(curDate.getDate() + 1)
+            holidaies.push(curDate.toISOString().split('T')[0])
+          } else {
+            curDate.setDate(curDate.getDate() - 1)
+            holidaies.push(curDate.toISOString().split('T')[0])
+          }
+        })
+        return holidaies
+      }
+      console.log(getHolidayTerm())
+
       let notFlag = true
       while (notFlag) {
         const newReserveDay = newReserveDateObj.getDay()
@@ -271,6 +301,9 @@ export default {
         }
         if (
           !this.reserveDates.includes(
+            newReserveDateObj.toISOString().split('T')[0]
+          ) &&
+          !getHolidayTerm().includes(
             newReserveDateObj.toISOString().split('T')[0]
           )
         ) {
