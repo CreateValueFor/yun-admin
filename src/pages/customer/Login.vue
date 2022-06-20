@@ -14,7 +14,7 @@
       <Input
         :value="loginData.receiverPhone"
         class="mb-6 h-16 px-3"
-        placeholder="실수령자 연락처를 입력해주세요,(-표시 제외)"
+        placeholder="실수령자 연락처를 입력해주세요,(-표시 제외, 안심번호 사용시 안심번호 작성)"
         name="receiverPhone"
         @onChange="onChange"
       />

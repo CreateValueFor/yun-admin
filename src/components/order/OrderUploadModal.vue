@@ -3,7 +3,7 @@
     <h3 slot="header">주문 업로드 설정</h3>
     <div slot="body" class="flex">
       <div class="w-1/2 p-3 border-r">
-        <h3>새벽배송</h3>
+        <h3>직접배송</h3>
         <div class="mt-3">
           <input
             type="radio"

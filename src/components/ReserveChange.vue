@@ -191,7 +191,7 @@ export default {
         deliveryType,
       } = res.data
       this.program = name
-      this.isEarly = deliveryType === '새벽배송'
+      this.isEarly = deliveryType === '새벽배송' || deliveryType === '직접배송'
       this.reservations = Reservations
       this.reserveDates = Reservations.map((item) => item.deliveryDate)
 

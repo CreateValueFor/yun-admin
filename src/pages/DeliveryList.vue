@@ -322,7 +322,7 @@
     </div>
     <div class="flex" v-if="showSummary">
       <div class="w-1/2">
-        <h2>새벽배송</h2>
+        <h2>직접배송</h2>
         <table>
           <thead>
             <th>
@@ -595,7 +595,7 @@ export default {
           (exclude) => exclude.name
         )
         // 배송, 하루 끼니 별 취합
-        if (deliveryType === '새벽배송') {
+        if (deliveryType === '새벽배송' || deliveryType === '직접배송') {
           //새벽 배송
           if (eatPerDay === 1) {
             deliveryCountPreparation.early1 += 1
@@ -868,7 +868,7 @@ export default {
           수취인명: item.Order.receiver,
           수취인연락처: item.Order.receiverPhone,
           구매자연락처: item.Order.buyerPhone,
-          배송지: item.Order.address1 + item.Order.address2 || '',
+          배송지: `${item.Order.address1} ${item.Order.address2}` || '',
           '(기본주소)': item.Order.address1,
           '(상세주소)': item.Order.address2,
           '공동현관 비밀번호': item.Order.entrancePassword,
@@ -976,7 +976,7 @@ export default {
       utils.book_append_sheet(
         workBook,
         requestTableEarlyExcel,
-        '요청사항표-새벽배송'
+        '요청사항표-직접배송'
       )
       utils.book_append_sheet(
         workBook,
@@ -1202,7 +1202,10 @@ export default {
         })
 
       makeList.forEach((item) => {
-        if (item.Order.deliveryType === '새벽배송') {
+        if (
+          item.Order.deliveryType === '새벽배송' ||
+          item.Order.deliveryType === '직접배송'
+        ) {
           if (!this.requestTableEarly[item.productInfo]) {
             this.requestTableEarly[item.productInfo] = []
           }

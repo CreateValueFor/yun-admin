@@ -344,7 +344,7 @@ export default {
         ) {
           this.uploadOption.early10 = ''
           return window.alert(
-            '새벽배송 10일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
+            '직접배송 10일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
           )
         }
         if (
@@ -353,7 +353,7 @@ export default {
         ) {
           this.uploadOption.early20 = ''
           return this.uploadOption.alert(
-            '새벽배송 20일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
+            '직접배송 20일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
           )
         }
       } else if (this.uploadOption.earlyType === 'tt') {
@@ -363,7 +363,7 @@ export default {
         ) {
           this.uploadOption.early10 = ''
           return window.alert(
-            '새벽배송 10일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+            '직접배송 10일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
           )
         }
         if (
@@ -372,7 +372,7 @@ export default {
         ) {
           this.uploadOption.early20 = ''
           return window.alert(
-            '새벽배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+            '직접배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
           )
         }
       }
@@ -385,7 +385,10 @@ export default {
         if (!item.상품명) {
           return
         }
-        if (item.deliveryType === '새벽배송') {
+        if (
+          item.deliveryType === '새벽배송' ||
+          item.deliveryType === '직접배송'
+        ) {
           if (item.상품명.includes('10일')) {
             this.early10.push(item)
           } else {
@@ -500,7 +503,11 @@ export default {
       )
       const excelDataEarly = utils.json_to_sheet(
         this.uploadedOrder
-          .filter((item) => item.deliveryType === '새벽배송')
+          .filter(
+            (item) =>
+              item.deliveryType === '새벽배송' ||
+              item.deliveryType === '직접배송'
+          )
           .map((item) => ({
             상품명: item.상품명,
             주문번호: item.serial,
