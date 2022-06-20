@@ -263,14 +263,13 @@ export default {
 
     addReserve() {
       const validReserves = this.reservations
-        .filter((reserve) => !reserve.holiday)
+        .filter((reserve) => !reserve.holiday && !reserve.locked)
         .sort()
 
       const newReserveDateObj = new Date(
         validReserves[validReserves.length - 1].deliveryDate
       )
 
-      console.log(this.holidaies)
       // 휴일 주간 날짜 다 배출
       const getHolidayTerm = () => {
         console.log(this.holidaies)
@@ -289,6 +288,7 @@ export default {
         })
         return holidaies
       }
+
       console.log(getHolidayTerm())
 
       let notFlag = true
