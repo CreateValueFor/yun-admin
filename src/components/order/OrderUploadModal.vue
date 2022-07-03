@@ -7,6 +7,44 @@
         <div class="mt-3">
           <input
             type="radio"
+            v-model="uploadOption.directType"
+            name="deliveryDateDirect"
+            value="mw"
+            id="mw-date-direct"
+          />
+          <label for="mw-date-direct" class="mr-3">월/수</label>
+          <input
+            type="radio"
+            v-model="uploadOption.directType"
+            name="deliveryDateDirect"
+            value="tt"
+            id="tt-date-direct"
+          />
+          <label for="tt-date-direct">화/목</label>
+        </div>
+        <div class="mt-3">10일 프로그램 - {{ orderCount.direct10 }}개</div>
+        <input
+          v-model="uploadOption.direct10"
+          class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+          type="date"
+          max="9999-12-31"
+          id="program-10-early"
+        />
+        <div class="mt-3">20일 프로그램 - {{ orderCount.direct20 }}개</div>
+        <input
+          v-model="uploadOption.direct20"
+          class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
+          type="date"
+          max="9999-12-31"
+          id="program-20-early"
+        />
+      </div>
+
+      <div class="w-1/2 p-3 border-r">
+        <h3>새벽배송</h3>
+        <div class="mt-3">
+          <input
+            type="radio"
             v-model="uploadOption.earlyType"
             name="deliveryDate"
             value="mw"
@@ -39,6 +77,7 @@
           id="program-20-early"
         />
       </div>
+
       <div class="w-1/2 p-3">
         <h3>일반배송(화, 목 배송)</h3>
         <div class="mt-3">10일 프로그램 - {{ orderCount.day10 }}개</div>

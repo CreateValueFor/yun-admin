@@ -303,14 +303,21 @@
       <div class="delivery--text-whitesummary ">
         <h2 class="summary--title bg-green-500 text-white">배송 통계</h2>
         <div class="flex">
-          <div class="w-1/2">
+          <div class="w-1/3">
             <h2>새벽</h2>
             <div>{{ '1식 ' + deliveryPreparation.early1 }}건</div>
             <div>{{ '2식 ' + deliveryPreparation.early2 }}건</div>
             <div>{{ '3식 ' + deliveryPreparation.early3 }}건</div>
             <div>{{ '총 팩수 ' + deliveryPreparation.earlyTotal }}개</div>
           </div>
-          <div class="w-1/2">
+          <div class="w-1/3">
+            <h2>직접</h2>
+            <div>{{ '1식 ' + deliveryPreparation.direct1 }}건</div>
+            <div>{{ '2식 ' + deliveryPreparation.direct2 }}건</div>
+            <div>{{ '3식 ' + deliveryPreparation.direct3 }}건</div>
+            <div>{{ '총 팩수 ' + deliveryPreparation.directTotal }}개</div>
+          </div>
+          <div class="w-1/3">
             <h2>일반</h2>
             <div>{{ '1식 ' + deliveryPreparation.day1 }}건</div>
             <div>{{ '2식 ' + deliveryPreparation.day2 }}건</div>
@@ -321,8 +328,8 @@
       </div>
     </div>
     <div class="flex" v-if="showSummary">
-      <div class="w-1/2">
-        <h2>직접배송</h2>
+      <div class="w-1/3">
+        <h2>새벽배송</h2>
         <table>
           <thead>
             <th>
@@ -363,7 +370,49 @@
           </tbody>
         </table>
       </div>
-      <div class="w-1/2">
+      <div class="w-1/3">
+        <h2>직접배송</h2>
+        <table>
+          <thead>
+            <th>
+              A
+            </th>
+            <th>
+              B
+            </th>
+            <th>
+              C
+            </th>
+            <th>
+              D
+            </th>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(productInfo, idx) in Object.keys(
+                requestTableDirect
+              ).sort()"
+              :key="`${productInfo}-${idx}`"
+            >
+              <td>{{ idx + 1 }}</td>
+              <td>
+                {{
+                  `${requestTableDirect[productInfo][0].Order.receiver} ${
+                    requestTableDirect[productInfo].length > 1
+                      ? requestTableDirect[productInfo][
+                          requestTableDirect[productInfo].length - 1
+                        ].Order.receiver
+                      : ''
+                  }`
+                }}
+              </td>
+              <td>{{ productInfo }}</td>
+              <td>{{ requestTableDirect[productInfo].length }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="w-1/3">
         <h2>일반배송</h2>
         <table>
           <thead>
@@ -487,6 +536,7 @@ export default {
       showSummary: false,
       requestTableEarly: {},
       requestTableDay: {},
+      requestTableDirect: {},
       loading: false,
     }
   },
@@ -546,6 +596,7 @@ export default {
       this.deliveryPreparation = {}
       this.requestTableEarly = {}
       this.requestTableDay = {}
+      this.requestTableDirect = {}
       this.searchList = []
     },
     async deliverySummary() {
@@ -572,8 +623,13 @@ export default {
         day1: 0,
         day2: 0,
         day3: 0,
+        direct1: 0,
+        direct2: 0,
+        direct3: 0,
+
         earlyTotal: 0,
         dayTotal: 0,
+        directTotal: 0,
       }
 
       products.forEach((item) => {
@@ -595,7 +651,7 @@ export default {
           (exclude) => exclude.name
         )
         // 배송, 하루 끼니 별 취합
-        if (deliveryType === '새벽배송' || deliveryType === '직접배송') {
+        if (deliveryType === '새벽배송') {
           //새벽 배송
           if (eatPerDay === 1) {
             deliveryCountPreparation.early1 += 1
@@ -603,6 +659,15 @@ export default {
             deliveryCountPreparation.early2 += 1
           } else {
             deliveryCountPreparation.early3 += 1
+          }
+        } else if (deliveryType === '직접배송') {
+          // 일반 배송
+          if (eatPerDay === 1) {
+            deliveryCountPreparation.direct1 += 1
+          } else if (eatPerDay === 2) {
+            deliveryCountPreparation.direct2 += 1
+          } else {
+            deliveryCountPreparation.direct3 += 1
           }
         } else {
           // 일반 배송
@@ -848,6 +913,11 @@ export default {
         deliveryCountPreparation.early1 * 2 +
         deliveryCountPreparation.early2 * 4 +
         deliveryCountPreparation.early3 * 6
+      deliveryCountPreparation.directTotal =
+        deliveryCountPreparation.direct1 * 2 +
+        deliveryCountPreparation.direct2 * 4 +
+        deliveryCountPreparation.direct3 * 6
+
       deliveryCountPreparation.dayTotal =
         deliveryCountPreparation.day1 * 2 +
         deliveryCountPreparation.day2 * 4 +
@@ -920,6 +990,7 @@ export default {
 
       const requestTableEarlyJson = []
       const requestTableDayJson = []
+      const requestTableDirectJson = []
 
       Object.keys(this.requestTableEarly)
         .sort()
@@ -955,12 +1026,33 @@ export default {
           })
         })
 
+      Object.keys(this.requestTableDirect)
+        .sort()
+        .forEach((item, idx) => {
+          requestTableDirectJson.push({
+            A: idx + 1,
+            B: `${this.requestTableDirect[item][0].Order.receiver} ${
+              this.requestTableDirect[item].length > 1
+                ? this.requestTableDirect[item][
+                    this.requestTableDirect[item].length - 1
+                  ].Order.receiver
+                : ''
+            }`,
+            C: item,
+            D: this.requestTableDirect[item].length,
+          })
+        })
+
       const excelDataEarly = utils.json_to_sheet(excelData)
       const ingredientPreparation = utils.json_to_sheet(
         ingredientPreparationExcel
       )
       const requestTableEarlyExcel = utils.json_to_sheet(requestTableEarlyJson)
       const requestTableDayExcel = utils.json_to_sheet(requestTableDayJson)
+      const requestTableDirectExcel = utils.json_to_sheet(
+        requestTableDirectJson
+      )
+
       const workBook = utils.book_new()
       utils.book_append_sheet(workBook, excelDataEarly, '제조 물량')
       utils.book_append_sheet(
@@ -976,12 +1068,18 @@ export default {
       utils.book_append_sheet(
         workBook,
         requestTableEarlyExcel,
-        '요청사항표-직접배송'
+        '요청사항표-새벽배송'
       )
       utils.book_append_sheet(
         workBook,
         requestTableDayExcel,
         '요청사항표-일반배송'
+      )
+
+      utils.book_append_sheet(
+        workBook,
+        requestTableDirectExcel,
+        '요청사항표-직접배송'
       )
       writeFile(workBook, `${this.searchDate}-제조물량/요청사항표.xlsx`)
     },
@@ -1203,13 +1301,18 @@ export default {
 
       makeList.forEach((item) => {
         if (
-          item.Order.deliveryType === '새벽배송' ||
-          item.Order.deliveryType === '직접배송'
+          item.Order.deliveryType === '새벽배송'
+          // item.Order.deliveryType === '직접배송'
         ) {
           if (!this.requestTableEarly[item.productInfo]) {
             this.requestTableEarly[item.productInfo] = []
           }
           this.requestTableEarly[item.productInfo].push(item)
+        } else if (item.Order.deliveryType === '직접배송') {
+          if (!this.requestTableDirect[item.productInfo]) {
+            this.requestTableDirect[item.productInfo] = []
+          }
+          this.requestTableDirect[item.productInfo].push(item)
         } else {
           if (!this.requestTableDay[item.productInfo]) {
             this.requestTableDay[item.productInfo] = []
@@ -1217,12 +1320,25 @@ export default {
           this.requestTableDay[item.productInfo].push(item)
         }
       })
+
+      // 새벽 배송 붙이기
       Object.keys(this.requestTableEarly)
         .sort()
         .forEach((key) => {
           this.searchList = [...this.searchList, ...this.requestTableEarly[key]]
         })
-      console.log(this.requestTableEarly)
+
+      // 직접 배송 붙이기
+      Object.keys(this.requestTableDirect)
+        .sort()
+        .forEach((key) => {
+          this.searchList = [
+            ...this.searchList,
+            ...this.requestTableDirect[key],
+          ]
+        })
+
+      //일반 배송 붙이기
       Object.keys(this.requestTableDay)
         .sort()
         .forEach((key) => {

@@ -206,6 +206,9 @@ export default {
       modalData: {},
       uploadOption: {
         earlyType: '',
+        directType: '',
+        direct10: '',
+        direct20: '',
         early10: '',
         early20: '',
         day10: '',
@@ -215,6 +218,8 @@ export default {
       early20: [],
       day10: [],
       day20: [],
+      direct10: [],
+      direct20: [],
       ingredients: [],
     }
   },
@@ -231,12 +236,20 @@ export default {
       let early20 = 0
       let day10 = 0
       let day20 = 0
+      let direct10 = 0
+      let direct20 = 0
       this.uploadedOrder.map((item) => {
-        if (item.deliveryType === '새벽') {
+        if (item.deliveryType === '새벽배송') {
           if (item.상품명 && item.상품명.includes('10일')) {
             early10 += 1
           } else {
             early20 += 1
+          }
+        } else if (item.deliveryType === '직접배송') {
+          if (item.상품명 && item.상품명.includes('10일')) {
+            direct10 += 1
+          } else {
+            direct20 += 1
           }
         } else {
           if (item.상품명 && item.상품명.includes('10일')) {
@@ -249,6 +262,8 @@ export default {
 
       return {
         total,
+        direct10,
+        direct20,
         early10,
         early20,
         day10,
@@ -381,18 +396,23 @@ export default {
       this.early20 = []
       this.day20 = []
       this.day10 = []
+      this.direct10 = []
+      this.direct20 = []
       this.uploadedOrder.map((item) => {
         if (!item.상품명) {
           return
         }
-        if (
-          item.deliveryType === '새벽배송' ||
-          item.deliveryType === '직접배송'
-        ) {
+        if (item.deliveryType === '새벽배송') {
           if (item.상품명.includes('10일')) {
             this.early10.push(item)
           } else {
             this.early20.push(item)
+          }
+        } else if (item.deliveryType === '직접배송') {
+          if (item.상품명.includes('10일')) {
+            this.direct10.push(item)
+          } else {
+            this.direct20.push(item)
           }
         } else {
           if (item.상품명.includes('10일')) {
@@ -421,6 +441,14 @@ export default {
           early20: {
             data: this.early20,
             startDate: this.uploadOption.early20,
+          },
+          direct10: {
+            data: this.direct10,
+            startDate: this.uploadOption.direct10,
+          },
+          direct20: {
+            data: this.direct20,
+            startDate: this.uploadOption.direct20,
           },
         })
         window.alert('정상적으로 업로드 되었습니다.')
@@ -553,7 +581,7 @@ export default {
         const tmpData = utils.sheet_to_json(
           workbook.Sheets[workbook.SheetNames[0]]
         )
-        console.log(this.processRaw(this.groupOrder(tmpData)))
+
         this.uploadedOrder = this.processRaw(this.groupOrder(tmpData))
       }
       reader.readAsBinaryString(file)
@@ -585,7 +613,11 @@ export default {
     },
     groupOrder(jsonData) {
       // 옵션 추가 시 상품주문번호는 달라지지만 주문번호는 달라지지 않기 때문에 주문번호로 같은 주문인 것 파악
+      if (!jsonData[0].주문번호) {
+        console.log(jsonData[0])
+      }
       let init_buySerial = jsonData[0].주문번호
+
       let order = []
       let totalOrder = []
       jsonData.forEach((item) => {
