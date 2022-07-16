@@ -140,9 +140,15 @@ export default {
   async mounted() {
     // 고객 정보 불러오기
     const {
-      data: { carboAmount, proteinAmount, CarboType },
+      data: {
+        carboAmount,
+        proteinAmount,
+        CarboType,
+        Package: { name },
+      },
     } = await customer.getCustomerInfo()
 
+    this.program = name
     this.carboAndProteinInfo = {
       carboAmount,
       proteinAmount,

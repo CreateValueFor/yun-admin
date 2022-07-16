@@ -136,7 +136,7 @@ export default {
   },
   data() {
     return {
-      deliveryType: ['직접배송', '일반배송'],
+      deliveryType: ['직접배송', '일반배송', '새벽배송'],
       selectedDeliveryType: '',
       deliveryInfo: {
         address1: '',

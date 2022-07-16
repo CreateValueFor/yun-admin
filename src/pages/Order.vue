@@ -207,17 +207,30 @@ export default {
       uploadOption: {
         earlyType: '',
         directType: '',
+        direct2: '',
+        direct4: '',
         direct10: '',
         direct20: '',
+        early2: '',
+        early4: '',
         early10: '',
         early20: '',
+        day2: '',
+        day4: '',
         day10: '',
         day20: '',
       },
+
+      early2: [],
+      early4: [],
       early10: [],
       early20: [],
+      day2: [],
+      day4: [],
       day10: [],
       day20: [],
+      direct2: [],
+      direct4: [],
       direct10: [],
       direct20: [],
       ingredients: [],
@@ -232,42 +245,25 @@ export default {
       const error = this.uploadedOrder.filter(
         (item) => item.상품명 === '상품이 아님'
       ).length
-      let early10 = 0
-      let early20 = 0
-      let day10 = 0
-      let day20 = 0
-      let direct10 = 0
-      let direct20 = 0
-      this.uploadedOrder.map((item) => {
-        if (item.deliveryType === '새벽배송') {
-          if (item.상품명 && item.상품명.includes('10일')) {
-            early10 += 1
-          } else {
-            early20 += 1
-          }
-        } else if (item.deliveryType === '직접배송') {
-          if (item.상품명 && item.상품명.includes('10일')) {
-            direct10 += 1
-          } else {
-            direct20 += 1
-          }
-        } else {
-          if (item.상품명 && item.상품명.includes('10일')) {
-            day10 += 1
-          } else {
-            day20 += 1
-          }
-        }
-      })
 
       return {
         total,
-        direct10,
-        direct20,
-        early10,
-        early20,
-        day10,
-        day20,
+
+        direct2: this.direct2.length,
+        direct4: this.direct4.length,
+        direct10: this.direct10.length,
+        direct20: this.direct20.length,
+
+        early2: this.early2.length,
+        early4: this.early4.length,
+        early10: this.early10.length,
+        early20: this.early20.length,
+
+        day2: this.day2.length,
+        day4: this.day4.length,
+        day10: this.day10.length,
+        day20: this.day20.length,
+
         error,
       }
     },
@@ -392,40 +388,16 @@ export default {
         }
       }
       this.loading = true
-      this.early10 = []
-      this.early20 = []
-      this.day20 = []
-      this.day10 = []
-      this.direct10 = []
-      this.direct20 = []
-      this.uploadedOrder.map((item) => {
-        if (!item.상품명) {
-          return
-        }
-        if (item.deliveryType === '새벽배송') {
-          if (item.상품명.includes('10일')) {
-            this.early10.push(item)
-          } else {
-            this.early20.push(item)
-          }
-        } else if (item.deliveryType === '직접배송') {
-          if (item.상품명.includes('10일')) {
-            this.direct10.push(item)
-          } else {
-            this.direct20.push(item)
-          }
-        } else {
-          if (item.상품명.includes('10일')) {
-            this.day10.push(item)
-          } else {
-            this.day20.push(item)
-          }
-        }
-      })
-      // this.uploadedOrder.forEach((item) => {})
-      // const res = await axios.post('http://3.35.9.130:3000/order', {
       try {
         await api.postOrderList({
+          day2: {
+            data: this.day2,
+            startDate: this.uploadOption.day2,
+          },
+          day4: {
+            data: this.day4,
+            startDate: this.uploadOption.day4,
+          },
           day10: {
             data: this.day10,
             startDate: this.uploadOption.day10,
@@ -434,6 +406,15 @@ export default {
             data: this.day20,
             startDate: this.uploadOption.day20,
           },
+
+          early2: {
+            data: this.early2,
+            startDate: this.uploadOption.early2,
+          },
+          early4: {
+            data: this.early4,
+            startDate: this.uploadOption.early4,
+          },
           early10: {
             data: this.early10,
             startDate: this.uploadOption.early10,
@@ -441,6 +422,15 @@ export default {
           early20: {
             data: this.early20,
             startDate: this.uploadOption.early20,
+          },
+
+          direct2: {
+            data: this.direct2,
+            startDate: this.uploadOption.direct2,
+          },
+          direct4: {
+            data: this.direct4,
+            startDate: this.uploadOption.direct4,
           },
           direct10: {
             data: this.direct10,
@@ -498,6 +488,50 @@ export default {
       this.$set(this.uploadedOrder[this.selectedIndex], '메모', e.memo)
       this.$set(this.uploadedOrder[this.selectedIndex], '확인필요', false)
       this.showModal = false
+    },
+    classifyOrder(orderList) {
+      this.early10 = []
+      this.early20 = []
+      this.day20 = []
+      this.day10 = []
+      this.direct10 = []
+      this.direct20 = []
+      orderList.map((item) => {
+        if (!item.상품명) {
+          return
+        }
+        if (item.deliveryType === '새벽배송') {
+          if (item.상품명.includes('2일')) {
+            this.early2.push(item)
+          } else if (item.상품명.includes('4일')) {
+            this.early4.push(item)
+          } else if (item.상품명.includes('10일')) {
+            this.early10.push(item)
+          } else {
+            this.early20.push(item)
+          }
+        } else if (item.deliveryType === '직접배송') {
+          if (item.상품명.includes('2일')) {
+            this.direct2.push(item)
+          } else if (item.상품명.includes('4일')) {
+            this.direct4.push(item)
+          } else if (item.상품명.includes('10일')) {
+            this.direct10.push(item)
+          } else {
+            this.direct20.push(item)
+          }
+        } else {
+          if (item.상품명.includes('2일')) {
+            this.day2.push(item)
+          } else if (item.상품명.includes('4일')) {
+            this.day4.push(item)
+          } else if (item.상품명.includes('10일')) {
+            this.day10.push(item)
+          } else {
+            this.day20.push(item)
+          }
+        }
+      })
     },
     checkOrder(item, idx) {
       // if (item.확인필요) {
@@ -583,6 +617,7 @@ export default {
         )
 
         this.uploadedOrder = this.processRaw(this.groupOrder(tmpData))
+        this.classifyOrder(this.uploadedOrder)
       }
       reader.readAsBinaryString(file)
     },

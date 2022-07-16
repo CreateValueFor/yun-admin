@@ -22,21 +22,26 @@
           />
           <label for="tt-date-direct">화/목</label>
         </div>
-        <div class="mt-3">10일 프로그램 - {{ orderCount.direct10 }}개</div>
-        <input
-          v-model="uploadOption.direct10"
-          class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-          type="date"
-          max="9999-12-31"
-          id="program-10-early"
+
+        <order-day-picker
+          v-model="uploadOption.direct2"
+          :count="orderCount.direct2"
+          during="2"
         />
-        <div class="mt-3">20일 프로그램 - {{ orderCount.direct20 }}개</div>
-        <input
+        <order-day-picker
+          v-model="uploadOption.direct4"
+          :count="orderCount.direct4"
+          during="4"
+        />
+        <order-day-picker
+          v-model="uploadOption.direct10"
+          :count="orderCount.direct10"
+          during="10"
+        />
+        <order-day-picker
           v-model="uploadOption.direct20"
-          class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-          type="date"
-          max="9999-12-31"
-          id="program-20-early"
+          :count="orderCount.direct20"
+          during="20"
         />
       </div>
 
@@ -60,41 +65,50 @@
           />
           <label for="tt-date">화/목</label>
         </div>
-        <div class="mt-3">10일 프로그램 - {{ orderCount.early10 }}개</div>
-        <input
-          v-model="uploadOption.early10"
-          class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-          type="date"
-          max="9999-12-31"
-          id="program-10-early"
+
+        <order-day-picker
+          v-model="uploadOption.early2"
+          :count="orderCount.early2"
+          during="2"
         />
-        <div class="mt-3">20일 프로그램 - {{ orderCount.early20 }}개</div>
-        <input
+        <order-day-picker
+          v-model="uploadOption.early4"
+          :count="orderCount.early4"
+          during="4"
+        />
+        <order-day-picker
+          v-model="uploadOption.early10"
+          :count="orderCount.early10"
+          during="10"
+        />
+        <order-day-picker
           v-model="uploadOption.early20"
-          class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-          type="date"
-          max="9999-12-31"
-          id="program-20-early"
+          :count="orderCount.early20"
+          during="20"
         />
       </div>
 
       <div class="w-1/2 p-3">
         <h3>일반배송(화, 목 배송)</h3>
-        <div class="mt-3">10일 프로그램 - {{ orderCount.day10 }}개</div>
-        <input
-          v-model="uploadOption.day10"
-          class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-          type="date"
-          max="9999-12-31"
-          id="program-10-day"
+        <order-day-picker
+          v-model="uploadOption.day2"
+          :count="orderCount.day2"
+          during="2"
         />
-        <div class="mt-3">20일 프로그램 - {{ orderCount.day20 }}개</div>
-        <input
+        <order-day-picker
+          v-model="uploadOption.day4"
+          :count="orderCount.day4"
+          during="4"
+        />
+        <order-day-picker
+          v-model="uploadOption.day10"
+          :count="orderCount.day10"
+          during="10"
+        />
+        <order-day-picker
           v-model="uploadOption.day20"
-          class="mt-3 bg-white h-10 w-full px-5 rounded-lg border text-sm focus:outline-none"
-          type="date"
-          max="9999-12-31"
-          id="program-20-day"
+          :count="orderCount.day20"
+          during="20"
         />
       </div>
     </div>
@@ -126,8 +140,9 @@
 </template>
 <script>
 import Modal from './Modal.vue'
+import OrderDayPicker from './OrderUploadModal/OrderDayPicker.vue'
 export default {
-  components: { Modal },
+  components: { Modal, OrderDayPicker },
   name: 'order-upload-modal',
   props: {
     show: Boolean,
