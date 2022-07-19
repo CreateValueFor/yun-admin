@@ -1,6 +1,6 @@
 <template>
   <div class="order-day-picker--container">
-    <div class="mt-3">{{ during }}일 프로그램 - {{ count }}개</div>
+    <div v-if="!all" class="mt-3">{{ during }}일 프로그램 - {{ count }}개</div>
     <input
       :value="value"
       ref="dayPicker"
@@ -23,6 +23,9 @@ export default {
     },
     during: {
       type: String,
+    },
+    all: {
+      type: Boolean,
     },
   },
   data() {

@@ -24,6 +24,13 @@
         </div>
 
         <order-day-picker
+          v-model="uploadOption.direct"
+          :count="orderCount.direct"
+          during="2"
+          all
+        />
+
+        <!-- <order-day-picker
           v-model="uploadOption.direct2"
           :count="orderCount.direct2"
           during="2"
@@ -42,7 +49,7 @@
           v-model="uploadOption.direct20"
           :count="orderCount.direct20"
           during="20"
-        />
+        /> -->
       </div>
 
       <div class="w-1/2 p-3 border-r">
@@ -67,6 +74,12 @@
         </div>
 
         <order-day-picker
+          v-model="uploadOption.early"
+          :count="orderCount.early"
+          during="2"
+          all
+        />
+        <!-- <order-day-picker
           v-model="uploadOption.early2"
           :count="orderCount.early2"
           during="2"
@@ -85,12 +98,18 @@
           v-model="uploadOption.early20"
           :count="orderCount.early20"
           during="20"
-        />
+        /> -->
       </div>
 
       <div class="w-1/2 p-3">
         <h3>일반배송(화, 목 배송)</h3>
         <order-day-picker
+          v-model="uploadOption.day"
+          :count="orderCount.day"
+          during="2"
+          all
+        />
+        <!-- <order-day-picker
           v-model="uploadOption.day2"
           :count="orderCount.day2"
           during="2"
@@ -109,7 +128,7 @@
           v-model="uploadOption.day20"
           :count="orderCount.day20"
           during="20"
-        />
+        /> -->
       </div>
     </div>
     <div slot="footer" class="flex justify-end">

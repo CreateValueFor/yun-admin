@@ -207,32 +207,38 @@ export default {
       uploadOption: {
         earlyType: '',
         directType: '',
-        direct2: '',
-        direct4: '',
-        direct10: '',
-        direct20: '',
-        early2: '',
-        early4: '',
-        early10: '',
-        early20: '',
-        day2: '',
-        day4: '',
-        day10: '',
-        day20: '',
+        early: '',
+        direct: '',
+        day: '',
+        // direct2: '',
+        // direct4: '',
+        // direct10: '',
+        // direct20: '',
+        // early2: '',
+        // early4: '',
+        // early10: '',
+        // early20: '',
+        // day2: '',
+        // day4: '',
+        // day10: '',
+        // day20: '',
       },
 
-      early2: [],
-      early4: [],
-      early10: [],
-      early20: [],
-      day2: [],
-      day4: [],
-      day10: [],
-      day20: [],
-      direct2: [],
-      direct4: [],
-      direct10: [],
-      direct20: [],
+      // early2: [],
+      // early4: [],
+      // early10: [],
+      // early20: [],
+      early: [],
+      // day2: [],
+      // day4: [],
+      // day10: [],
+      // day20: [],
+      day: [],
+      // direct2: [],
+      // direct4: [],
+      // direct10: [],
+      // direct20: [],
+      direct: [],
       ingredients: [],
     }
   },
@@ -248,21 +254,24 @@ export default {
 
       return {
         total,
+        early: this.early.length,
+        direct: this.direct.length,
+        day: this.day.length,
 
-        direct2: this.direct2.length,
-        direct4: this.direct4.length,
-        direct10: this.direct10.length,
-        direct20: this.direct20.length,
+        // direct2: this.direct2.length,
+        // direct4: this.direct4.length,
+        // direct10: this.direct10.length,
+        // direct20: this.direct20.length,
 
-        early2: this.early2.length,
-        early4: this.early4.length,
-        early10: this.early10.length,
-        early20: this.early20.length,
+        // early2: this.early2.length,
+        // early4: this.early4.length,
+        // early10: this.early10.length,
+        // early20: this.early20.length,
 
-        day2: this.day2.length,
-        day4: this.day4.length,
-        day10: this.day10.length,
-        day20: this.day20.length,
+        // day2: this.day2.length,
+        // day4: this.day4.length,
+        // day10: this.day10.length,
+        // day20: this.day20.length,
 
         error,
       }
@@ -329,117 +338,168 @@ export default {
 
     async postOrder() {
       if (
-        this.uploadOption.day10 !== '' &&
-        ![2, 4].includes(new Date(this.uploadOption.day10).getDay())
+        this.uploadOption.day !== '' &&
+        ![2, 4].includes(new Date(this.uploadOption.day).getDay())
       ) {
-        this.uploadOption.day10 = ''
+        this.uploadOption.day = ''
         return window.alert(
           '일반배송 10일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
         )
       }
 
-      if (
-        this.uploadOption.day20 !== '' &&
-        ![2, 4].includes(new Date(this.uploadOption.day20).getDay())
-      ) {
-        this.uploadOption.day20 = ''
-        return window.alert(
-          '일반배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
-        )
-      }
-
-      if (this.uploadOption.earlyType === 'mw') {
+      // if (
+      //   this.uploadOption.day20 !== '' &&
+      //   ![2, 4].includes(new Date(this.uploadOption.day20).getDay())
+      // ) {
+      //   this.uploadOption.day20 = ''
+      //   return window.alert(
+      //     '일반배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+      //   )
+      // }
+      if (this.uploadOption.directType === 'mw') {
         if (
-          this.uploadOption.early10 !== '' &&
-          ![1, 3].includes(new Date(this.uploadOption.early10).getDay())
+          this.uploadOption.direct !== '' &&
+          ![1, 3].includes(new Date(this.uploadOption.direct).getDay())
         ) {
-          this.uploadOption.early10 = ''
+          this.uploadOption.direct = ''
           return window.alert(
             '직접배송 10일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
           )
         }
+        // if (
+        //   this.uploadOption.early20 !== '' &&
+        //   ![1, 3].includes(new Date(this.uploadOption.early20).getDay())
+        // ) {
+        //   this.uploadOption.early20 = ''
+        //   return this.uploadOption.alert(
+        //     '직접배송 20일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
+        //   )
+        // }
+      } else if (this.uploadOption.directType === 'tt') {
         if (
-          this.uploadOption.early20 !== '' &&
-          ![1, 3].includes(new Date(this.uploadOption.early20).getDay())
+          this.uploadOption.direct !== '' &&
+          ![2, 4].includes(new Date(this.uploadOption.direct).getDay())
         ) {
-          this.uploadOption.early20 = ''
-          return this.uploadOption.alert(
-            '직접배송 20일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
-          )
-        }
-      } else if (this.uploadOption.earlyType === 'tt') {
-        if (
-          this.uploadOption.early10 !== '' &&
-          ![2, 4].includes(new Date(this.uploadOption.early10).getDay())
-        ) {
-          this.uploadOption.early10 = ''
+          this.uploadOption.direct = ''
           return window.alert(
             '직접배송 10일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
           )
         }
+        // if (
+        //   this.uploadOption.early20 !== '' &&
+        //   ![2, 4].includes(new Date(this.uploadOption.early20).getDay())
+        // ) {
+        //   this.uploadOption.early20 = ''
+        //   return window.alert(
+        //     '직접배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+        //   )
+        // }
+      }
+
+      if (this.uploadOption.earlyType === 'mw') {
         if (
-          this.uploadOption.early20 !== '' &&
-          ![2, 4].includes(new Date(this.uploadOption.early20).getDay())
+          this.uploadOption.early !== '' &&
+          ![1, 3].includes(new Date(this.uploadOption.early).getDay())
         ) {
-          this.uploadOption.early20 = ''
+          this.uploadOption.early = ''
           return window.alert(
-            '직접배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+            '새벽배송 10일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
           )
         }
+        // if (
+        //   this.uploadOption.early20 !== '' &&
+        //   ![1, 3].includes(new Date(this.uploadOption.early20).getDay())
+        // ) {
+        //   this.uploadOption.early20 = ''
+        //   return this.uploadOption.alert(
+        //     '직접배송 20일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
+        //   )
+        // }
+      } else if (this.uploadOption.earlyType === 'tt') {
+        if (
+          this.uploadOption.early !== '' &&
+          ![2, 4].includes(new Date(this.uploadOption.early).getDay())
+        ) {
+          this.uploadOption.early = ''
+          return window.alert(
+            '새벽배송 10일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+          )
+        }
+        // if (
+        //   this.uploadOption.early20 !== '' &&
+        //   ![2, 4].includes(new Date(this.uploadOption.early20).getDay())
+        // ) {
+        //   this.uploadOption.early20 = ''
+        //   return window.alert(
+        //     '직접배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
+        //   )
+        // }
       }
       this.loading = true
       try {
         await api.postOrderList({
-          day2: {
-            data: this.day2,
-            startDate: this.uploadOption.day2,
+          day: {
+            data: this.day,
+            startDate: this.uploadOption.day,
           },
-          day4: {
-            data: this.day4,
-            startDate: this.uploadOption.day4,
-          },
-          day10: {
-            data: this.day10,
-            startDate: this.uploadOption.day10,
-          },
-          day20: {
-            data: this.day20,
-            startDate: this.uploadOption.day20,
-          },
-
-          early2: {
-            data: this.early2,
-            startDate: this.uploadOption.early2,
-          },
-          early4: {
-            data: this.early4,
-            startDate: this.uploadOption.early4,
-          },
-          early10: {
-            data: this.early10,
-            startDate: this.uploadOption.early10,
-          },
-          early20: {
-            data: this.early20,
-            startDate: this.uploadOption.early20,
+          // day2: {
+          //   data: this.day2,
+          //   startDate: this.uploadOption.day2,
+          // },
+          // day4: {
+          //   data: this.day4,
+          //   startDate: this.uploadOption.day4,
+          // },
+          // day10: {
+          //   data: this.day10,
+          //   startDate: this.uploadOption.day10,
+          // },
+          // day20: {
+          //   data: this.day20,
+          //   startDate: this.uploadOption.day20,
+          // },
+          early: {
+            data: this.early,
+            startDate: this.uploadOption.early,
           },
 
-          direct2: {
-            data: this.direct2,
-            startDate: this.uploadOption.direct2,
+          // early2: {
+          //   data: this.early2,
+          //   startDate: this.uploadOption.early2,
+          // },
+          // early4: {
+          //   data: this.early4,
+          //   startDate: this.uploadOption.early4,
+          // },
+          // early10: {
+          //   data: this.early10,
+          //   startDate: this.uploadOption.early10,
+          // },
+          // early20: {
+          //   data: this.early20,
+          //   startDate: this.uploadOption.early20,
+          // },
+
+          direct: {
+            data: this.direct,
+            startDate: this.uploadOption.direct,
           },
-          direct4: {
-            data: this.direct4,
-            startDate: this.uploadOption.direct4,
-          },
-          direct10: {
-            data: this.direct10,
-            startDate: this.uploadOption.direct10,
-          },
-          direct20: {
-            data: this.direct20,
-            startDate: this.uploadOption.direct20,
-          },
+          // direct2: {
+          //   data: this.direct2,
+          //   startDate: this.uploadOption.direct2,
+          // },
+          // direct4: {
+          //   data: this.direct4,
+          //   startDate: this.uploadOption.direct4,
+          // },
+          // direct10: {
+          //   data: this.direct10,
+          //   startDate: this.uploadOption.direct10,
+          // },
+          // direct20: {
+          //   data: this.direct20,
+          //   startDate: this.uploadOption.direct20,
+          // },
         })
         window.alert('정상적으로 업로드 되었습니다.')
         this.loading = false
@@ -490,46 +550,52 @@ export default {
       this.showModal = false
     },
     classifyOrder(orderList) {
-      this.early10 = []
-      this.early20 = []
-      this.day20 = []
-      this.day10 = []
-      this.direct10 = []
-      this.direct20 = []
+      this.early = []
+      this.day = []
+      this.direct = []
+      // this.early10 = []
+      // this.early20 = []
+      // this.day20 = []
+      // this.day10 = []
+      // this.direct10 = []
+      // this.direct20 = []
       orderList.map((item) => {
         if (!item.상품명) {
           return
         }
         if (item.deliveryType === '새벽배송') {
-          if (item.상품명.includes('2일')) {
-            this.early2.push(item)
-          } else if (item.상품명.includes('4일')) {
-            this.early4.push(item)
-          } else if (item.상품명.includes('10일')) {
-            this.early10.push(item)
-          } else {
-            this.early20.push(item)
-          }
+          this.early.push(item)
+          // if (item.상품명.includes('2일')) {
+          //   this.early2.push(item)
+          // } else if (item.상품명.includes('4일')) {
+          //   this.early4.push(item)
+          // } else if (item.상품명.includes('10일')) {
+          //   this.early10.push(item)
+          // } else {
+          //   this.early20.push(item)
+          // }
         } else if (item.deliveryType === '직접배송') {
-          if (item.상품명.includes('2일')) {
-            this.direct2.push(item)
-          } else if (item.상품명.includes('4일')) {
-            this.direct4.push(item)
-          } else if (item.상품명.includes('10일')) {
-            this.direct10.push(item)
-          } else {
-            this.direct20.push(item)
-          }
+          this.direct.push(item)
+          // if (item.상품명.includes('2일')) {
+          //   this.direct2.push(item)
+          // } else if (item.상품명.includes('4일')) {
+          //   this.direct4.push(item)
+          // } else if (item.상품명.includes('10일')) {
+          //   this.direct10.push(item)
+          // } else {
+          //   this.direct20.push(item)
+          // }
         } else {
-          if (item.상품명.includes('2일')) {
-            this.day2.push(item)
-          } else if (item.상품명.includes('4일')) {
-            this.day4.push(item)
-          } else if (item.상품명.includes('10일')) {
-            this.day10.push(item)
-          } else {
-            this.day20.push(item)
-          }
+          this.day.push(item)
+          // if (item.상품명.includes('2일')) {
+          //   this.day2.push(item)
+          // } else if (item.상품명.includes('4일')) {
+          //   this.day4.push(item)
+          // } else if (item.상품명.includes('10일')) {
+          //   this.day10.push(item)
+          // } else {
+          //   this.day20.push(item)
+          // }
         }
       })
     },
