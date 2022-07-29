@@ -1,43 +1,45 @@
 <template>
-  <div>
-    <h2>배송 불가일 설정</h2>
-    <div class="flex">
-      <p class="font-semibold w-32 text-lg">배송 불가일 추가</p>
-      <input
-        type="date"
-        name="date"
-        v-model="newHoliday"
-        placeholder="Search products..."
-        class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
-      />
-      <p class="font-semibold w-32 text-lg">배송 불가 타입</p>
-      <select
-        v-model="newHolidayType"
-        class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
-      >
-        <option value="all">전부</option>
-        <option value="day">일반배송만</option>
-      </select>
-      <button
-        class="bg-green-500 w-48	rounded-lg px-6 py-2 text-white font-semibold shadow"
-        @click="createHoliday"
-      >
-        공휴일 생성
-      </button>
-    </div>
-    <div>
-      <p>공휴일 목록</p>
-      <div
-        v-for="day in holidays"
-        :key="day.id"
-        class="px-3 py-1 border rounded-md my-3 flex items-center"
-      >
-        {{ day.date }} {{ day.target === 'day' ? '일반배송만' : '전부' }}
-        <div
-          class="ml-3 cursor-pointer hover:opacity-70 bg-red-200 w-5 h-5 flex items-center justify-center rounded-full"
-          @click="deleteHoliday(day.date)"
+  <div style="overflow:scroll">
+    <div style="min-width: 980px">
+      <h2>배송 불가일 설정</h2>
+      <div class="flex">
+        <p class="font-semibold w-32 text-lg">배송 불가일 추가</p>
+        <input
+          type="date"
+          name="date"
+          v-model="newHoliday"
+          placeholder="Search products..."
+          class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
+        />
+        <p class="font-semibold w-32 text-lg">배송 불가 타입</p>
+        <select
+          v-model="newHolidayType"
+          class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
         >
-          x
+          <option value="all">전부</option>
+          <option value="day">일반배송만</option>
+        </select>
+        <button
+          class="bg-green-500 w-48	rounded-lg px-6 py-2 text-white font-semibold shadow"
+          @click="createHoliday"
+        >
+          공휴일 생성
+        </button>
+      </div>
+      <div>
+        <p>공휴일 목록</p>
+        <div
+          v-for="day in holidays"
+          :key="day.id"
+          class="px-3 py-1 border rounded-md my-3 flex items-center"
+        >
+          {{ day.date }} {{ day.target === 'day' ? '일반배송만' : '전부' }}
+          <div
+            class="ml-3 cursor-pointer hover:opacity-70 bg-red-200 w-5 h-5 flex items-center justify-center rounded-full"
+            @click="deleteHoliday(day.date)"
+          >
+            x
+          </div>
         </div>
       </div>
     </div>

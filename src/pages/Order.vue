@@ -56,100 +56,104 @@
               </button>
             </div>
           </div>
-          <table>
-            <thead>
-              <th>주문번호</th>
-              <th>구매자명</th>
-              <th>수취인명</th>
-              <th>구매자연락처</th>
-              <th>수취인연락처</th>
-              <th>배송지</th>
-              <th>기본주소</th>
-              <th>상세주소</th>
-              <th>공동현관 비밀번호</th>
-              <th>배송메세지</th>
-              <th>상품명</th>
-              <th>단백질량</th>
-              <th>탄수화물량</th>
-              <th>탄수화물 구성</th>
-              <th>제외 식재료</th>
-              <th>제외 메뉴</th>
-              <!-- <th>요청사항</th> -->
-              <th>배송</th>
-              <!-- <th>메모</th> -->
-              <th></th>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(item, idx) in uploadedOrder"
-                :key="idx"
-                :class="{ needCheck: item.확인필요 }"
-              >
-                <td>{{ item.serial }}</td>
-                <td>{{ item.buyer }}</td>
-                <td>{{ item.receiver }}</td>
-                <td>{{ item.buyerPhone }}</td>
-                <td>{{ item.receiverPhone }}</td>
-                <td>{{ item.배송지 }}</td>
-                <td>{{ item.address1 }}</td>
-                <td>{{ item.address2 }}</td>
-                <td>{{ item.entrancePassword }}</td>
-                <td>{{ item.deliveryMessage }}</td>
-                <td>{{ item.상품명 }}</td>
-                <!-- <td>{{ item.시작일 }}</td>
-                <td>{{ item.종료일 }}</td> -->
-                <td>{{ item.proteinAmount }}</td>
-                <td>{{ item.carboAmount }}</td>
-                <td>{{ item.carboType }}</td>
-                <!-- <td>{{ item.excludeIngredient.join(' , ') || '없음' }}</td> -->
-                <!-- <td>{{ item.요청사항 }}</td> -->
-                <td>
-                  <div>
-                    <button
-                      class="bg-green-500 shadow rounded-lg px-6 py-2 text-white"
-                      @click="checkOrder(item, idx)"
-                    >
-                      제외
-                    </button>
-                    <!-- </div> -->
-                    <!-- <div v-else> -->
-                    <!-- {{ item.제외식재료 }} -->
+          <div style="overflow: scroll;">
+            <table>
+              <thead>
+                <th>주문번호</th>
+                <th>구매자명</th>
+                <th>수취인명</th>
+                <th>구매자연락처</th>
+                <th>수취인연락처</th>
+                <th>배송지</th>
+                <th>기본주소</th>
+                <th>상세주소</th>
+                <th>우편번호</th>
+                <th>공동현관 비밀번호</th>
+                <th>배송메세지</th>
+                <th>상품명</th>
+                <th>단백질량</th>
+                <th>탄수화물량</th>
+                <th>탄수화물 구성</th>
+                <th>제외 식재료</th>
+                <th>제외 메뉴</th>
+                <!-- <th>요청사항</th> -->
+                <th>배송</th>
+                <!-- <th>메모</th> -->
+                <th></th>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(item, idx) in uploadedOrder"
+                  :key="idx"
+                  :class="{ needCheck: item.확인필요 }"
+                >
+                  <td>{{ item.serial }}</td>
+                  <td>{{ item.buyer }}</td>
+                  <td>{{ item.receiver }}</td>
+                  <td>{{ item.buyerPhone }}</td>
+                  <td>{{ item.receiverPhone }}</td>
+                  <td>{{ item.배송지 }}</td>
+                  <td>{{ item.address1 }}</td>
+                  <td>{{ item.address2 }}</td>
+                  <td>{{ item.postNumber }}</td>
+                  <td>{{ item.entrancePassword }}</td>
+                  <td>{{ item.deliveryMessage }}</td>
+                  <td>{{ item.상품명 }}</td>
+                  <!-- <td>{{ item.시작일 }}</td>
+                  <td>{{ item.종료일 }}</td> -->
+                  <td>{{ item.proteinAmount }}</td>
+                  <td>{{ item.carboAmount }}</td>
+                  <td>{{ item.carboType }}</td>
+                  <!-- <td>{{ item.excludeIngredient.join(' , ') || '없음' }}</td> -->
+                  <!-- <td>{{ item.요청사항 }}</td> -->
+                  <td>
+                    <div>
+                      <button
+                        class="bg-green-500 shadow rounded-lg px-6 py-2 text-white"
+                        @click="checkOrder(item, idx)"
+                      >
+                        제외
+                      </button>
+                      <!-- </div> -->
+                      <!-- <div v-else> -->
+                      <!-- {{ item.제외식재료 }} -->
+                      {{
+                        (item.excludeIngredientName &&
+                          item.excludeIngredientName.join(' , ')) ||
+                          item.excludeIngredients.join(' , ') ||
+                          '없음'
+                      }}
+                    </div>
+                  </td>
+                  <td>
                     {{
-                      (item.excludeIngredientName &&
-                        item.excludeIngredientName.join(' , ')) ||
-                        item.excludeIngredients.join(' , ') ||
+                      (item.excludeProductName &&
+                        item.excludeProductName.join(' , ')) ||
+                        (item.excludeProducts &&
+                          item.excludeProducts.join(' , ')) ||
                         '없음'
                     }}
-                  </div>
-                </td>
-                <td>
-                  {{
-                    (item.excludeProductName &&
-                      item.excludeProductName.join(' , ')) ||
-                      (item.excludeProducts &&
-                        item.excludeProducts.join(' , ')) ||
-                      '없음'
-                  }}
-                </td>
-                <td>{{ item.deliveryType }}</td>
-                <!-- <td>{{ item.메모 }}</td> -->
-                <td>
-                  <button
-                    class="bg-green-500 shadow rounded-lg px-6 py-2 text-white"
-                    @click="openUpdateModal(item, idx)"
-                  >
-                    수정
-                  </button>
-                  <button
-                    @click="deleteOrder(idx)"
-                    class="bg-red-500 shadow rounded-lg px-6 py-2 text-white"
-                  >
-                    삭제
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  </td>
+                  <td>{{ item.deliveryType }}</td>
+                  <!-- <td>{{ item.메모 }}</td> -->
+                  <td>
+                    <button
+                      class="bg-green-500 shadow rounded-lg px-6 py-2 text-white"
+                      @click="openUpdateModal(item, idx)"
+                    >
+                      수정
+                    </button>
+                    <button
+                      @click="deleteOrder(idx)"
+                      class="bg-red-500 shadow rounded-lg px-6 py-2 text-white"
+                    >
+                      삭제
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -210,34 +214,11 @@ export default {
         early: '',
         direct: '',
         day: '',
-        // direct2: '',
-        // direct4: '',
-        // direct10: '',
-        // direct20: '',
-        // early2: '',
-        // early4: '',
-        // early10: '',
-        // early20: '',
-        // day2: '',
-        // day4: '',
-        // day10: '',
-        // day20: '',
       },
-
-      // early2: [],
-      // early4: [],
-      // early10: [],
-      // early20: [],
       early: [],
-      // day2: [],
-      // day4: [],
-      // day10: [],
-      // day20: [],
+
       day: [],
-      // direct2: [],
-      // direct4: [],
-      // direct10: [],
-      // direct20: [],
+
       direct: [],
       ingredients: [],
     }
@@ -257,22 +238,6 @@ export default {
         early: this.early.length,
         direct: this.direct.length,
         day: this.day.length,
-
-        // direct2: this.direct2.length,
-        // direct4: this.direct4.length,
-        // direct10: this.direct10.length,
-        // direct20: this.direct20.length,
-
-        // early2: this.early2.length,
-        // early4: this.early4.length,
-        // early10: this.early10.length,
-        // early20: this.early20.length,
-
-        // day2: this.day2.length,
-        // day4: this.day4.length,
-        // day10: this.day10.length,
-        // day20: this.day20.length,
-
         error,
       }
     },
@@ -346,16 +311,6 @@ export default {
           '일반배송 10일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
         )
       }
-
-      // if (
-      //   this.uploadOption.day20 !== '' &&
-      //   ![2, 4].includes(new Date(this.uploadOption.day20).getDay())
-      // ) {
-      //   this.uploadOption.day20 = ''
-      //   return window.alert(
-      //     '일반배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
-      //   )
-      // }
       if (this.uploadOption.directType === 'mw') {
         if (
           this.uploadOption.direct !== '' &&
@@ -406,15 +361,6 @@ export default {
             '새벽배송 10일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
           )
         }
-        // if (
-        //   this.uploadOption.early20 !== '' &&
-        //   ![1, 3].includes(new Date(this.uploadOption.early20).getDay())
-        // ) {
-        //   this.uploadOption.early20 = ''
-        //   return this.uploadOption.alert(
-        //     '직접배송 20일 프로그램의 시작일이 월요일 또는 수요일이 아닙니다.'
-        //   )
-        // }
       } else if (this.uploadOption.earlyType === 'tt') {
         if (
           this.uploadOption.early !== '' &&
@@ -425,15 +371,6 @@ export default {
             '새벽배송 10일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
           )
         }
-        // if (
-        //   this.uploadOption.early20 !== '' &&
-        //   ![2, 4].includes(new Date(this.uploadOption.early20).getDay())
-        // ) {
-        //   this.uploadOption.early20 = ''
-        //   return window.alert(
-        //     '직접배송 20일 프로그램의 시작일이 화요일 또는 목요일이 아닙니다.'
-        //   )
-        // }
       }
       this.loading = true
       try {
@@ -442,64 +379,15 @@ export default {
             data: this.day,
             startDate: this.uploadOption.day,
           },
-          // day2: {
-          //   data: this.day2,
-          //   startDate: this.uploadOption.day2,
-          // },
-          // day4: {
-          //   data: this.day4,
-          //   startDate: this.uploadOption.day4,
-          // },
-          // day10: {
-          //   data: this.day10,
-          //   startDate: this.uploadOption.day10,
-          // },
-          // day20: {
-          //   data: this.day20,
-          //   startDate: this.uploadOption.day20,
-          // },
           early: {
             data: this.early,
             startDate: this.uploadOption.early,
           },
 
-          // early2: {
-          //   data: this.early2,
-          //   startDate: this.uploadOption.early2,
-          // },
-          // early4: {
-          //   data: this.early4,
-          //   startDate: this.uploadOption.early4,
-          // },
-          // early10: {
-          //   data: this.early10,
-          //   startDate: this.uploadOption.early10,
-          // },
-          // early20: {
-          //   data: this.early20,
-          //   startDate: this.uploadOption.early20,
-          // },
-
           direct: {
             data: this.direct,
             startDate: this.uploadOption.direct,
           },
-          // direct2: {
-          //   data: this.direct2,
-          //   startDate: this.uploadOption.direct2,
-          // },
-          // direct4: {
-          //   data: this.direct4,
-          //   startDate: this.uploadOption.direct4,
-          // },
-          // direct10: {
-          //   data: this.direct10,
-          //   startDate: this.uploadOption.direct10,
-          // },
-          // direct20: {
-          //   data: this.direct20,
-          //   startDate: this.uploadOption.direct20,
-          // },
         })
         window.alert('정상적으로 업로드 되었습니다.')
         this.loading = false
@@ -513,13 +401,6 @@ export default {
     },
 
     uploadOrder() {
-      console.log(this.uploadedOrder)
-      // return
-      // const isCheckedAll = this.uploadedOrder.filter((item) => item.확인필요)
-      //   .length
-      // if (isCheckedAll > 0) {
-      //   window.alert(`${isCheckedAll}개가 확인되지 않음`)
-      // }
       this.showUploadModal = true
     },
 
@@ -752,6 +633,7 @@ export default {
         initOrder.naverId = order[0].구매자ID
         initOrder.excludeProducts = []
         initOrder.excludeProductName = []
+        initOrder.postNumber = order[0].우편번호
 
         // 주소 받기
 
@@ -880,6 +762,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 table {
+  min-width: 1444px;
   th {
     font-size: 12px;
   }

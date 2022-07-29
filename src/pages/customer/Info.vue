@@ -155,7 +155,9 @@ export default {
       carboType: CarboType.name,
     }
     const [ingredients, products] = await customer.getCompose()
-    this.ingredients = ingredients
+    this.ingredients = ingredients.filter(
+      (item) => !this.exceptIngredient.includes(item)
+    )
     this.products = products
 
     const { excludeIngredients, excludeProducts } = await customer.getExcludes()
@@ -181,6 +183,16 @@ export default {
         carbo: require('@/assets/customer/carbo.svg'),
       },
       showIngredients: false,
+      exceptIngredient: [
+        '월3팩',
+        '수6팩',
+        '수요일5팩',
+        '수요일3팩',
+        '목3팩',
+        '메뉴동일',
+        '화요일3팩',
+        '화요일5팩',
+      ],
     }
   },
   methods: {

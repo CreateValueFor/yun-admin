@@ -75,100 +75,102 @@
         </button>
       </div>
     </div>
-    <table v-if="searchList.length">
-      <thead>
-        <th>구매자명</th>
-        <th>수취인명</th>
-        <th>수취인연락처</th>
-        <th>구매자연락처</th>
-        <th>배송지</th>
-        <th>(기본주소)</th>
-        <th>(상세주소)</th>
-        <th>공동현관 비밀번호</th>
-        <th>배송메세지</th>
-        <th>시작일</th>
-        <th>종료일</th>
-        <th>상품정보</th>
-        <th>상품명</th>
-        <th>탄수화물 구성</th>
-        <th>탄수화물량</th>
-        <th>단백질량</th>
-        <th>제외메뉴</th>
-        <th>제외토핑</th>
-        <th>배송</th>
-        <th>수정</th>
-      </thead>
-      <tbody>
-        <tr v-for="(order, idx) in searchList" :key="idx">
-          <td>{{ order.buyer }}</td>
-          <td>{{ order.receiver }}</td>
-          <td>{{ order.receiverPhone }}</td>
-          <td>{{ order.buyerPhone }}</td>
-          <td>{{ order.address1 + order.address2 }}</td>
-          <td>{{ order.address1 }}</td>
-          <td>{{ order.address2 }}</td>
-          <td>{{ order.entrancePassword }}</td>
-          <td>{{ order.deliveryMessage }}</td>
-          <td>{{ order.startDate }}</td>
-
-          <td>{{ order.endDate }}</td>
-          <td>{{ order.productInfo }}</td>
-          <td>{{ order.productName }}</td>
-          <td>
-            {{
-              order.CarboType ? order.CarboType.name : '탄수화물 구성 오류 발생'
-            }}
-          </td>
-          <td>{{ order.carboAmount }}</td>
-          <td>{{ order.proteinAmount }}</td>
-          <!-- <td>{{ order.excludeProducts }}</td> -->
-          <td>
-            <button
-              class="bg-green-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
-              @click="excludeProductAndIngredient(order)"
-            >
-              제외
-            </button>
-            {{
-              order.Products &&
-                order.Products.map((item) => item.name).join(',')
-            }}
-          </td>
-          <td>
-            {{
-              order.Ingredients &&
-                order.Ingredients.map((item) => item.name).join(',')
-            }}
-          </td>
-          <td>
-            {{ order.deliveryType }}
-          </td>
-
-          <td>
-            <button
-              class="bg-green-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
-              @click="openUpdateModal(idx)"
-            >
-              수정
-            </button>
-            <button
-              class="bg-red-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
-              @click="deleteSingleOrder(order.id)"
-            >
-              삭제
-            </button>
-          </td>
-          <td>
-            <button
-              class="bg-green-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
-              @click="selectedOrderId = order.id"
-            >
-              배송변경
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div style="overflow: scroll;">
+      <table v-if="searchList.length">
+        <thead>
+          <th>구매자명</th>
+          <th>수취인명</th>
+          <th>수취인연락처</th>
+          <th>구매자연락처</th>
+          <th>배송지</th>
+          <th>(기본주소)</th>
+          <th>(상세주소)</th>
+          <th>공동현관 비밀번호</th>
+          <th>배송메세지</th>
+          <th>시작일</th>
+          <th>종료일</th>
+          <th>상품정보</th>
+          <th>상품명</th>
+          <th>탄수화물 구성</th>
+          <th>탄수화물량</th>
+          <th>단백질량</th>
+          <th>제외메뉴</th>
+          <th>제외토핑</th>
+          <th>배송</th>
+          <th>수정</th>
+        </thead>
+        <tbody>
+          <tr v-for="(order, idx) in searchList" :key="idx">
+            <td>{{ order.buyer }}</td>
+            <td>{{ order.receiver }}</td>
+            <td>{{ order.receiverPhone }}</td>
+            <td>{{ order.buyerPhone }}</td>
+            <td>{{ order.address1 + order.address2 }}</td>
+            <td>{{ order.address1 }}</td>
+            <td>{{ order.address2 }}</td>
+            <td>{{ order.entrancePassword }}</td>
+            <td>{{ order.deliveryMessage }}</td>
+            <td>{{ order.startDate }}</td>
+            <td>{{ order.endDate }}</td>
+            <td>{{ order.productInfo }}</td>
+            <td>{{ order.productName }}</td>
+            <td>
+              {{
+                order.CarboType
+                  ? order.CarboType.name
+                  : '탄수화물 구성 오류 발생'
+              }}
+            </td>
+            <td>{{ order.carboAmount }}</td>
+            <td>{{ order.proteinAmount }}</td>
+            <!-- <td>{{ order.excludeProducts }}</td> -->
+            <td>
+              <button
+                class="bg-green-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
+                @click="excludeProductAndIngredient(order)"
+              >
+                제외
+              </button>
+              {{
+                order.Products &&
+                  order.Products.map((item) => item.name).join(',')
+              }}
+            </td>
+            <td>
+              {{
+                order.Ingredients &&
+                  order.Ingredients.map((item) => item.name).join(',')
+              }}
+            </td>
+            <td>
+              {{ order.deliveryType }}
+            </td>
+            <td>
+              <button
+                class="bg-green-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
+                @click="openUpdateModal(idx)"
+              >
+                수정
+              </button>
+              <button
+                class="bg-red-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
+                @click="deleteSingleOrder(order.id)"
+              >
+                삭제
+              </button>
+            </td>
+            <td>
+              <button
+                class="bg-green-500	rounded-lg px-6 py-2 text-white font-semibold shadow"
+                @click="selectedOrderId = order.id"
+              >
+                배송변경
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <exclude-menu-and-ingredient
       v-if="showExcludeModal"
       :order="selectedOrder"
@@ -481,6 +483,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 table {
+  min-width: 1444px;
   th {
     font-size: 12px;
   }
