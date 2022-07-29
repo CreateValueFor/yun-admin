@@ -55,6 +55,8 @@
             <option value="name">고객명</option>
             <option value="phone">연락처</option>
             <option value="address">주소</option>
+            <option value="startDate">시작일</option>
+            <option value="endDate">종료일</option>
           </select>
           <input
             type="search"

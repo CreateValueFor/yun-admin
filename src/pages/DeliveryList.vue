@@ -465,6 +465,7 @@
           <th>(기본주소)</th>
           <th>(상세주소)</th>
           <th>우편번호</th>
+          <th>구매자ID</th>
           <th>공동현관 비밀번호</th>
           <th>배송메세지</th>
           <th>시작일</th>
@@ -488,6 +489,7 @@
             <td>{{ delivery.Order.address1 }}</td>
             <td>{{ delivery.Order.address2 }}</td>
             <td>{{ delivery.Order.postNumber }}</td>
+            <td>{{ delivery.Order.naverId }}</td>
             <td>{{ delivery.Order.entrancePassword }}</td>
             <td>{{ delivery.Order.deliveryMessage }}</td>
             <td>{{ delivery.deliveryDate }}</td>
@@ -545,14 +547,6 @@ export default {
   },
   async mounted() {
     this.productList = await api.getAllProducts()
-    // this.searchDate = '2022-06-01'
-    // this.products = {
-    //   product1: 19,
-    //   product2: 3,
-    //   product3: 8,
-    //   product4: 1,
-    //   product5: 2,
-    // }
   },
   watch: {
     products: {
@@ -944,6 +938,7 @@ export default {
           배송지: `${item.Order.address1} ${item.Order.address2}` || '',
           '(기본주소)': item.Order.address1,
           '(상세주소)': item.Order.address2,
+          우편번호: item.Order.postNumber,
           '공동현관 비밀번호': item.Order.entrancePassword,
           배송메세지: item.Order.deliveryMessage,
           배송일: item.deliveryDate,
@@ -955,6 +950,19 @@ export default {
           제외메뉴: item.excludeProduct,
           제외토핑: item.excludeTopping,
           배송: item.Order.deliveryType,
+        }
+      })
+
+      const early = []
+      const day = []
+      const direct = []
+      excelData.map((item) => {
+        if (item.deliveryType === '새벽배송') {
+          early.push(item)
+        } else if (item.deliveryType === '직접배송') {
+          direct.push(item)
+        } else {
+          day.push(item)
         }
       })
 
@@ -1045,8 +1053,11 @@ export default {
             D: this.requestTableDirect[item].length,
           })
         })
+      /// 제조 물량 표
+      const excelDataEarly = utils.json_to_sheet(early)
+      const excelDataDay = utils.json_to_sheet(day)
+      const excelDataDirect = utils.json_to_sheet(direct)
 
-      const excelDataEarly = utils.json_to_sheet(excelData)
       const ingredientPreparation = utils.json_to_sheet(
         ingredientPreparationExcel
       )
@@ -1057,7 +1068,10 @@ export default {
       )
 
       const workBook = utils.book_new()
-      utils.book_append_sheet(workBook, excelDataEarly, '제조 물량')
+      utils.book_append_sheet(workBook, excelDataEarly, '제조 물량(새벽)')
+      utils.book_append_sheet(workBook, excelDataDay, '제조 물량(일반)')
+      utils.book_append_sheet(workBook, excelDataDirect, '제조 물량(직접)')
+
       utils.book_append_sheet(
         workBook,
         ingredientPreparation,
