@@ -138,7 +138,97 @@
         </div>
       </div>
       <div class="menu--summary">
-        <h2 class="summary--title bg-green-500 text-white">메뉴별 식재료</h2>
+        <h2 class="summary--title bg-green-500 text-white">
+          메뉴별 식재료(메인)
+        </h2>
+        <div class="flex">
+          <div
+            v-for="menu in Object.keys(mainPreparation)"
+            :key="menu"
+            class="w-1/5"
+          >
+            <div>{{ mainPreparation[menu].name }}</div>
+
+            <div
+              v-for="igd in mainPreparation[menu].ingredients"
+              :key="menu + igd.name"
+              class="summary-item summary-item-detail"
+            >
+              <div v-if="!igd.Product_Ingredients.type === 'topping'">
+                <div>
+                  <div>
+                    {{ igd.name }}
+                    {{
+                      `(${
+                        igd.Product_Ingredients.type === 'carbo'
+                          ? '탄수화물'
+                          : igd.Product_Ingredients.type === 'topping'
+                          ? '토핑'
+                          : '메인'
+                      })`
+                    }}
+                  </div>
+                </div>
+                <div>
+                  <div>
+                    {{
+                      (
+                        igd.Product_Ingredients.amount * (igd.count || 0)
+                      ).toFixed(2) + igd.Product_Ingredients.unit
+                    }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <h2 class="summary--title bg-green-500 text-white">
+          메뉴별 식재료(토핑)
+        </h2>
+        <div class="flex">
+          <div
+            v-for="menu in Object.keys(toppingPreparation)"
+            :key="menu"
+            class="w-1/5"
+          >
+            <div>{{ toppingPreparation[menu].name }}</div>
+
+            <div
+              v-for="igd in toppingPreparation[menu].ingredients"
+              :key="menu + igd.name"
+              class="summary-item summary-item-detail"
+            >
+              <div v-if="igd.Product_Ingredients.type === 'topping'">
+                <div>
+                  <div>
+                    {{ igd.name }}
+                    {{
+                      `(${
+                        igd.Product_Ingredients.type === 'carbo'
+                          ? '탄수화물'
+                          : igd.Product_Ingredients.type === 'topping'
+                          ? '토핑'
+                          : '메인'
+                      })`
+                    }}
+                  </div>
+                </div>
+                <div>
+                  <div>
+                    {{
+                      (
+                        igd.Product_Ingredients.amount * (igd.count || 0)
+                      ).toFixed(2) + igd.Product_Ingredients.unit
+                    }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <h2 class="summary--title bg-green-500 text-white">
+          메뉴별 식재료(댠백질/탄수화물)
+        </h2>
         <div class="flex">
           <div
             v-for="menu in Object.keys(menuPreparation)"
@@ -156,47 +246,6 @@
                 }}
               </div>
             </div>
-
-            <div
-              v-for="igd in menuPreparation[menu].ingredients"
-              :key="menu + igd.name"
-              class="summary-item summary-item-detail"
-            >
-              <div>
-                <div>
-                  {{ igd.name }}
-
-                  {{
-                    `(${
-                      igd.Product_Ingredients.type === 'carbo'
-                        ? '탄수화물'
-                        : igd.Product_Ingredients.type === 'topping'
-                        ? '토핑'
-                        : '메인'
-                    })`
-                  }}
-                </div>
-                <!-- <div>
-                  단위 :
-                  {{
-                    igd.Product_Ingredients.amount.toFixed(2) +
-                      igd.Product_Ingredients.unit
-                  }}
-                </div> -->
-              </div>
-
-              <div>
-                <!-- <div>{{ igd.count || 0 }}</div> -->
-                <div>
-                  {{
-                    (igd.Product_Ingredients.amount * (igd.count || 0)).toFixed(
-                      2
-                    ) + igd.Product_Ingredients.unit
-                  }}
-                </div>
-              </div>
-            </div>
-
             <div class="summary-item">
               <div>{{ `기본` }}</div>
               <div>{{ menuPreparation[menu].count || 0 }}</div>
@@ -330,7 +379,7 @@
     <div class="flex" v-if="showSummary">
       <div class="w-1/3">
         <h2>새벽배송</h2>
-        <table>
+        <table class="delivery-type-count">
           <thead>
             <th>
               A
@@ -372,7 +421,7 @@
       </div>
       <div class="w-1/3">
         <h2>직접배송</h2>
-        <table>
+        <table class="delivery-type-count">
           <thead>
             <th>
               A
@@ -414,7 +463,7 @@
       </div>
       <div class="w-1/3">
         <h2>일반배송</h2>
-        <table>
+        <table class="delivery-type-count">
           <thead>
             <th>
               A
@@ -537,6 +586,8 @@ export default {
       searchDate: '',
       ingredientPreparation: {},
       menuPreparation: {},
+      mainPreparation: {},
+      toppingPreparation: {},
       deliveryPreparation: {},
       showSummary: false,
       requestTableEarly: {},
@@ -836,6 +887,10 @@ export default {
                   }
 
                   igd.count += 1
+                } else {
+                  if (excludeIngredientNames.includes(igd.name)) {
+                    igd.count += 1
+                  }
                 }
               }
 
@@ -858,10 +913,27 @@ export default {
             (igd) => igd.Product_Ingredients.type !== 'main'
           ),
         ]
+        // topping Ingredient preparation
+        this.$set(
+          this.toppingPreparation,
+          menu,
+          productInfos[menu].ingredients.filter(
+            (igd) => igd.Product_Ingredients.type !== 'main'
+          )
+        )
+        // main Ingredient preparation
+        this.$set(
+          this.mainPreparation,
+          menu,
+          productInfos[menu].ingredients.filter(
+            (igd) => igd.Product_Ingredients.type === 'main'
+          )
+        )
       })
 
       this.menuPreparation = productInfos
       console.log('menuPreparation', this.menuPreparation)
+
       const filteredIngredientPreparation = {}
 
       Object.keys(productInfos).forEach((menu) => {
@@ -1370,6 +1442,9 @@ export default {
 <style lang="scss" scoped>
 table {
   min-width: 1444px;
+  &.delivery-type-count {
+    min-width: auto;
+  }
   th {
     font-size: 12px;
   }
