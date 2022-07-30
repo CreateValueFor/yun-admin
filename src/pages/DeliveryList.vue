@@ -1,25 +1,7 @@
 <template>
   <div id="home" class="flex-1 flex flex-col">
     <!-- breadcrumb -->
-    <nav class="text-sm font-semibold mb-6" aria-label="Breadcrumb">
-      <ol class="list-none p-0 inline-flex">
-        <li class="flex items-center text-blue-500">
-          <a href="#" class="text-gray-700">Home</a>
-          <svg
-            class="fill-current w-3 h-3 mx-3"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 320 512"
-          >
-            <path
-              d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"
-            />
-          </svg>
-        </li>
-        <li class="flex items-center">
-          <a href="#" class="text-gray-600">Dashboard</a>
-        </li>
-      </ol>
-    </nav>
+    <PageTitle />
     <!-- breadcrumb end -->
 
     <tap-menu />
@@ -38,525 +20,34 @@
         제조물량 간략보기
       </button>
     </div>
-    <div class="flex flex-1 flex-wrap -mx-3 ">
-      <div class="bg-white w-full p-3 rounded-lg">
-        <div class="flex mb-3">
-          <p class="font-semibold w-32 text-lg">배송날짜</p>
-          <input
-            name="serch"
-            type="date"
-            v-model="searchDate"
-            placeholder="Search products..."
-            class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
-          />
-        </div>
-        <div class="flex mb-3">
-          <p class="font-semibold w-32 text-lg">제조메뉴</p>
-          <select
-            v-model="products.product1"
-            class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
-            >
-          </select>
-          <select
-            v-model="products.product2"
-            class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
-            >
-          </select>
-          <select
-            v-model="products.product3"
-            class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
-            >
-          </select>
-          <select
-            v-model="products.product4"
-            class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
-            >
-          </select>
-          <select
-            v-model="products.product5"
-            class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
-            >
-          </select>
-        </div>
-        <button
-          class="bg-green-500 w-48	rounded-lg px-6 py-2 text-white font-semibold shadow"
-          @click="search"
-          :disabled="loading"
-        >
-          {{ loading ? '로딩 중...' : '검색하기' }}
-        </button>
-      </div>
-    </div>
+    <Search
+      :searchDate="searchDate"
+      :products="products"
+      :productList="productList"
+      @click="search"
+      :loading="loading"
+    />
     <div v-if="showSummary">
-      <div class="ingredient--summary" style="margin-bottom: 30px;">
-        <h2 class="summary--title bg-green-500 text-white">식재료 별 준비량</h2>
-        <div
-          v-for="ingredient in Object.keys(ingredientPreparation)"
-          :key="ingredient"
-          class="summary-item"
-        >
-          {{
-            `${ingredient} : ${ingredientPreparation[ingredient].amount.toFixed(
-              2
-            )} ${ingredientPreparation[ingredient].unit}`
-          }}
-        </div>
-      </div>
+      <IngredientPreparation :ingredientPreparation="ingredientPreparation" />
       <div class="menu--summary">
-        <h2 class="summary--title bg-green-500 text-white">
-          메뉴별 식재료(메인)
-        </h2>
-        <div class="flex" style="margin-bottom: 30px;">
-          <div
-            v-for="menu in Object.keys(mainPreparation)"
-            :key="menu"
-            class="w-1/5"
-          >
-            <div>{{ menuPreparation[menu].name }}</div>
-
-            <div
-              v-for="igd in mainPreparation[menu]"
-              :key="menu + igd.name"
-              class="summary-item summary-item-detail"
-            >
-              <div>
-                <div>
-                  <div>
-                    {{ igd.name }}
-                    {{
-                      `(${
-                        igd.Product_Ingredients.type === 'carbo'
-                          ? '탄수화물'
-                          : igd.Product_Ingredients.type === 'topping'
-                          ? '토핑'
-                          : '메인'
-                      })`
-                    }}
-                  </div>
-                </div>
-                <div>
-                  <div>
-                    {{
-                      (
-                        igd.Product_Ingredients.amount * (igd.count || 0)
-                      ).toFixed(2) + igd.Product_Ingredients.unit
-                    }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <h2 class="summary--title bg-green-500 text-white">
-          메뉴별 식재료(토핑)
-        </h2>
-        <div class="flex" style="margin-bottom: 30px;">
-          <div
-            v-for="menu in Object.keys(toppingPreparation)"
-            :key="menu"
-            class="w-1/5"
-          >
-            <div>{{ menuPreparation[menu].name }}</div>
-
-            <div
-              v-for="igd in toppingPreparation[menu]"
-              :key="menu + igd.name"
-              class="summary-item summary-item-detail"
-            >
-              <div>
-                <div>
-                  <div>
-                    {{ igd.name }}
-                    {{
-                      `(${
-                        igd.Product_Ingredients.type === 'carbo'
-                          ? '탄수화물'
-                          : igd.Product_Ingredients.type === 'topping'
-                          ? '토핑'
-                          : '메인'
-                      })`
-                    }}
-                  </div>
-                </div>
-                <div>
-                  <div>
-                    {{
-                      (
-                        igd.Product_Ingredients.amount * (igd.count || 0)
-                      ).toFixed(2) + igd.Product_Ingredients.unit
-                    }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <h2 class="summary--title bg-green-500 text-white">
-          메뉴별 식재료(댠백질/탄수화물)
-        </h2>
-        <div class="flex">
-          <div
-            v-for="menu in Object.keys(menuPreparation)"
-            :key="menu"
-            class="w-1/5"
-          >
-            <div>{{ menuPreparation[menu].name }}</div>
-            <div class="summary-item">
-              <div>{{ `단백질 총합` }}</div>
-              <div>
-                {{
-                  (menuPreparation[menu].count || 0) +
-                    (menuPreparation[menu].count15 * 1.5 || 0) +
-                    (menuPreparation[menu].count20 * 2 || 0)
-                }}
-              </div>
-            </div>
-            <div class="summary-item">
-              <div>{{ `기본` }}</div>
-              <div>{{ menuPreparation[menu].count || 0 }}</div>
-            </div>
-            <div class="summary-item">
-              <div>
-                {{ `단150` }}
-              </div>
-              <div>
-                {{ menuPreparation[menu].count15 || 0 }}
-              </div>
-            </div>
-            <div class="summary-item">
-              <div>
-                {{ `단200 ` }}
-              </div>
-              <div>
-                {{ menuPreparation[menu].count20 || 0 }}
-              </div>
-            </div>
-            <div v-if="menuPreparation[menu].sweetPotato">
-              <div class="summary-item">
-                <div>
-                  {{ `고구마 기본` }}
-                </div>
-                <div>
-                  {{ menuPreparation[menu].sweetPotato.count || 0 }}
-                </div>
-              </div>
-              <div class="summary-item">
-                <div>
-                  {{ `고구마 150` }}
-                </div>
-                <div>
-                  <div>
-                    {{ menuPreparation[menu].sweetPotato.count15 || 0 }}
-                  </div>
-                </div>
-              </div>
-              <div class="summary-item">
-                <div>
-                  고구마 200
-                </div>
-                <div>
-                  {{ menuPreparation[menu].sweetPotato.count20 || 0 }}
-                </div>
-              </div>
-            </div>
-            <div v-if="menuPreparation[menu].mixed">
-              <div class="summary-item">
-                <div>
-                  고구마 + 현미밥 기본
-                </div>
-                <div>
-                  {{ menuPreparation[menu].mixed.count || 0 }}
-                </div>
-              </div>
-              <div class="summary-item">
-                <div>
-                  고구마 + 현미밥 150
-                </div>
-                <div>
-                  {{ menuPreparation[menu].mixed.count15 || 0 }}
-                </div>
-              </div>
-              <div class="summary-item">
-                <div>
-                  고구마 + 현미밥 200
-                </div>
-                <div>
-                  {{ menuPreparation[menu].mixed.count20 || 0 }}
-                </div>
-              </div>
-            </div>
-            <div v-if="menuPreparation[menu].rice">
-              <div class="summary-item">
-                <div>
-                  현미밥 기본
-                </div>
-                <div>
-                  {{ menuPreparation[menu].rice.count || 0 }}
-                </div>
-              </div>
-              <div class="summary-item">
-                <div>
-                  현미밥 150
-                </div>
-                <div>
-                  {{ menuPreparation[menu].rice.count15 || 0 }}
-                </div>
-              </div>
-              <div class="summary-item">
-                <div>
-                  현미밥 200
-                </div>
-                <div>
-                  {{ menuPreparation[menu].rice.count20 || 0 }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <MainPreparation
+          :mainPreparation="mainPreparation"
+          :menuPreparation="menuPreparation"
+        />
+        <ToppingPreparation
+          :toppingPreparation="toppingPreparation"
+          :menuPreparation="menuPreparation"
+        />
+        <CPPreparation :menuPreparation="menuPreparation" />
       </div>
-      <div class="delivery--text-whitesummary ">
-        <h2 class="summary--title bg-green-500 text-white">배송 통계</h2>
-        <div class="flex">
-          <div class="w-1/3">
-            <h2>새벽</h2>
-            <div>{{ '1식 ' + deliveryPreparation.early1 }}건</div>
-            <div>{{ '2식 ' + deliveryPreparation.early2 }}건</div>
-            <div>{{ '3식 ' + deliveryPreparation.early3 }}건</div>
-            <div>{{ '총 팩수 ' + deliveryPreparation.earlyTotal }}개</div>
-          </div>
-          <div class="w-1/3">
-            <h2>직접</h2>
-            <div>{{ '1식 ' + deliveryPreparation.direct1 }}건</div>
-            <div>{{ '2식 ' + deliveryPreparation.direct2 }}건</div>
-            <div>{{ '3식 ' + deliveryPreparation.direct3 }}건</div>
-            <div>{{ '총 팩수 ' + deliveryPreparation.directTotal }}개</div>
-          </div>
-          <div class="w-1/3">
-            <h2>일반</h2>
-            <div>{{ '1식 ' + deliveryPreparation.day1 }}건</div>
-            <div>{{ '2식 ' + deliveryPreparation.day2 }}건</div>
-            <div>{{ '3식 ' + deliveryPreparation.day3 }}건</div>
-            <div>{{ '총 팩수 ' + deliveryPreparation.dayTotal }}개</div>
-          </div>
-        </div>
-      </div>
+      <DeliverySummary :deliveryPreparation="deliveryPreparation" />
     </div>
     <div class="flex" v-if="showSummary">
-      <div class="w-1/3">
-        <h2>새벽배송</h2>
-        <table class="delivery-type-count">
-          <thead>
-            <th>
-              A
-            </th>
-            <th>
-              B
-            </th>
-            <th>
-              C
-            </th>
-            <th>
-              D
-            </th>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(productInfo, idx) in Object.keys(
-                requestTableEarly
-              ).sort()"
-              :key="`${productInfo}-${idx}`"
-            >
-              <td>{{ idx + 1 }}</td>
-              <td>
-                {{
-                  `${requestTableEarly[productInfo][0].Order.receiver} ${
-                    requestTableEarly[productInfo].length > 1
-                      ? requestTableEarly[productInfo][
-                          requestTableEarly[productInfo].length - 1
-                        ].Order.receiver
-                      : ''
-                  }`
-                }}
-              </td>
-              <td>{{ productInfo }}</td>
-              <td>{{ requestTableEarly[productInfo].length }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="w-1/3">
-        <h2>직접배송</h2>
-        <table class="delivery-type-count">
-          <thead>
-            <th>
-              A
-            </th>
-            <th>
-              B
-            </th>
-            <th>
-              C
-            </th>
-            <th>
-              D
-            </th>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(productInfo, idx) in Object.keys(
-                requestTableDirect
-              ).sort()"
-              :key="`${productInfo}-${idx}`"
-            >
-              <td>{{ idx + 1 }}</td>
-              <td>
-                {{
-                  `${requestTableDirect[productInfo][0].Order.receiver} ${
-                    requestTableDirect[productInfo].length > 1
-                      ? requestTableDirect[productInfo][
-                          requestTableDirect[productInfo].length - 1
-                        ].Order.receiver
-                      : ''
-                  }`
-                }}
-              </td>
-              <td>{{ productInfo }}</td>
-              <td>{{ requestTableDirect[productInfo].length }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="w-1/3">
-        <h2>일반배송</h2>
-        <table class="delivery-type-count">
-          <thead>
-            <th>
-              A
-            </th>
-            <th>
-              B
-            </th>
-            <th>
-              C
-            </th>
-            <th>
-              D
-            </th>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(productInfo, idx) in Object.keys(requestTableDay).sort()"
-              :key="`${productInfo}-${idx}`"
-            >
-              <td>{{ idx + 1 }}</td>
-              <td>
-                {{
-                  `${requestTableDay[productInfo][0].Order.receiver} ${
-                    requestTableDay[productInfo].length > 1
-                      ? requestTableDay[productInfo][
-                          requestTableDay[productInfo].length - 1
-                        ].Order.receiver
-                      : ''
-                  }`
-                }}
-              </td>
-              <td>{{ productInfo }}</td>
-              <td>{{ requestTableDay[productInfo].length }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <RequestTable title="새벽배송" :summary="requestTableEarly" />
+      <RequestTable title="직접배송" :summary="requestTableDirect" />
+      <RequestTable title="일반배송" :summary="requestTableDay" />
     </div>
-
-    <div style="overflow: scroll;">
-      <table v-if="searchList.length">
-        <thead>
-          <th>구매자명</th>
-          <th>수취인명</th>
-          <th>수취인연락처</th>
-          <th>구매자연락처</th>
-          <th>배송지</th>
-          <th>(기본주소)</th>
-          <th>(상세주소)</th>
-          <th>우편번호</th>
-          <th>구매자ID</th>
-          <th>공동현관 비밀번호</th>
-          <th>배송메세지</th>
-          <th>시작일</th>
-          <th>상품정보</th>
-          <th>상품명</th>
-          <th>탄수화물 구성</th>
-          <th>탄수화물량</th>
-          <th>단백질량</th>
-          <th>제외메뉴</th>
-          <th>제외토핑</th>
-          <th>배송</th>
-          <th>요청사항</th>
-        </thead>
-        <tbody>
-          <tr v-for="(delivery, idx) in searchList" :key="idx">
-            <td>{{ delivery.Order.buyer }}</td>
-            <td>{{ delivery.Order.receiver }}</td>
-            <td>{{ delivery.Order.receiverPhone }}</td>
-            <td>{{ delivery.Order.buyerPhone }}</td>
-            <td>{{ delivery.Order.address1 + delivery.Order.address2 }}</td>
-            <td>{{ delivery.Order.address1 }}</td>
-            <td>{{ delivery.Order.address2 }}</td>
-            <td>{{ delivery.Order.postNumber }}</td>
-            <td>{{ delivery.Order.naverId }}</td>
-            <td>{{ delivery.Order.entrancePassword }}</td>
-            <td>{{ delivery.Order.deliveryMessage }}</td>
-            <td>{{ delivery.deliveryDate }}</td>
-            <td>{{ delivery.productInfo }}</td>
-            <td>{{ delivery.productName }}</td>
-            <td>
-              {{ delivery.Order.CarboType.name.replaceAll(' ', '') }}
-            </td>
-            <td>{{ delivery.Order.carboAmount }}</td>
-            <td>{{ delivery.Order.proteinAmount }}</td>
-            <td>{{ delivery.excludeProduct }}</td>
-            <td>{{ delivery.excludeTopping }}</td>
-            <td>{{ delivery.Order.deliveryType }}</td>
-            <td>{{ delivery.Order.request }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <Table :searchList="searchList" />
   </div>
 </template>
 
@@ -566,12 +57,32 @@ import TapMenu from '../components/order/TapMenu.vue'
 import { utils, writeFile } from 'xlsx'
 import custom from '@/api/custom.js'
 import api from '@/api/api.js'
+import RequestTable from '@/components/deliveryList/RequestTable.vue'
+import Table from '@/components/deliveryList/Table.vue'
+import DeliverySummary from '@/components/deliveryList/DeliverySummary.vue'
+import MainPreparation from '@/components/deliveryList/MainPreparation.vue'
+import ToppingPreparation from '@/components/deliveryList/ToppingPreparation.vue'
+import CPPreparation from '@/components/deliveryList/CPPreparation.vue'
+import IngredientPreparation from '@/components/deliveryList/IngredientPreparation.vue'
+import Search from '@/components/deliveryList/Search.vue'
+import PageTitle from '@/components/common/PageTitle.vue'
 
 // import axios from 'axios'
 
 export default {
   name: 'DashboardHome',
-  components: { TapMenu },
+  components: {
+    TapMenu,
+    RequestTable,
+    DeliverySummary,
+    Table,
+    MainPreparation,
+    ToppingPreparation,
+    CPPreparation,
+    IngredientPreparation,
+    PageTitle,
+    Search,
+  },
   data() {
     return {
       searchList: [],
@@ -741,26 +252,38 @@ export default {
         const deliveryCount = tmpOrder.Package.eatPerDay * 2
         // 제품 순회하면서 담긴 것만 배열에 담기
         let i = 0
+        const excludeMenuIds = item.excludeMenus.map((item) => item.id)
+
         while (deliveryMenus.length !== deliveryCount) {
+          let productIdx = (i % 5) + 1
+          let product = this.products[`product${productIdx}`]
           if (i > 100) {
             window.alert(
               `${item.Order.receiver}님께 배송 가능한 메뉴가 없어 식재료 준비량에 합산되지 않습니다.`
             )
             break
           }
-
-          if (item.excludeMenus.length) {
-            // 제외 메뉴가 있을 경우
-            const excludeMenuIds = item.excludeMenus.map((item) => item.id)
-
-            if (
-              !excludeMenuIds.includes(this.products[`product${(i % 5) + 1}`])
-            ) {
-              deliveryMenus.push(this.products[`product${(i % 5) + 1}`])
+          // if (deliveryCount === 6) {
+          //   if ([1, 2].includes(productIdx) && deliveryMenus.length < 5) {
+          //     deliveryMenus.push(product)
+          //     deliveryMenus.push(product)
+          //   } else {
+          //     deliveryMenus.push(product)
+          //   }
+          //   console.log(deliveryMenus)
+          // } else
+          if (!excludeMenuIds.includes(product)) {
+            if (deliveryCount === 6) {
+              if ([1, 2].includes(productIdx) && deliveryMenus.length < 5) {
+                deliveryMenus.push(product)
+                deliveryMenus.push(product)
+              } else {
+                deliveryMenus.push(product)
+              }
+              console.log(deliveryMenus)
+            } else {
+              deliveryMenus.push(product)
             }
-          } else {
-            // 제외메뉴 없을 경우 그냥 하나씩 넣어주기
-            deliveryMenus.push(this.products[`product${(i % 5) + 1}`])
           }
 
           i += 1
@@ -878,7 +401,6 @@ export default {
                 // 수요일 3팩, 메뉴동일인 경우
                 if (['수요일3팩', '메뉴동일'].includes(igd.name)) {
                   if (excludeIngredientNames.includes(igd.name)) {
-                    console.log(igd)
                     igd.count += 1
                   }
                 } else if (
@@ -918,7 +440,6 @@ export default {
       })
 
       Object.keys(productInfos).forEach((menu) => {
-        console.log(productInfos[menu].ingredients)
         productInfos[menu].ingredients = [
           ...productInfos[menu].ingredients.filter(
             (igd) => igd.Product_Ingredients.type === 'main'
@@ -946,7 +467,6 @@ export default {
       })
 
       this.menuPreparation = productInfos
-      console.log('menuPreparation', this.menuPreparation)
 
       const filteredIngredientPreparation = {}
 
