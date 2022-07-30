@@ -123,7 +123,7 @@
       </div>
     </div>
     <div v-if="showSummary">
-      <div class="ingredient--summary">
+      <div class="ingredient--summary" style="margin-bottom: 30px;">
         <h2 class="summary--title bg-green-500 text-white">식재료 별 준비량</h2>
         <div
           v-for="ingredient in Object.keys(ingredientPreparation)"
@@ -141,20 +141,20 @@
         <h2 class="summary--title bg-green-500 text-white">
           메뉴별 식재료(메인)
         </h2>
-        <div class="flex">
+        <div class="flex" style="margin-bottom: 30px;">
           <div
             v-for="menu in Object.keys(mainPreparation)"
             :key="menu"
             class="w-1/5"
           >
-            <div>{{ mainPreparation[menu].name }}</div>
+            <div>{{ menuPreparation[menu].name }}</div>
 
             <div
-              v-for="igd in mainPreparation[menu].ingredients"
+              v-for="igd in mainPreparation[menu]"
               :key="menu + igd.name"
               class="summary-item summary-item-detail"
             >
-              <div v-if="!igd.Product_Ingredients.type === 'topping'">
+              <div>
                 <div>
                   <div>
                     {{ igd.name }}
@@ -185,20 +185,20 @@
         <h2 class="summary--title bg-green-500 text-white">
           메뉴별 식재료(토핑)
         </h2>
-        <div class="flex">
+        <div class="flex" style="margin-bottom: 30px;">
           <div
             v-for="menu in Object.keys(toppingPreparation)"
             :key="menu"
             class="w-1/5"
           >
-            <div>{{ toppingPreparation[menu].name }}</div>
+            <div>{{ menuPreparation[menu].name }}</div>
 
             <div
-              v-for="igd in toppingPreparation[menu].ingredients"
+              v-for="igd in toppingPreparation[menu]"
               :key="menu + igd.name"
               class="summary-item summary-item-detail"
             >
-              <div v-if="igd.Product_Ingredients.type === 'topping'">
+              <div>
                 <div>
                   <div>
                     {{ igd.name }}
@@ -598,6 +598,14 @@ export default {
   },
   async mounted() {
     this.productList = await api.getAllProducts()
+    this.searchDate = '2022-08-01'
+    this.products = {
+      product1: 1,
+      product2: 2,
+      product3: 3,
+      product4: 4,
+      product5: 5,
+    }
   },
   watch: {
     products: {
@@ -867,7 +875,13 @@ export default {
                   igd.count += 2
                 }
               } else if (igd.Product_Ingredients.type === 'topping') {
-                if (
+                // 수요일 3팩, 메뉴동일인 경우
+                if (['수요일3팩', '메뉴동일'].includes(igd.name)) {
+                  if (excludeIngredientNames.includes(igd.name)) {
+                    console.log(igd)
+                    igd.count += 1
+                  }
+                } else if (
                   !(
                     excludeIngredientNames.length &&
                     ((igd.name === '병아리콩' &&
@@ -918,15 +932,15 @@ export default {
           this.toppingPreparation,
           menu,
           productInfos[menu].ingredients.filter(
-            (igd) => igd.Product_Ingredients.type !== 'main'
+            (igd) => igd.Product_Ingredients.type === 'topping'
           )
         )
         // main Ingredient preparation
         this.$set(
           this.mainPreparation,
           menu,
-          productInfos[menu].ingredients.filter(
-            (igd) => igd.Product_Ingredients.type === 'main'
+          productInfos[menu].ingredients.filter((igd) =>
+            ['main', 'carbo'].includes(igd.Product_Ingredients.type)
           )
         )
       })
