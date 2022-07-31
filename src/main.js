@@ -47,7 +47,7 @@ const routes = [
   },
 
   {
-    path: '/545f7b3a', component: Dashboard, children: [
+    path: '/545f7b3a-asdjf123-51234', component: Dashboard, children: [
       { path: '/', redirect: { name: 'Home' } },
       { path: 'home', name: 'Home', component: Home },
       { path: 'order', name: 'Order', component: Order },
@@ -58,6 +58,10 @@ const routes = [
       { path: 'addProduct', name: 'AddProduct', component: AddProduct },
       { path: 'manageProduct', name: 'ManageProduct', component: ManageProduct }
     ]
+  },
+  {
+    path: "*",
+    redirect: "/"
   }
 
 ]

@@ -29,6 +29,7 @@
     />
     <div v-if="showSummary">
       <IngredientPreparation :ingredientPreparation="ingredientPreparation" />
+
       <div class="menu--summary">
         <MainPreparation
           :mainPreparation="mainPreparation"
@@ -41,12 +42,13 @@
         <CPPreparation :menuPreparation="menuPreparation" />
       </div>
       <DeliverySummary :deliveryPreparation="deliveryPreparation" />
+      <RequestTableGroup
+        :requestTableEarly="requestTableEarly"
+        :requestTableDirect="requestTableDirect"
+        :requestTableDay="requestTableDay"
+      />
     </div>
-    <div class="flex" v-if="showSummary">
-      <RequestTable title="새벽배송" :summary="requestTableEarly" />
-      <RequestTable title="직접배송" :summary="requestTableDirect" />
-      <RequestTable title="일반배송" :summary="requestTableDay" />
-    </div>
+
     <Table :searchList="searchList" />
   </div>
 </template>
@@ -57,7 +59,7 @@ import TapMenu from '../components/order/TapMenu.vue'
 import { utils, writeFile } from 'xlsx'
 import custom from '@/api/custom.js'
 import api from '@/api/api.js'
-import RequestTable from '@/components/deliveryList/RequestTable.vue'
+import RequestTableGroup from '@/components/deliveryList/RequestTableGroup.vue'
 import Table from '@/components/deliveryList/Table.vue'
 import DeliverySummary from '@/components/deliveryList/DeliverySummary.vue'
 import MainPreparation from '@/components/deliveryList/MainPreparation.vue'
@@ -73,7 +75,7 @@ export default {
   name: 'DashboardHome',
   components: {
     TapMenu,
-    RequestTable,
+    RequestTableGroup,
     DeliverySummary,
     Table,
     MainPreparation,
@@ -165,6 +167,40 @@ export default {
       this.requestTableDay = {}
       this.requestTableDirect = {}
       this.searchList = []
+    },
+    getMenus(row) {
+      const deliveryMenus = []
+      const deliveryCount = row.Order.Package.eatPerDay * 2
+      // 제품 순회하면서 담긴 것만 배열에 담기
+      let i = 0
+      const excludeMenuIds = row.excludeMenus.map((item) => item.id)
+
+      while (deliveryMenus.length !== deliveryCount) {
+        let productIdx = (i % 5) + 1
+        let product = this.products[`product${productIdx}`]
+        if (i > 100) {
+          window.alert(
+            `${row.Order.receiver}님께 배송 가능한 메뉴가 없어 식재료 준비량에 합산되지 않습니다.`
+          )
+          break
+        }
+        if (!excludeMenuIds.includes(product)) {
+          if (deliveryCount === 6) {
+            if ([1, 2].includes(productIdx) && deliveryMenus.length < 5) {
+              deliveryMenus.push(product)
+              deliveryMenus.push(product)
+            } else {
+              deliveryMenus.push(product)
+            }
+            console.log(deliveryMenus)
+          } else {
+            deliveryMenus.push(product)
+          }
+        }
+
+        i += 1
+      }
+      return deliveryMenus
     },
     async deliverySummary() {
       // 오늘 치 식재료에 쓰이는 메뉴 정보 불러오기
@@ -263,15 +299,6 @@ export default {
             )
             break
           }
-          // if (deliveryCount === 6) {
-          //   if ([1, 2].includes(productIdx) && deliveryMenus.length < 5) {
-          //     deliveryMenus.push(product)
-          //     deliveryMenus.push(product)
-          //   } else {
-          //     deliveryMenus.push(product)
-          //   }
-          //   console.log(deliveryMenus)
-          // } else
           if (!excludeMenuIds.includes(product)) {
             if (deliveryCount === 6) {
               if ([1, 2].includes(productIdx) && deliveryMenus.length < 5) {
@@ -288,7 +315,7 @@ export default {
 
           i += 1
         }
-
+        // const deliveryMenus = getMenus(item)
         // 메뉴 취합 완료
         // 식재료 별 준비량 찾기
 
@@ -733,7 +760,7 @@ export default {
       res
         // .filter((item) => item !== false)
         .map((result) => {
-          const { item } = result
+          const { item, excludeProduct } = result
 
           let isSpecial = false
           let specialList = []
@@ -801,10 +828,8 @@ export default {
             specialList.push(toppings.join(' '))
           }
 
-          if (result.excludeProduct.length) {
-            const excludeProductIds = result.excludeProduct.map(
-              (item) => item.id
-            )
+          if (excludeProduct.length) {
+            const excludeProductIds = excludeProduct.map((item) => item.id)
             availableMenu = this.dailyMenuIds.filter(
               (item) => !excludeProductIds.includes(item)
             )
@@ -918,7 +943,7 @@ export default {
             excludeTopping: item.Order.Ingredients.map(
               (item) => item.name
             ).join(','),
-            excludeMenus: result.excludeProduct,
+            excludeMenus: excludeProduct,
           })
         })
 
