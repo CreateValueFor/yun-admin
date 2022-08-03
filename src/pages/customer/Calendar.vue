@@ -515,6 +515,7 @@ export default {
 }
 table {
   font-weight: 700;
+  min-width: auto;
   thead {
     background: none;
   }

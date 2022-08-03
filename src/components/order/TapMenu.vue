@@ -1,20 +1,20 @@
 <template>
   <div class="lg:flex justify-start items-center mb-6">
-    <router-link to="/545f7b3a/order">
+    <router-link to="/545f7b3a-asdjf123-51234/order">
       <button
         class="bg-blue-500 hover:bg-blue-600 focus:outline-none rounded-lg px-6 py-2 text-white font-semibold mr-3 shadow"
       >
         주문 업로드
       </button>
     </router-link>
-    <router-link to="/545f7b3a/order-list">
+    <router-link to="/545f7b3a-asdjf123-51234/order-list">
       <button
         class="bg-blue-500 hover:bg-blue-600 focus:outline-none rounded-lg px-6 py-2 text-white font-semibold mr-3 shadow"
       >
         주문 리스트
       </button>
     </router-link>
-    <router-link to="/545f7b3a/delivery-list">
+    <router-link to="/545f7b3a-asdjf123-51234/delivery-list">
       <button
         class="bg-blue-500 hover:bg-blue-600 focus:outline-none rounded-lg px-6 py-2 text-white font-semibold mr-3 shadow"
       >

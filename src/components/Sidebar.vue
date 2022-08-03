@@ -13,7 +13,7 @@
     <div class="mb-4 px-4">
       <p class="pl-4 text-sm font-semibold mb-1">MAIN</p>
       <router-link
-        to="/545f7b3a"
+        to="/545f7b3a-asdjf123-51234"
         class="w-full flex items-center text-blue-400 h-10 pl-4 bg-gray-200 hover:bg-gray-200 rounded-lg cursor-pointer"
       >
         <svg class="h-6 w-6 fill-current mr-2" viewBox="0 0 20 20">
@@ -25,7 +25,7 @@
       </router-link>
 
       <router-link
-        to="/545f7b3a/order"
+        to="/545f7b3a-asdjf123-51234/order"
         class="w-full flex items-center text-blue-400 h-10 pl-4 hover:bg-gray-200 rounded-lg cursor-pointer"
       >
         <svg class="h-6 w-6 fill-current mr-2" viewBox="0 0 20 20">
@@ -36,7 +36,7 @@
         <span class="text-gray-700">주문 관리</span>
       </router-link>
       <router-link
-        to="/545f7b3a/calendar"
+        to="/545f7b3a-asdjf123-51234/calendar"
         class="w-full flex items-center text-blue-400 h-10 pl-4 hover:bg-gray-200 rounded-lg cursor-pointer"
       >
         <svg class="h-6 w-6 fill-current mr-2" viewBox="0 0 20 20">
@@ -51,7 +51,7 @@
     <div class="mb-4 px-4">
       <p class="pl-4 text-sm font-semibold mb-1">PRODUCTS</p>
       <router-link
-        to="/545f7b3a/addProduct"
+        to="/545f7b3a-asdjf123-51234/addProduct"
         class="w-full flex items-center text-blue-400 h-10 pl-4 hover:bg-gray-200 rounded-lg cursor-pointer"
       >
         <svg class="h-6 w-6 fill-current mr-2" viewBox="0 0 20 20">
@@ -62,7 +62,7 @@
         <span class="text-gray-700">제품 추가</span>
       </router-link>
       <router-link
-        to="/545f7b3a/manageProduct"
+        to="/545f7b3a-asdjf123-51234/manageProduct"
         class="w-full flex items-center text-blue-400 h-10 pl-4 hover:bg-gray-200 rounded-lg cursor-pointer"
       >
         <svg class="h-6 w-6 fill-current mr-2" viewBox="0 0 20 20">
