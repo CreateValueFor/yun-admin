@@ -145,9 +145,11 @@ export default {
         proteinAmount,
         CarboType,
         Package: { name },
+        receiver,
       },
     } = await customer.getCustomerInfo()
 
+    this.userName = receiver
     this.program = name
     this.carboAndProteinInfo = {
       carboAmount,
@@ -203,6 +205,9 @@ export default {
     onAdd(e) {
       const { name, value } = e
       if (name === 'menu') {
+        if (this.excludeMenus.length >= 6) {
+          return window.alert('제외메뉴 선택은 최대 6개 가능합니다.')
+        }
         if (this.excludeMenus.includes(value)) {
           return
         }
