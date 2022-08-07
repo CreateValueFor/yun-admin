@@ -16,8 +16,9 @@
           v-model="newHolidayType"
           class="bg-white h-10 w-64 xl:w-64 px-5 rounded-lg border text-sm focus:outline-none"
         >
-          <option value="all">전부</option>
-          <option value="day">일반배송만</option>
+          <option value="새벽배송">새벽배송</option>
+          <option value="일반배송">일반배송</option>
+          <option value="직접배송">직접배송</option>
         </select>
         <button
           class="bg-green-500 w-48	rounded-lg px-6 py-2 text-white font-semibold shadow"
@@ -33,10 +34,10 @@
           :key="day.id"
           class="px-3 py-1 border rounded-md my-3 flex items-center"
         >
-          {{ day.date }} {{ day.target === 'day' ? '일반배송만' : '전부' }}
+          {{ day.date }} {{ day.target }}
           <div
             class="ml-3 cursor-pointer hover:opacity-70 bg-red-200 w-5 h-5 flex items-center justify-center rounded-full"
-            @click="deleteHoliday(day.date)"
+            @click="deleteHoliday(day.date, day.target)"
           >
             x
           </div>
@@ -79,8 +80,8 @@ export default {
         this.init()
       }
     },
-    async deleteHoliday(date) {
-      const res = await api.deleteHoliday(date)
+    async deleteHoliday(date, target) {
+      const res = await api.deleteHoliday(date, target)
       if (res.success) {
         window.alert('공휴일 삭제 완료')
         this.init()

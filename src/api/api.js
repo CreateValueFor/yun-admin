@@ -95,8 +95,8 @@ const postHoliday = async (param) => {
     return res;
 }
 
-const deleteHoliday = async (date) => {
-    const res = await _baseDeleteRequest('holiday/' + date);
+const deleteHoliday = async (date, target) => {
+    const res = await _baseDeleteRequest(`holiday/${date}/${target}`);
     return res;
 }
 

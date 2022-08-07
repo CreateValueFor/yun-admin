@@ -32,7 +32,8 @@
       <div class="program-container flex justify-between">
         <h2 class="program-title">식단 종료일</h2>
         <div class="program-contents">{{ endDate }}</div>
-        <div
+        <div style="width:40px"></div>
+        <!-- <div
           class="program-label relative"
           :class="{ early: isEarly, day: !isEarly }"
         >
@@ -47,7 +48,7 @@
           >
             {{ remainDelivery }}회
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
     <divider title="일정 변경하기" />
