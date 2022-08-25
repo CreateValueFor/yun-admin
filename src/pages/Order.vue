@@ -434,49 +434,17 @@ export default {
       this.early = []
       this.day = []
       this.direct = []
-      // this.early10 = []
-      // this.early20 = []
-      // this.day20 = []
-      // this.day10 = []
-      // this.direct10 = []
-      // this.direct20 = []
+
       orderList.map((item) => {
         if (!item.상품명) {
           return
         }
         if (item.deliveryType === '새벽배송') {
           this.early.push(item)
-          // if (item.상품명.includes('2일')) {
-          //   this.early2.push(item)
-          // } else if (item.상품명.includes('4일')) {
-          //   this.early4.push(item)
-          // } else if (item.상품명.includes('10일')) {
-          //   this.early10.push(item)
-          // } else {
-          //   this.early20.push(item)
-          // }
         } else if (item.deliveryType === '직접배송') {
           this.direct.push(item)
-          // if (item.상품명.includes('2일')) {
-          //   this.direct2.push(item)
-          // } else if (item.상품명.includes('4일')) {
-          //   this.direct4.push(item)
-          // } else if (item.상품명.includes('10일')) {
-          //   this.direct10.push(item)
-          // } else {
-          //   this.direct20.push(item)
-          // }
         } else {
           this.day.push(item)
-          // if (item.상품명.includes('2일')) {
-          //   this.day2.push(item)
-          // } else if (item.상품명.includes('4일')) {
-          //   this.day4.push(item)
-          // } else if (item.상품명.includes('10일')) {
-          //   this.day10.push(item)
-          // } else {
-          //   this.day20.push(item)
-          // }
         }
       })
     },

@@ -195,14 +195,14 @@ export default {
   },
   async mounted() {
     this.productList = await api.getAllProducts()
-    this.searchDate = '2022-08-01'
-    this.products = {
-      product1: 1,
-      product2: 2,
-      product3: 3,
-      product4: 4,
-      product5: 5,
-    }
+    // this.searchDate = '2022-08-15'
+    // this.products = {
+    //   product1: 1,
+    //   product2: 2,
+    //   product3: 3,
+    //   product4: 4,
+    //   product5: 5,
+    // }
   },
   watch: {
     products: {
@@ -584,38 +584,16 @@ export default {
       Object.keys(productInfos).forEach((menu) => {
         productInfos[menu].ingredients.forEach((igd) => {
           if (!filteredIngredientPreparation[igd.name]) {
-            if (igd.Product_Ingredients.type === 'carbo') {
-              filteredIngredientPreparation[igd.name] = {
-                name: igd.name,
-                amount: igd.count * igd.Product_Ingredients.amount,
-                priority: 1,
-                unit: igd.Product_Ingredients.unit,
-                // amount: igd.Product_Ingredients.amount,
-                duplicate: false,
-              }
-            } else if (igd.Product_Ingredients.type === 'topping') {
-              filteredIngredientPreparation[igd.name] = {
-                name: igd.name,
-
-                priority: 2,
-                unit: igd.Product_Ingredients.unit,
-                amount: igd.count * igd.Product_Ingredients.amount,
-                duplicate: false,
-              }
-            } else {
-              filteredIngredientPreparation[igd.name] = {
-                name: igd.name,
-
-                priority: 3,
-                unit: igd.Product_Ingredients.unit,
-                amount: igd.count * igd.Product_Ingredients.amount,
-                duplicate: false,
-              }
+            filteredIngredientPreparation[igd.name] = {
+              name: igd.name,
+              amount:
+                (igd.count ? igd.count : 0) * igd.Product_Ingredients.amount,
+              unit: igd.Product_Ingredients.unit,
             }
           } else {
             filteredIngredientPreparation[igd.name].duplicate = true
             filteredIngredientPreparation[igd.name].amount +=
-              igd.count * igd.Product_Ingredients.amount
+              (igd.count ? igd.count : 0) * igd.Product_Ingredients.amount
           }
         })
       })
@@ -655,7 +633,7 @@ export default {
           배송지: `${item.Order.address1} ${item.Order.address2}` || '',
           '(기본주소)': item.Order.address1,
           '(상세주소)': item.Order.address2,
-          우편번호: item.Order.postNumber,
+
           '공동현관 비밀번호': item.Order.entrancePassword,
           배송메세지: item.Order.deliveryMessage,
           배송일: item.deliveryDate,
@@ -667,6 +645,7 @@ export default {
           제외메뉴: item.excludeProduct,
           제외토핑: item.excludeTopping,
           배송: item.Order.deliveryType,
+          우편번호: item.Order.postNumber,
         }
       })
 
@@ -674,9 +653,9 @@ export default {
       const day = []
       const direct = []
       excelData.map((item) => {
-        if (item.deliveryType === '새벽배송') {
+        if (item.배송 === '새벽배송') {
           early.push(item)
-        } else if (item.deliveryType === '직접배송') {
+        } else if (item.배송 === '직접배송') {
           direct.push(item)
         } else {
           day.push(item)
@@ -904,6 +883,9 @@ export default {
                   if (!toppings.includes('사과x')) {
                     return toppings.push('사과x')
                   }
+                  break
+                default:
+                  return toppings.push(item.name + 'x')
               }
             })
             if (toppings.length) {

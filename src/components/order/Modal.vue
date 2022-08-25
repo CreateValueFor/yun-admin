@@ -96,11 +96,16 @@ export default {
     if (this.order) {
       this.memo = this.order.memo
     }
+    console.log(this.order)
     this.products = await api.getAllProducts()
     this.ingredients = await api.getAllIngredients()
-    this.excludeIngredient = this.order.excludeIngredients.map(
-      (item) => this.ingredients.filter((igd) => igd.name === item)[0].id
-    )
+    // this.excludeIngredient = this.order.excludeIngredients.map(
+    //   (item) => this.ingredients.filter((igd) => igd.name === item)[0].id
+    // )
+    this.excludeIngredient = this.order.excludeIngredients
+    this.excludeProduct = this.order.excludeProducts
+    console.log(this.excludeIngredient)
+
     this.products = this.products.map((item) => ({ ...item, checked: false }))
   },
   methods: {
