@@ -195,7 +195,7 @@ export default {
   },
   async mounted() {
     this.productList = await api.getAllProducts()
-    // this.searchDate = '2022-08-15'
+    // this.searchDate = '2022-09-12'
     // this.products = {
     //   product1: 1,
     //   product2: 2,
@@ -637,6 +637,8 @@ export default {
           '공동현관 비밀번호': item.Order.entrancePassword,
           배송메세지: item.Order.deliveryMessage,
           배송일: item.deliveryDate,
+          배송시작일: item.Order.startDate,
+          배송종료일: item.endDate,
           상품정보: item.productInfo,
           상품명: item.productName,
           '탄수화물 구성': item.Order.CarboType.name,
@@ -679,19 +681,35 @@ export default {
         (key) => {
           const item = this.menuPreparation[key]
 
-          const menu = {
+          const menu = []
+          menu.push({
             name: item.name,
-            기본: item.count,
-            단백질150g: item.count15,
-            단백질200g: item.count20,
-          }
-          item.ingredients.forEach((igd) => {
-            menu[igd.name] =
-              igd.count * igd.Product_Ingredients.amount +
-              igd.Product_Ingredients.unit
+            속성: '',
+            수량: item.count,
+          })
+          menu.push({
+            name: '단백질150g',
+            속성: '',
+            수량: item.count15,
+          })
+          menu.push({
+            name: '단백질200g',
+            속성: '',
+            수량: item.count20,
           })
 
-          return [menu]
+          item.ingredients.forEach((igd) => {
+            console.log(igd)
+            menu.push({
+              name: igd.name,
+              속성: custom.toppingTypeFormatter(igd.Product_Ingredients.type),
+              수량:
+                igd.count * igd.Product_Ingredients.amount +
+                igd.Product_Ingredients.unit,
+            })
+          })
+
+          return menu
         }
       )
 
@@ -823,7 +841,8 @@ export default {
       res
         // .filter((item) => item !== false)
         .map((result) => {
-          const { item, excludeProduct } = result
+          const { item, excludeProduct, lastReserve } = result
+          item.endDate = lastReserve
 
           let isSpecial = false
           let specialList = []

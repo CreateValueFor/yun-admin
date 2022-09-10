@@ -285,6 +285,19 @@ const productAbbreviator = (product) => {
 
 }
 
+const toppingTypeFormatter = (type) => {
+    switch (type) {
+        case "main":
+            return '메인상품'
+        case "carbo":
+            return '탄수화물'
+        case "topping":
+            return '토핑'
+        default:
+            return "토핑"
+    }
+}
+
 export default {
     productList,
     dayTranslate,
@@ -298,4 +311,5 @@ export default {
     orderTranslater,
     excludeMenuList,
     productAbbreviator,
+    toppingTypeFormatter
 }

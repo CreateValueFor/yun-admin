@@ -14,6 +14,7 @@
         <th>공동현관 비밀번호</th>
         <th>배송메세지</th>
         <th>시작일</th>
+        <th>종료일</th>
         <th>상품정보</th>
         <th>상품명</th>
         <th>탄수화물 구성</th>
@@ -37,7 +38,8 @@
           <td>{{ delivery.Order.naverId }}</td>
           <td>{{ delivery.Order.entrancePassword }}</td>
           <td>{{ delivery.Order.deliveryMessage }}</td>
-          <td>{{ delivery.deliveryDate }}</td>
+          <td>{{ delivery.Order.startDate }}</td>
+          <td>{{ delivery.endDate }}</td>
           <td>{{ delivery.productInfo }}</td>
           <td>{{ delivery.productName }}</td>
           <td>
