@@ -164,20 +164,17 @@
       </Slide>
     </hooper>
 
-    <div class="flex items-center">
+    <div class="flex items-start">
       <img class="mr-3" src="@/assets/notice.svg" alt="notice" />
-      <span
-        style="font-family: 'Roboto';
-font-style: normal;
-font-weight: 400;
-font-size: 12px;
-line-height: 14px;
-
-color: #9A1111;
-"
-        >ex. 5월 05일 ~ 06일 어린이날 택배사 휴무로 인해 일반배송이
-        중단됩니다.</span
-      >
+      <span class="notice-text">
+        9월 12일 ~ 9월 15일 윤식단 추석휴가로 [모든 배송]이 중단됩니다.
+        <br /><br />
+        10월 03일 개천절 [직접배송]이 중단됩니다. 전날 공휴일(개천절)로 인해
+        10월 04일 [일반배송]이 중단됩니다.<br /><br />
+        전날 공휴일(한글날)로 인해 10월 10일 [직접배송]이 중단됩니다.<br /><br />
+        *다른 요일로 대체 배송이 이루어지지 않으며, 종료일이 연장되어
+        진행됩니다.
+      </span>
     </div>
     <button class="btn" @click="onSave">저장하기</button>
   </div>
@@ -211,6 +208,16 @@ export default {
       reserveDates: [],
       holidaies: [],
       lockDates: ['2022-05-23'],
+      notices: [
+        '9월 12일 ~ 9월 15일 윤식단 추석휴가로 [모든 배송]이 중단됩니다.',
+
+        '10월 03일 개천절 [직접배송]이 중단됩니다.',
+        '전날 공휴일(개천절)로 인해 10월 04일 [일반배송]이 중단됩니다.',
+
+        '전날 공휴일(한글날)로 인해 10월 10일 [직접배송]이 중단됩니다.',
+
+        '*다른 요일로 대체 배송이 이루어지지 않으며, 종료일이 연장되어 진행됩니다.',
+      ],
     }
   },
   computed: {
@@ -504,6 +511,17 @@ export default {
     }
   }
 }
+
+.notice-text {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 14px;
+
+  color: #9a1111;
+}
+
 .btn {
   margin-top: 20px;
   width: 100px;
