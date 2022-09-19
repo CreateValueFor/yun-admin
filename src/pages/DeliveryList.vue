@@ -112,6 +112,7 @@
       </div>
     </div>
     <div v-if="showSummary">
+      <LineHonest :lineHonest="lineHonest" />
       <IngredientPreparation :ingredientPreparation="ingredientPreparation" />
 
       <div class="menu--summary">
@@ -150,6 +151,7 @@ import MainPreparation from '@/components/deliveryList/MainPreparation.vue'
 import ToppingPreparation from '@/components/deliveryList/ToppingPreparation.vue'
 import CPPreparation from '@/components/deliveryList/CPPreparation.vue'
 import IngredientPreparation from '@/components/deliveryList/IngredientPreparation.vue'
+import LineHonest from '@/components/deliveryList/LineHonest.vue'
 // import Search from '@/components/deliveryList/Search.vue'
 import PageTitle from '@/components/common/PageTitle.vue'
 
@@ -166,6 +168,7 @@ export default {
     ToppingPreparation,
     CPPreparation,
     IngredientPreparation,
+    LineHonest,
     PageTitle,
     // Search,
   },
@@ -182,6 +185,12 @@ export default {
       },
       searchDate: '',
       ingredientPreparation: {},
+      lineHonest: {
+        totalPacks: 0,
+        early: 0,
+        direct: 0,
+        day: 0,
+      },
       menuPreparation: {},
       mainPreparation: {},
       toppingPreparation: {},
@@ -195,14 +204,14 @@ export default {
   },
   async mounted() {
     this.productList = await api.getAllProducts()
-    // this.searchDate = '2022-09-12'
-    // this.products = {
-    //   product1: 1,
-    //   product2: 2,
-    //   product3: 3,
-    //   product4: 4,
-    //   product5: 5,
-    // }
+    this.searchDate = '2022-09-19'
+    this.products = {
+      product1: 1,
+      product2: 2,
+      product3: 3,
+      product4: 4,
+      product5: 5,
+    }
   },
   watch: {
     products: {
@@ -276,7 +285,6 @@ export default {
             } else {
               deliveryMenus.push(product)
             }
-            console.log(deliveryMenus)
           } else {
             deliveryMenus.push(product)
           }
@@ -327,7 +335,29 @@ export default {
       })
       //제품 배정해주기
 
+      // 라인 어니스트 인 경우 예외 처리
       this.searchList.forEach((item) => {
+        if (item.Order.Package.name === '라인 어니스트') {
+          this.lineHonest.totalPacks += 1 * item.Order.count
+          const deliveryType = item.Order.deliveryType
+
+          switch (deliveryType) {
+            case '새벽배송':
+              this.lineHonest.early += 1
+              break
+            case '직접배송':
+              this.lineHonest.direct += 1
+              break
+            case '일반배송':
+              this.lineHonest.day += 1
+              break
+            default:
+              break
+          }
+          console.log(item)
+          return
+        }
+
         const tmpOrder = item.Order
         const carboAmount = item.Order.carboAmount
         const deliveryType = item.Order.deliveryType
@@ -391,7 +421,6 @@ export default {
               } else {
                 deliveryMenus.push(product)
               }
-              console.log(deliveryMenus)
             } else {
               deliveryMenus.push(product)
             }
@@ -699,7 +728,6 @@ export default {
           })
 
           item.ingredients.forEach((igd) => {
-            console.log(igd)
             menu.push({
               name: igd.name,
               속성: custom.toppingTypeFormatter(igd.Product_Ingredients.type),

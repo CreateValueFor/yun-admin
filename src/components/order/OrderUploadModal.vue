@@ -29,27 +29,6 @@
           during="2"
           all
         />
-
-        <!-- <order-day-picker
-          v-model="uploadOption.direct2"
-          :count="orderCount.direct2"
-          during="2"
-        />
-        <order-day-picker
-          v-model="uploadOption.direct4"
-          :count="orderCount.direct4"
-          during="4"
-        />
-        <order-day-picker
-          v-model="uploadOption.direct10"
-          :count="orderCount.direct10"
-          during="10"
-        />
-        <order-day-picker
-          v-model="uploadOption.direct20"
-          :count="orderCount.direct20"
-          during="20"
-        /> -->
       </div>
 
       <div class="w-1/2 p-3 border-r">
@@ -79,26 +58,6 @@
           during="2"
           all
         />
-        <!-- <order-day-picker
-          v-model="uploadOption.early2"
-          :count="orderCount.early2"
-          during="2"
-        />
-        <order-day-picker
-          v-model="uploadOption.early4"
-          :count="orderCount.early4"
-          during="4"
-        />
-        <order-day-picker
-          v-model="uploadOption.early10"
-          :count="orderCount.early10"
-          during="10"
-        />
-        <order-day-picker
-          v-model="uploadOption.early20"
-          :count="orderCount.early20"
-          during="20"
-        /> -->
       </div>
 
       <div class="w-1/2 p-3">
@@ -109,26 +68,6 @@
           during="2"
           all
         />
-        <!-- <order-day-picker
-          v-model="uploadOption.day2"
-          :count="orderCount.day2"
-          during="2"
-        />
-        <order-day-picker
-          v-model="uploadOption.day4"
-          :count="orderCount.day4"
-          during="4"
-        />
-        <order-day-picker
-          v-model="uploadOption.day10"
-          :count="orderCount.day10"
-          during="10"
-        />
-        <order-day-picker
-          v-model="uploadOption.day20"
-          :count="orderCount.day20"
-          during="20"
-        /> -->
       </div>
     </div>
     <div slot="footer" class="flex justify-end">

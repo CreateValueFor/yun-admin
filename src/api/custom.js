@@ -142,8 +142,8 @@ const serviceNameFormatter = (service) => {
             return '1일 1식 10일 프로그램(새벽)'
         case '새벽 : 20일 : 1일 4식 20일 (60팩)':
             return '1일 4식 20일 프로그램(새벽)'
-
-
+        case '[윤식단 단품] 닭고야 샐러드 도시락 정기배송 다이어트 건강 식단 새벽배송 배달 저염식 단백질 바프식단 바디프로필식단':
+            return '라인 어니스트'
         default:
             return '상품이 아님'
     }

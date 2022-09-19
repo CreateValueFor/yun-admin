@@ -604,11 +604,6 @@ export default {
         initOrder.postNumber = order[0].우편번호
 
         // 주소 받기
-
-        // 배송지 v2
-        // initOrder.배송지 = order[0]['(기본주소)'] + order[0]['(상세주소)']
-        // initOrder.address1 = order[0]['(기본주소)']
-        // initOrder.address2 = order[0]['(상세주소)']
         initOrder.배송지 = order[0].배송지
         if (initOrder.배송지.split(') ').length === 2) {
           initOrder.address1 = initOrder.배송지.split(') ')[0] + ')'
@@ -633,93 +628,134 @@ export default {
         initOrder.excludeIngredients = []
         initOrder.excludeIngredientName = []
 
-        order.forEach((item) => {
-          // 주문 행의 상품종류가 '조합형 옵션 상품'인 경우엔 본 주문에 대한 데이터
-          // 우선 본 주문에 대한 데이터 필터링 진행
-          if (
-            item['상품종류'] === '조합형옵션상품' ||
-            item['상품종류'] === '옵션상품'
-          ) {
-            // 본 주문
-            // 주문 상품 명
-            initOrder.상품명 = custom.serviceNameFormatter(item.상품명)
+        if (
+          order.some(
+            (item) =>
+              custom.serviceNameFormatter(item.상품명) === '라인 어니스트'
+          )
+        ) {
+          // 라인 어니스트인 경우
+          let totalPack = 0
+          order.forEach((item) => {
+            if (
+              item['상품종류'] === '조합형옵션상품' ||
+              item['상품종류'] === '옵션상품'
+            ) {
+              // 주 메뉴
+              const packageName = custom.serviceNameFormatter(item.상품명)
+              initOrder.상품명 = packageName
+              const deliveryTypeIdx = item.옵션정보.indexOf('/ 배송방법 선택: ')
 
-            const entrancePasswordIdx =
-              item.옵션정보.indexOf(
-                "공동현관 출입비밀번호 (없을 시 '없음'작성):"
-              ) + 1
+              const deliveryType = item.옵션정보.substring(
+                deliveryTypeIdx + 11,
+                deliveryTypeIdx + 15
+              )
+              initOrder.deliveryType = deliveryType
 
-            const deliveryTypeIdx = item.옵션정보.indexOf('/ 배송방법 선택: ')
-            // const alterTypeIdx = item.옵션정보.indexOf('/ ')
+              totalPack += item.수량
+            } else {
+              //옵션 상품
+              if (item.상품명.includes('3')) {
+                totalPack += item.수량 * 3
+              }
+            }
+          })
+          initOrder.상품명 = `${initOrder.상품명} ${totalPack}팩`
+          initOrder.count = totalPack
+        } else {
+          // 일반 주문인 경우
+          order.forEach((item) => {
+            // 주문 행의 상품종류가 '조합형 옵션 상품'인 경우엔 본 주문에 대한 데이터
+            // 우선 본 주문에 대한 데이터 필터링 진행
+            if (
+              item['상품종류'] === '조합형옵션상품' ||
+              item['상품종류'] === '옵션상품'
+            ) {
+              // 본 주문
+              // 라인 어니스트 제품 따로 처리하기
+              // TODO
 
-            const password = item.옵션정보.substring(
-              entrancePasswordIdx + 26,
-              deliveryTypeIdx
-            )
-            initOrder.entrancePassword = password
+              // 주문 상품 명
+              initOrder.상품명 = custom.serviceNameFormatter(item.상품명)
 
-            const deliveryType = item.옵션정보.substring(
-              deliveryTypeIdx + 11,
-              deliveryTypeIdx + 15
-            )
-            initOrder.deliveryType = deliveryType
-          } else {
-            // 옵션 값
-            const optionType = item['옵션정보'].indexOf('메뉴 변경 요청')
+              const entrancePasswordIdx =
+                item.옵션정보.indexOf(
+                  "공동현관 출입비밀번호 (없을 시 '없음'작성):"
+                ) + 1
 
-            if (optionType !== -1) {
-              // 메뉴 변경 요청 사항
-              if (
-                item['옵션정보'].includes('제외') ||
-                item['옵션정보'].includes('기타')
-              ) {
-                // 제외 식재료 처리
-                const excludeWordIdx = item['옵션정보'].indexOf('제외')
-                if (excludeWordIdx === -1) {
-                  // 기타인 경우
-                  initOrder.확인필요 = true
-                } else {
-                  const ingredient = item['옵션정보']
-                    .substring(optionType + 9, excludeWordIdx)
-                    .trim()
-                  const xigd = this.ingredients.find(
-                    (igd) => igd.name === ingredient
-                  )
-                  if (xigd) {
-                    initOrder.excludeIngredients.push(xigd.id)
-                    initOrder.excludeIngredientName.push(xigd.name)
+              const deliveryTypeIdx = item.옵션정보.indexOf('/ 배송방법 선택: ')
+              // const alterTypeIdx = item.옵션정보.indexOf('/ ')
+
+              const password = item.옵션정보.substring(
+                entrancePasswordIdx + 26,
+                deliveryTypeIdx
+              )
+              initOrder.entrancePassword = password
+
+              const deliveryType = item.옵션정보.substring(
+                deliveryTypeIdx + 11,
+                deliveryTypeIdx + 15
+              )
+              initOrder.deliveryType = deliveryType
+            } else {
+              // 옵션 값
+              const optionType = item['옵션정보'].indexOf('메뉴 변경 요청')
+
+              if (optionType !== -1) {
+                // 메뉴 변경 요청 사항
+                if (
+                  item['옵션정보'].includes('제외') ||
+                  item['옵션정보'].includes('기타')
+                ) {
+                  // 제외 식재료 처리
+                  const excludeWordIdx = item['옵션정보'].indexOf('제외')
+                  if (excludeWordIdx === -1) {
+                    // 기타인 경우
+                    initOrder.확인필요 = true
                   } else {
-                    console.log('문제가 발생', xigd, ingredient)
+                    const ingredient = item['옵션정보']
+                      .substring(optionType + 9, excludeWordIdx)
+                      .trim()
+                    const xigd = this.ingredients.find(
+                      (igd) => igd.name === ingredient
+                    )
+                    if (xigd) {
+                      initOrder.excludeIngredients.push(xigd.id)
+                      initOrder.excludeIngredientName.push(xigd.name)
+                    } else {
+                      console.log('문제가 발생', xigd, ingredient)
+                    }
+                  }
+                } else {
+                  // 탄수화물 처리
+                  initOrder.carboType = item['옵션정보'].split(':')[1].trim()
+                  if (initOrder.carboType === '현미밥만') {
+                    initOrder.carboType = '현미밥'
                   }
                 }
               } else {
-                // 탄수화물 처리
-                initOrder.carboType = item['옵션정보'].split(':')[1].trim()
-                if (initOrder.carboType === '현미밥만') {
-                  initOrder.carboType = '현미밥'
-                }
-              }
-            } else {
-              if (item['옵션정보'].includes('단백질')) {
-                // 단백질 구성
-                if (item['옵션정보'].includes('50g')) {
-                  initOrder.proteinAmount = 1.5
-                }
-                if (item['옵션정보'].includes('100g')) {
-                  initOrder.proteinAmount = 2
-                }
-              } else {
-                // 탄수화물 구성
-                if (item['옵션정보'].includes('50g')) {
-                  initOrder.carboAmount = 1.5
-                }
-                if (item['옵션정보'].includes('100g')) {
-                  initOrder.carboAmount = 2
+                if (item['옵션정보'].includes('단백질')) {
+                  // 단백질 구성
+                  if (item['옵션정보'].includes('50g')) {
+                    initOrder.proteinAmount = 1.5
+                  }
+                  if (item['옵션정보'].includes('100g')) {
+                    initOrder.proteinAmount = 2
+                  }
+                } else {
+                  // 탄수화물 구성
+                  if (item['옵션정보'].includes('50g')) {
+                    initOrder.carboAmount = 1.5
+                  }
+                  if (item['옵션정보'].includes('100g')) {
+                    initOrder.carboAmount = 2
+                  }
                 }
               }
             }
-          }
-        })
+          })
+        }
+
         totalOrder.push(initOrder) // 파싱한 주문 저장
         initOrder = {} // 주문 초기화
       })
