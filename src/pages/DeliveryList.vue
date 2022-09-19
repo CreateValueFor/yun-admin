@@ -200,18 +200,35 @@ export default {
       requestTableDay: {},
       requestTableDirect: {},
       loading: false,
+      markedToppings: [
+        '콩',
+        '병아리콩',
+        '콩 추가 (ㅇ)',
+        '당근',
+        '토핑당근',
+        '방울토마토',
+        '사과',
+        '견과류',
+        '아몬드',
+        '스위트콘',
+        '삶은계란 (토핑)',
+        '건크렌베리 (ㅇ)',
+        '바나나칩 (ㅇ)',
+        '콩 추가 (ㅇ)',
+        '견과류 추가 (ㅇ)',
+      ],
     }
   },
   async mounted() {
     this.productList = await api.getAllProducts()
-    this.searchDate = '2022-09-19'
-    this.products = {
-      product1: 1,
-      product2: 2,
-      product3: 3,
-      product4: 4,
-      product5: 5,
-    }
+    // this.searchDate = '2022-09-19'
+    // this.products = {
+    //   product1: 1,
+    //   product2: 2,
+    //   product3: 3,
+    //   product4: 4,
+    //   product5: 5,
+    // }
   },
   watch: {
     products: {
@@ -932,7 +949,14 @@ export default {
                   }
                   break
                 default:
-                  return toppings.push(item.name + 'x')
+                  if (this.markedToppings.includes(item.name)) {
+                    if (item.name.includes('ㅇ')) {
+                      return toppings.push(item.name)
+                    } else {
+                      return toppings.push(item.name + 'x')
+                    }
+                  }
+                  return
               }
             })
             if (toppings.length) {
