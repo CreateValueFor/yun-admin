@@ -604,19 +604,22 @@ export default {
         initOrder.postNumber = order[0].우편번호
 
         // 주소 받기
-        initOrder.배송지 = order[0].배송지
-        if (initOrder.배송지.split(') ').length === 2) {
-          initOrder.address1 = initOrder.배송지.split(') ')[0] + ')'
-          initOrder.address2 = initOrder.배송지.split(') ')[1]
-        } else {
-          initOrder.address1 = initOrder.배송지
-            .split(' ')
-            .splice(0, initOrder.배송지.split(' ').length - 1)
-            .join(' ')
-          initOrder.address2 = initOrder.배송지.split(' ')[
-            initOrder.배송지.split(' ').length - 1
-          ]
-        }
+        // initOrder.배송지 = order[0].배송지
+        // if (initOrder.배송지.split(') ').length === 2) {
+
+        // } else {//   initOrder.address1 = initOrder.배송지.split(') ')[0] + ')'
+        //   initOrder.address2 = initOrder.배송지.split(') ')[1]
+        //   initOrder.address1 = initOrder.배송지
+        //     .split(' ')
+        //     .splice(0, initOrder.배송지.split(' ').length - 1)
+        //     .join(' ')
+        //   initOrder.address2 = initOrder.배송지.split(' ')[
+        //     initOrder.배송지.split(' ').length - 1
+        //   ]
+        // }
+        initOrder.address1 = order[0].기본배송지
+        initOrder.address2 = order[0].상세배송지
+
         initOrder['우편번호'] = order[0]['(우편번호)']
         // 배송 메세지
         initOrder.deliveryMessage = order[0]['배송메세지'] || '없음'

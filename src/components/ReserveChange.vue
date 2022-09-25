@@ -161,6 +161,7 @@ export default {
       holidaies: [],
       lockDates: ['2022-05-23'],
       deliveryDay: '',
+      deliveryType: '',
     }
   },
   computed: {
@@ -191,6 +192,7 @@ export default {
         deliveryType,
       } = res.data
       this.program = name
+      this.deliveryType = deliveryType
       this.isEarly = deliveryType === '새벽배송' || deliveryType === '직접배송'
       this.reservations = Reservations
       this.reserveDates = Reservations.map((item) => item.deliveryDate)
@@ -254,6 +256,9 @@ export default {
           this.reserveDates = this.reserveDates.filter(
             (item) => reserves[i] !== item
           )
+          this.reservations = this.reservations.filter(
+            (item) => item.deliveryDate !== reserves[i]
+          )
           break
         }
       }
@@ -272,24 +277,28 @@ export default {
 
       // 휴일 주간 날짜 다 배출
       const getHolidayTerm = () => {
-        console.log(this.holidaies)
         const holidaies = []
-        this.holidaies.forEach((item) => {
-          holidaies.push(item)
-          const curDate = new Date(item)
-          if ([1, 3].includes(curDate.getDay())) {
-            // 월 수 인 경우
-            curDate.setDate(curDate.getDate() + 1)
-            holidaies.push(curDate.toISOString().split('T')[0])
-          } else {
-            curDate.setDate(curDate.getDate() - 1)
-            holidaies.push(curDate.toISOString().split('T')[0])
-          }
-        })
+
+        if (this.deliveryType === '일반배송') {
+          this.holidaies.forEach((item) => {
+            holidaies.push(item)
+            const curDate = new Date(item)
+            if ([1, 3].includes(curDate.getDay())) {
+              // 월 수 인 경우
+              curDate.setDate(curDate.getDate() + 1)
+              holidaies.push(curDate.toISOString().split('T')[0])
+            } else {
+              curDate.setDate(curDate.getDate() - 1)
+              holidaies.push(curDate.toISOString().split('T')[0])
+            }
+          })
+        } else {
+          this.holidaies.forEach((item) => holidaies.push(item))
+        }
         return holidaies
       }
 
-      console.log(getHolidayTerm())
+      // console.log(getHolidayTerm())
 
       let notFlag = true
       while (notFlag) {
@@ -299,13 +308,10 @@ export default {
         } else {
           newReserveDateObj.setDate(newReserveDateObj.getDate() + 5)
         }
+        const newReserveDate = newReserveDateObj.toISOString().split('T')[0]
         if (
-          !this.reserveDates.includes(
-            newReserveDateObj.toISOString().split('T')[0]
-          ) &&
-          !getHolidayTerm().includes(
-            newReserveDateObj.toISOString().split('T')[0]
-          )
+          !this.reserveDates.includes(newReserveDate) &&
+          !getHolidayTerm().includes(newReserveDate)
         ) {
           notFlag = false
         }

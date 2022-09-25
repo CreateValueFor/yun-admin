@@ -21,7 +21,7 @@
       <Input
         :value="loginData.naverId"
         class="h-16 px-3 mb-2"
-        placeholder="네이버 아이디 앞 2자리를 입력해주세요."
+        placeholder="네이버 아이디 앞 2자리를 입력해주세요. (자사몰 주문시 자사몰 아이디 앞 2자리)"
         name="naverId"
         @onChange="onChange"
       />
