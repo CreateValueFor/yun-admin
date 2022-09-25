@@ -647,11 +647,11 @@ export default {
               // 주 메뉴
               const packageName = custom.serviceNameFormatter(item.상품명)
               initOrder.상품명 = packageName
-              const deliveryTypeIdx = item.옵션정보.indexOf('/ 배송방법 선택: ')
+              const deliveryTypeIdx = item.옵션정보.indexOf('/ 배송방법:')
 
               const deliveryType = item.옵션정보.substring(
-                deliveryTypeIdx + 11,
-                deliveryTypeIdx + 15
+                deliveryTypeIdx + 7,
+                deliveryTypeIdx + 12
               )
               initOrder.deliveryType = deliveryType
 
