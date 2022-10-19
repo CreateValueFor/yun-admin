@@ -22,11 +22,11 @@ export default {
       lgds: [
         {
           name: '닭가슴살',
-          amount: 150,
+          amount: 100,
         },
         {
           name: '고구마',
-          amount: 120,
+          amount: 100,
         },
         {
           name: '토마토',

@@ -633,9 +633,8 @@ export default {
         initOrder.excludeIngredientName = []
 
         if (
-          order.some(
-            (item) =>
-              custom.serviceNameFormatter(item.상품명) === '라인 어니스트'
+          order.some((item) =>
+            custom.serviceNameFormatter(item.상품명).includes('라인 어니스트')
           )
         ) {
           // 라인 어니스트인 경우
@@ -648,11 +647,21 @@ export default {
               // 주 메뉴
               const packageName = custom.serviceNameFormatter(item.상품명)
               initOrder.상품명 = packageName
-              const deliveryTypeIdx = item.옵션정보.indexOf('/ 배송방법:')
+              const entrancePasswordIdx = item.옵션정보.indexOf(
+                " (없을 시 '없음'작성):"
+              )
+              const deliveryTypeIdx = item.옵션정보.indexOf('/ 배송방법')
+              console.log(entrancePasswordIdx)
+              const password = item.옵션정보.substring(
+                entrancePasswordIdx + 15,
+                deliveryTypeIdx
+              )
+
+              initOrder.entrancePassword = password
 
               const deliveryType = item.옵션정보.substring(
-                deliveryTypeIdx + 7,
-                deliveryTypeIdx + 12
+                deliveryTypeIdx + 10,
+                deliveryTypeIdx + 15
               )
               initOrder.deliveryType = deliveryType
 
