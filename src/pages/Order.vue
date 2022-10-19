@@ -619,6 +619,7 @@ export default {
         // }
         initOrder.address1 = order[0].기본배송지
         initOrder.address2 = order[0].상세배송지
+        initOrder.배송지 = `${initOrder.address1} ${initOrder.address2}`
 
         initOrder['우편번호'] = order[0]['(우편번호)']
         // 배송 메세지

@@ -41,66 +41,121 @@
         </div>
         <div class="flex mb-3">
           <p class="font-semibold w-32 text-lg">제조메뉴</p>
-          <select
-            v-model="products.product1"
-            class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
+          <div>
+            <select
+              v-model="products.product1"
+              class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
             >
-          </select>
-          <select
-            v-model="products.product2"
-            class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
+              <option
+                v-for="(product, idx) in productList"
+                :key="idx"
+                :disabled="product.disabled"
+                :value="product.id"
+                >{{ product.name }}</option
+              >
+            </select>
+            <div>
+              <input
+                type="checkbox"
+                name="product1_mixed"
+                id="product1_mixed"
+                v-model="isMixedGrain.product1"
+              />
+              <label for="product1_mixed">고구마+현미밥 </label>
+            </div>
+          </div>
+          <div>
+            <select
+              v-model="products.product2"
+              class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
             >
-          </select>
-          <select
-            v-model="products.product3"
-            class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
+              <option
+                v-for="(product, idx) in productList"
+                :key="idx"
+                :disabled="product.disabled"
+                :value="product.id"
+                >{{ product.name }}</option
+              >
+            </select>
+            <div>
+              <input
+                type="checkbox"
+                name="product2_mixed"
+                id="product2_mixed"
+                v-model="isMixedGrain.product2"
+              />
+              <label for="product2_mixed">고구마+현미밥 </label>
+            </div>
+          </div>
+          <div>
+            <select
+              v-model="products.product3"
+              class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
             >
-          </select>
-          <select
-            v-model="products.product4"
-            class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
+              <option
+                v-for="(product, idx) in productList"
+                :key="idx"
+                :disabled="product.disabled"
+                :value="product.id"
+                >{{ product.name }}</option
+              >
+            </select>
+            <div>
+              <input
+                type="checkbox"
+                name="product3_mixed"
+                id="product3_mixed"
+                v-model="isMixedGrain.product3"
+              />
+              <label for="product3_mixed">고구마+현미밥 </label>
+            </div>
+          </div>
+          <div>
+            <select
+              v-model="products.product4"
+              class="bg-white mr-3 h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
             >
-          </select>
-          <select
-            v-model="products.product5"
-            class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
-          >
-            <option
-              v-for="(product, idx) in productList"
-              :key="idx"
-              :disabled="product.disabled"
-              :value="product.id"
-              >{{ product.name }}</option
+              <option
+                v-for="(product, idx) in productList"
+                :key="idx"
+                :disabled="product.disabled"
+                :value="product.id"
+                >{{ product.name }}</option
+              >
+            </select>
+            <div>
+              <input
+                type="checkbox"
+                name="product4_mixed"
+                id="product4_mixed"
+                v-model="isMixedGrain.product4"
+              />
+              <label for="product4_mixed">고구마+현미밥 </label>
+            </div>
+          </div>
+          <div>
+            <select
+              v-model="products.product5"
+              class="bg-white h-10 w-32  px-5 rounded-lg border text-sm focus:outline-none"
             >
-          </select>
+              <option
+                v-for="(product, idx) in productList"
+                :key="idx"
+                :disabled="product.disabled"
+                :value="product.id"
+                >{{ product.name }}</option
+              >
+            </select>
+            <div>
+              <input
+                type="checkbox"
+                name="product5_mixed"
+                id="product5_mixed"
+                v-model="isMixedGrain.product5"
+              />
+              <label for="product5_mixed">고구마+현미밥 </label>
+            </div>
+          </div>
         </div>
         <button
           class="bg-green-500 w-48	rounded-lg px-6 py-2 text-white font-semibold shadow"
@@ -217,18 +272,25 @@ export default {
         '콩 추가 (ㅇ)',
         '견과류 추가 (ㅇ)',
       ],
+      isMixedGrain: {
+        product1: false,
+        product2: false,
+        product3: false,
+        product4: false,
+        product5: false,
+      },
     }
   },
   async mounted() {
     this.productList = await api.getAllProducts()
-    // this.searchDate = '2022-09-19'
-    // this.products = {
-    //   product1: 1,
-    //   product2: 2,
-    //   product3: 3,
-    //   product4: 4,
-    //   product5: 5,
-    // }
+    this.searchDate = '2022-09-19'
+    this.products = {
+      product1: 1,
+      product2: 2,
+      product3: 3,
+      product4: 4,
+      product5: 5,
+    }
   },
   watch: {
     products: {
@@ -451,6 +513,7 @@ export default {
 
         // TODO 메뉴별 1.5인분 수 1인분 수 구분 필요
 
+        // deliveryMenus.forEach((item, idx) => {
         deliveryMenus.forEach((item) => {
           // 각 제품 제조 갯수 초기화
           if (!productInfos[item].count && !productInfos[item].count15) {
@@ -489,12 +552,15 @@ export default {
           // 탄수화물 취합량
           if (carboAmount === 1) {
             productInfos[item][custom.carboTypeFormatter(carboType)].count += 1
+
             // 식재료 별 준비량 파싱
             if (carboType === '고구마') {
               ingredientPreparation.고구마 += 1
             } else if (carboType === '현미밥') {
               ingredientPreparation.현미밥 += 1
             } else {
+              // this.isMixedGrain[`product${idx + 1}`].amount += 1
+
               // ingredientPreparation.고구마 += 0.5
               // ingredientPreparation.현미밥 += 0.5
               ingredientPreparation['고구마+현미밥'] += 1
@@ -513,6 +579,7 @@ export default {
               // ingredientPreparation.고구마 += 0.75
               // ingredientPreparation.현미밥 += 0.75
               ingredientPreparation['고구마+현미밥'] += 1
+              // this.isMixedGrain[`product${idx + 1}`].amount += 1.5
             }
           } else {
             productInfos[item][
@@ -527,6 +594,7 @@ export default {
               // ingredientPreparation.고구마 += 1
               // ingredientPreparation.현미밥 += 1
               ingredientPreparation['고구마+현미밥'] += 2
+              // this.isMixedGrain[`product${idx + 1}`].amount += 2
             }
           }
           // 식재료 취합
@@ -644,7 +712,40 @@ export default {
         })
       })
 
+      // isMixedGrain 객체 보면서 현미밥 수량 체크
+      let totalRice = 0
+      Object.keys(productInfos).forEach((menu, idx) => {
+        const product = productInfos[menu]
+
+        const isMixed = this.isMixedGrain[`product${idx + 1}`]
+        let grain = 0
+        if (!product.mixed) {
+          return
+        }
+
+        if (isMixed) {
+          console.log('현비밥 + 고구마')
+          grain += product.mixed.count
+          grain += product.mixed.count15 * 1.5
+          grain += product.mixed.count20 * 2
+        }
+        grain += product.rice.count
+        grain += product.rice.count15 * 1.5
+        grain += product.rice.count20 * 2
+
+        totalRice += grain
+      })
+
+      // 현미밥 수량만큼 고구마 제외
+      filteredIngredientPreparation.고구마.amount -= totalRice * 0.1
+      filteredIngredientPreparation.현미밥 = {
+        amount: totalRice * 0.1,
+        name: '현미밥',
+        unit: 'kg',
+      }
+
       this.ingredientPreparation = filteredIngredientPreparation
+
       // this.ingredientPreparation = ingredientPreparation
 
       deliveryCountPreparation.earlyTotal =
