@@ -439,9 +439,11 @@ export default {
         if (!item.상품명) {
           return
         }
-        if (item.deliveryType === '새벽배송') {
+        const deliveryType = item.deliveryType.trim()
+        console.log(deliveryType)
+        if (deliveryType === '새벽배송') {
           this.early.push(item)
-        } else if (item.deliveryType === '직접배송') {
+        } else if (deliveryType === '직접배송') {
           this.direct.push(item)
         } else {
           this.day.push(item)
@@ -665,12 +667,12 @@ export default {
               )
               initOrder.deliveryType = deliveryType
 
-              totalPack += item.수량
+              totalPack += item.수량 * 4
             } else {
               //옵션 상품
-              if (item.상품명.includes('3')) {
-                totalPack += item.수량 * 3
-              }
+              // if (item.상품명.includes('3')) {
+              //   totalPack += item.수량 * 3
+              // }
             }
           })
           initOrder.상품명 = `${initOrder.상품명} ${totalPack}팩`
