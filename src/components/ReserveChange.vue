@@ -212,6 +212,7 @@ export default {
 
       // 달력 만들기
       const date = new Date()
+      date.setDate(1)
       date.setMonth(date.getMonth() - 2)
       this.years.push(date.getFullYear())
       this.months.push(date.getMonth() + 1)
