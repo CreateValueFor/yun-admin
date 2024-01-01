@@ -10,6 +10,7 @@
       :options="options"
       :name="name"
       :value="localValue"
+      :disabled="disabled"
     />
     <div class="yun-label">{{ label }}</div>
   </div>

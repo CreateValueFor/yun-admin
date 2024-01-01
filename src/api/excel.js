@@ -83,9 +83,9 @@ export const processRaw = (groupedRaw) => {
             }
             if (item.옵션정보.includes('토핑')) {
                 // console.log(item.옵션정보)
-                console.log(item.옵션정보.split("토핑")[1].replace("제외", "").trim())
+                // console.log(item.옵션정보.split("토핑")[1].replace("제외", "").trim())
                 initOrder.제외토핑 = item.옵션정보.split("토핑")[1].replace("제외", "").trim()
-                console.log(initOrder)
+                // console.log(initOrder)
             }
             initOrder.상품명 = custom.serviceNameFormatter(item.상품명)
             // 공통 정보

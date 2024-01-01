@@ -26,7 +26,6 @@ const _basePatchRequest = async (path, param) => {
 
 
 const getOrderList = async (query) => {
-    console.log(query)
     const res = await _baseGetRequest('order?' + qs.stringify(query))
     return res.data;
 }

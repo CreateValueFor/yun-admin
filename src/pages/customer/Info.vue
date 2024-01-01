@@ -1,5 +1,13 @@
 <template>
   <div class="p-5">
+    <a
+      href="https://www.notion.so/8a43dbefe2b544688a1bb4d3f41918af"
+      class="input-button ml-auto"
+      target="_blank"
+      style="width : 115px"
+    >
+      윤식단 구독 지침서
+    </a>
     <guide title="나의 메뉴 구성 관리하기" content="식단 주문정보">
       <slot>
         <div class="detail">
@@ -18,20 +26,17 @@
           >
             식단 한팩 구성
           </h2>
-
-          본 페이지는 나의 식단 기본 구성을 관리하는 섹션입니다.<br />하단
-          내용을 통해 나의 식단 기본 구성 확인 및 변경이 가능합니다.<br /><br />변경된
-          식단 구성 정보는 2일 후 반영됩니다.<br />변경을 원하시는 구성을 식단
-          수령일 최소 2일 전, 오후 5시 이전으로 변경해주세요.<br /><br />탄수화물
-          구성 변경이 가능합니다.<br />탄수화물 및 단백질 양 변경은 카카오채널
-          ‘윤식단'을 통해 문의주세요.<br /><br />
-          알러지 및 식재료 제외가 가능합니다.이 경우 해당 식재료가 들어가는 메뉴
-          구성이 전체 제외됩니다.<br />하단 메뉴별 구성 식재료를
-          참고해주세요.<br /><br />메뉴 제외가 가능합니다.수령을 원치 않으시는
-          메뉴를 제외해주세요.<br />단, 제외하는 메뉴가 많아질수록 식단 구성
-          순환의 다양성이 떨어집니다.<br /><br />기본 토핑 제외가 가능합니다.이
-          경우 식단 하단의 기본토핑만 제외되며 메뉴는 제공됩니다.<br />단,
-          기본토핑 제외 시 다른 토핑으로 대체되거나 추가되는 부분은 없습니다.
+          1)메뉴 제외는 최대 6개까지 가 능합니다.<br />
+          단, 제외 메뉴수가 많아질수록 메뉴 순환의 다양성이 떨어질 수
+          있습니다.<br /><br />
+          2)탄수화물 구성 변경이 가능합니다.<br />
+          고구마만(기본)<br />
+          고구마+현미밥 번갈아 제공<br />
+          현미밥만<br />
+          *단백질, 탄수화물 추가는 상담원을 통해 요청 부탁드립니다.<br /><br />
+          3)토핑 병아리콩, 토핑 당근 제외가 가능합니다.<br />
+          메뉴 속재료는 제외가 불가하며, 원치 않는 속재료가 포함된 메뉴는 [메뉴
+          제외]를 부탁 드립니다.
         </div>
       </slot>
     </guide>
@@ -76,30 +81,33 @@
     </div>
     <hr style="width: 100%; margin: 50px 0px;" />
     <div class="allergy-container program-container flex flex-col w-full">
-      <button class="input-button ml-auto" @click="showIngredients = true">
-        메뉴별 구성 식재료 보기
-      </button>
       <InfoSelect
         title="알러지 및 식재료 제외"
         :options="ingredients"
         type="식재료"
         name="ingredient"
-        label="해당 식재료를 포함하는 메뉴가 전체 제외됩니다."
+        label="해당 식재료를 포함하는 메뉴가 전체 제외됩니다.토핑재료만 제외가 가 능하며 메뉴 속재료는 제외 가 불 가 합니다. 원치
+        않는 속재료가 포함된 메뉴는 [메뉴 제외]를 부탁드립니다."
         :userName="userName"
         :selectedList="excludedIngredients"
         @add="onAdd"
         @remove="onRemove"
       />
 
-      <hr class="w-full" />
+      <hr class="w-full" style="width: 100%; margin: 10px 0px 50px;" />
+      <a
+        href="https://diamond-pet-538.notion.site/2a159c842479488d909e18d9a0728bbd?pvs=4"
+        class="input-button ml-auto"
+        target="_blank"
+      >
+        메뉴별 구성 식재료 보기
+      </a>
       <InfoSelect
         title="메뉴 제외"
         :options="products"
         type="메뉴"
         name="menu"
-        label="제외 된 메뉴를 뺀 식단 구성으로
-자율적 / 가능한 순차적으로
-식단이 랜덤 제공됩니다."
+        label="제외 된 메뉴를 뺀 식단 구성으로 자율적 / 가능한 순차적으로 식단이 랜덤 제공됩니다."
         :userName="userName"
         :selectedList="excludeMenus"
         @add="onAdd"
@@ -157,15 +165,18 @@ export default {
       carboType: CarboType.name,
     }
     const [ingredients, products] = await customer.getCompose()
-    this.ingredients = ingredients.filter(
-      (item) => !this.exceptIngredient.includes(item)
-    )
-    this.products = products
+    this.ingredients = ingredients
+      .filter((item) => !this.exceptIngredient.includes(item))
+      .filter((item) => item.includes('토핑당근') || item.includes('병아리콩'))
+    console.log(this.ingredients)
+    this.products = products.filter((item) => !item.includes('메뉴'))
+    console.log(products)
 
     const { excludeIngredients, excludeProducts } = await customer.getExcludes()
     console.log(excludeIngredients, excludeProducts)
     this.excludedIngredients = excludeIngredients
     this.excludeMenus = excludeProducts
+    console.log(excludeProducts)
   },
   data() {
     return {
@@ -245,6 +256,20 @@ export default {
 }
 </script>
 <style lang="scss">
+.input-button {
+  margin-left: 10px;
+  padding: 0px 10px;
+  display: flex;
+  align-items: center;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1.5rem;
+  background: #e6e6e6;
+  border: 1px solid #fff;
+  color: #555555;
+}
 .program {
   margin: 50px auto;
   width: 80%;

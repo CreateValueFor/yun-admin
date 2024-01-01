@@ -1,22 +1,26 @@
 <template>
   <div class="p-5" style="margin-bottom: 50px;">
+    <a
+      href="https://www.notion.so/8a43dbefe2b544688a1bb4d3f41918af"
+      class="input-button ml-auto"
+      target="_blank"
+      style="width : 115px"
+    >
+      윤식단 구독 지침서
+    </a>
     <guide title="나의 배송 일정 관리하기" content="일정 변경하기">
       <slot>
         <div class="detail">
-          본 페이지는 나의 배송일정을 관리하는 섹션입니다.<br />
-          하단 달력을 통해 프로그램 별 기본 셋팅된 배송 진행일자 확인이
-          가능합니다.<br /><br />
-          배송 정지를 원하시는 날짜는 달력 내 열쇠를 클릭하여 잠궈주세요.<br />
-          배송 진행을 원하시는 날짜는 달력 내 열쇠를 한번 더 클릭하여
-          풀어주세요.<br /><br />
-          변경이 가능한 일자는 수령일 최소 2일 전 오후 5시까지입니다. 변경이
-          불가한 일자는 달력 클릭이 불가합니다.<br /><br />
-          직접배송은 공휴일 포함 정상 배송되며, 일반배송은 택배사 휴무로 인해
-          공휴일 배송이 불가합니다.<br /><br />
-          공휴일 일정과 관련하여 배송지 혹은 배송일자 변경이 필요하실 경우
-          수령일 최소 2일 전 미리 조정해주세요.<br /><br />
-          배송일정 장기 중단은 선택하시는 만큼 가능합니다.<br />
-          필요하신 중단 일자는 달력 내 열쇠를 잠궈주세요.
+          배송정지 희망 날짜를 클릭하여 자물쇠를 잠궈주세요.<br />
+          (날짜칸이 회색으로 변하면 정상 정지 입니다.)<br />
+          잠긴 자물쇠 모양 을 한 번 더 클릭하면 잠금 이 해지되어 정상 배송이
+          진행됩니다.<br /><br />
+          변경 후 오른쪽 하단의 [저장하기]버튼 을 반드시 눌러주세요.<br />
+          배송정지 반영 가 능 시점<br />
+          월요일 배송 : 전 주 금요일 16시 전까지<br />
+          화요일 배송 : 전 주 금요일 16시 전까지<br />
+          수요일 배송 : 월요일 16시 전까지<br />
+          목요일 배송 : 화요일 16시 전까지<br />
         </div>
       </slot>
     </guide>
@@ -26,7 +30,7 @@
         <h2 class="program-title">식단 프로그램</h2>
         <div class="program-contents">{{ program }}</div>
         <div class="program-label" :class="{ early: isEarly, day: !isEarly }">
-          {{ isEarly ? '직접배송' : '일반배송' }}
+          {{ isEarly ? '새벽배송' : '일반배송' }}
         </div>
       </div>
       <div class="program-container flex justify-between">
@@ -241,7 +245,7 @@ export default {
       deliveryType,
     } = res.data
     this.program = name
-    this.isEarly = deliveryType === '직접배송'
+    this.isEarly = deliveryType === '새벽배송'
     this.reservations = Reservations
     this.reserveDates = Reservations.map((item) => item.deliveryDate)
     this.lockDates = Reservations.filter((item) => item.locked).map(
@@ -285,9 +289,7 @@ export default {
       )
 
       if (compareDate > selectedDate) {
-        return window.alert(
-          '배송일 이전 오후 5시가 지나면 배송을 수정할 수 없습니다.'
-        )
+        return window.alert('해당 배송일정은 현재 수정이 불가합니다.')
       }
       //공휴일일 경우 해제 불가
       if (

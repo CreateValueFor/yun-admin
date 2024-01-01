@@ -5,6 +5,7 @@
       :name="name"
       :id="name"
       v-model="localValue"
+      :disabled="disabled"
     >
       <option v-for="option in options" :key="option">{{ option }}</option>
     </select>
@@ -31,6 +32,10 @@ export default {
     value: {
       type: [String, Number],
       require: true,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

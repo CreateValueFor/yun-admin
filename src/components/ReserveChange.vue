@@ -248,7 +248,7 @@ export default {
       await this.init()
     },
     removeReserve() {
-      console.log('remove')
+      // console.log('remove')
       const reserves = this.reserveDates.sort().reverse()
       for (let i = 0; i < reserves.length; i++) {
         if (this.lockDates.includes(reserves[i])) {
@@ -263,7 +263,7 @@ export default {
           break
         }
       }
-      console.log(this.reserveDates)
+      // console.log(this.reserveDates)
       this.calendarData()
     },
 

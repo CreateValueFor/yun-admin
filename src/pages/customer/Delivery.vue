@@ -1,5 +1,13 @@
 <template>
   <div class="p-5">
+    <a
+      href="https://www.notion.so/8a43dbefe2b544688a1bb4d3f41918af"
+      class="input-button ml-auto"
+      target="_blank"
+      style="width : 115px"
+    >
+      윤식단 구독 지침서
+    </a>
     <guide title="나의 배송지 변경하기" content="배송지 정보">
       <slot>
         <div class="detail">
@@ -34,8 +42,16 @@
       @onChange="selectedDeliveryType = $event.value"
       img="bus"
       title="배송 형태"
+      :disabled="true"
     />
-    <hr style="width:200px; margin: 30px auto 30px; margin-top:30px;" />
+    <div class="detail" style="text-align:center; margin:10px 0px 30px">
+      배송지 변경 반영 가 능 시점 월요일 배송 : 전 주 금요일 16시 전까지
+      화요일<br />
+      배송 : 전 주 금요일 16시 전까지 수요일 배송 : 월요일 16시 전까지 목요일<br />
+      배송 : 화요일 16시 전까지
+    </div>
+
+    <!-- <hr style="width:200px; margin: 30px auto 30px; margin-top:30px;" /> -->
     <div class="relative">
       <input-with-label-no-img
         name="address1"
@@ -86,9 +102,9 @@
         margin-bottom:30px;
         "
     >
-      직접배송 시 문 앞까지 원활히 배송되기 위한 필수 기입사항입니다. 정확한
-      비밀번호 입력 순서 혹은 자세한 출입 방법을 적어주세요.<br />
-      없을 시 ‘없음'으로 작성해주세요.
+      *새벽배송의 경우 공동현관 출입방 법 을 반드시 기재해주세요.<br />
+      새벽시간에 건물자유출입이 불 가 할 경우, 1층에 대응배송이 이루어질 수
+      있습니다.
     </div>
     <input-with-label-no-img
       title="배송메세지"
@@ -212,6 +228,16 @@ export default {
 }
 </script>
 <style lang="scss">
+.detail {
+  /* border-top: 0.7px solid #e6e6e6; */
+
+  font-family: 'Roboto';
+
+  font-size: 12px;
+  line-height: 1rem;
+
+  color: #999999;
+}
 .input-row {
   display: flex;
   align-items: center;
