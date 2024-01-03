@@ -24,6 +24,25 @@ const _basePatchRequest = async (path, param) => {
     return res.data;
 }
 
+// 프로그램 가져오기
+const getProgramList = async () => {
+    const res = await _baseGetRequest('program')
+    return res.result;
+}
+const addProgram = async (data) => {
+    const res = await _basePostRequest('program', data)
+    return res.result;
+}
+const editProgram = async (id, data) => {
+    const res = await _basePutRequest(`program/${id}/program`, data)
+    return res.result;
+}
+const deleteProgram = async (id) => {
+    const res = await _baseDeleteRequest(`program/${id}/program`)
+    return res.result;
+}
+
+
 
 const getOrderList = async (query) => {
     const res = await _baseGetRequest('order?' + qs.stringify(query))
@@ -139,7 +158,12 @@ export default {
     // 제품 삭제
     deleteProduct,
     //배송 요일 변경
-    patchDeliveryDay
+    patchDeliveryDay,
+    getProgramList,
+    editProgram,
+    addProgram,
+    deleteProgram
+
 
 
 }

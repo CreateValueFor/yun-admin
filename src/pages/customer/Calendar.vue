@@ -280,7 +280,7 @@ export default {
     lockDelivery(monthIdx, idx, secondIdx) {
       const compareDate = new Date()
       compareDate.setDate(compareDate.getDate() + 1)
-      compareDate.setHours(17)
+      compareDate.setHours(16)
       compareDate.setMinutes(0)
       compareDate.setSeconds(0)
 

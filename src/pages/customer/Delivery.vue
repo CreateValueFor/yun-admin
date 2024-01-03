@@ -45,10 +45,12 @@
       :disabled="true"
     />
     <div class="detail" style="text-align:center; margin:10px 0px 30px">
-      배송지 변경 반영 가 능 시점 월요일 배송 : 전 주 금요일 16시 전까지
-      화요일<br />
-      배송 : 전 주 금요일 16시 전까지 수요일 배송 : 월요일 16시 전까지 목요일<br />
-      배송 : 화요일 16시 전까지
+      배송지 변경 반영 가능 시점<br /><br />
+
+      월요일 배송 : 전 주 금요일 16시 전까지<br />
+      화요일 배송 : 전 주 금요일 16시 전까지<br />
+      수요일 배송 : 월요일 16시 전까지<br />
+      목요일 배송 : 화요일 16시 전까지
     </div>
 
     <!-- <hr style="width:200px; margin: 30px auto 30px; margin-top:30px;" /> -->
