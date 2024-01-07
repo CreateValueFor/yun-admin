@@ -216,11 +216,10 @@ export default {
         day: '',
       },
       early: [],
-
       day: [],
-
       direct: [],
       ingredients: [],
+      specialPrograms: [],
     }
   },
   computed: {
@@ -247,7 +246,6 @@ export default {
   },
   methods: {
     openUpdateModal(item, idx) {
-      console.log(item, idx)
       this.selectedIndex = idx
       this.modalData = item
       this.modalData = {
@@ -257,7 +255,7 @@ export default {
           bean: item.excludeIngredientName.includes('콩'),
         },
       }
-      console.log(this.modalData)
+
       this.showUpdateModal = true
     },
     deleteOrder(idx) {
@@ -272,7 +270,6 @@ export default {
           this.modalData.excludeIngredientName.push(carrot.name)
         }
       } else {
-        console.log('당근 토핑 제외 안함')
         this.modalData.excludeIngredients = this.modalData.excludeIngredients.filter(
           (item) => item !== carrot.id
         )
@@ -294,8 +291,6 @@ export default {
           (item) => item !== bean.name
         )
       }
-
-      console.log(this.modalData)
 
       this.$set(this.uploadedOrder, this.selectedIndex, this.modalData)
       this.showUpdateModal = false
@@ -405,7 +400,6 @@ export default {
     },
 
     changeOrder(e) {
-      console.log(e)
       this.$set(
         this.uploadedOrder[this.selectedIndex],
         'excludeProducts',
@@ -440,7 +434,7 @@ export default {
           return
         }
         const deliveryType = item.deliveryType.trim()
-        console.log(deliveryType)
+
         if (deliveryType === '새벽배송') {
           this.early.push(item)
         } else if (deliveryType === '직접배송') {
@@ -516,19 +510,11 @@ export default {
     },
     onChange(event) {
       const file = event.target.files[0]
-      // const fileName = file.name
-      // declare FileReader, temp result
       const reader = new FileReader()
-      // let tmpResult = []
 
       reader.onload = () => {
         let data = reader.result
         let workbook = read(data, { type: 'binary' })
-
-        // workbook.SheetNames.forEach((sheetName) => {
-        //   const roa = utils.sheet_to_json(workbook.Sheets[sheetName])
-        //   // tmpResult = roa
-        // })
         const tmpData = utils.sheet_to_json(
           workbook.Sheets[workbook.SheetNames[0]]
         )
@@ -565,9 +551,7 @@ export default {
     },
     groupOrder(jsonData) {
       // 옵션 추가 시 상품주문번호는 달라지지만 주문번호는 달라지지 않기 때문에 주문번호로 같은 주문인 것 파악
-      if (!jsonData[0].주문번호) {
-        console.log(jsonData[0])
-      }
+
       let init_buySerial = jsonData[0].주문번호
 
       let order = []
@@ -605,20 +589,6 @@ export default {
         initOrder.excludeProductName = []
         initOrder.postNumber = order[0].우편번호
 
-        // 주소 받기
-        // initOrder.배송지 = order[0].배송지
-        // if (initOrder.배송지.split(') ').length === 2) {
-
-        // } else {//   initOrder.address1 = initOrder.배송지.split(') ')[0] + ')'
-        //   initOrder.address2 = initOrder.배송지.split(') ')[1]
-        //   initOrder.address1 = initOrder.배송지
-        //     .split(' ')
-        //     .splice(0, initOrder.배송지.split(' ').length - 1)
-        //     .join(' ')
-        //   initOrder.address2 = initOrder.배송지.split(' ')[
-        //     initOrder.배송지.split(' ').length - 1
-        //   ]
-        // }
         initOrder.address1 = order[0].기본배송지
         initOrder.address2 = order[0].상세배송지
         initOrder.배송지 = `${initOrder.address1} ${initOrder.address2}`
@@ -653,7 +623,7 @@ export default {
                 " (없을 시 '없음'작성):"
               )
               const deliveryTypeIdx = item.옵션정보.indexOf('/ 배송방법')
-              console.log(entrancePasswordIdx)
+
               const password = item.옵션정보.substring(
                 entrancePasswordIdx + 15,
                 deliveryTypeIdx

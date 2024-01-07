@@ -189,7 +189,7 @@
       />
     </div>
 
-    <Table :searchList="searchList" />
+    <Table :searchList="[...searchList, ...specialProgramList]" />
   </div>
 </template>
 
@@ -230,6 +230,7 @@ export default {
   data() {
     return {
       searchList: [],
+      specialProgramList: [],
       productList: custom.productList,
       products: {
         product1: '',
@@ -255,6 +256,7 @@ export default {
       requestTableDay: {},
       requestTableDirect: {},
       loading: false,
+      specialPrograms: [],
       markedToppings: [
         '콩',
         '병아리콩',
@@ -283,7 +285,7 @@ export default {
   },
   async mounted() {
     this.productList = await api.getAllProducts()
-    this.searchDate = '2022-09-19'
+    this.searchDate = '2024-01-08'
     this.products = {
       product1: 1,
       product2: 2,
@@ -291,6 +293,8 @@ export default {
       product4: 4,
       product5: 5,
     }
+    this.specialPrograms = (await api.getProgramList()).slice(14)
+    console.log(this.specialPrograms)
   },
   watch: {
     products: {
@@ -418,7 +422,7 @@ export default {
       this.searchList.forEach((item) => {
         if (item.Order.Package.name === '라인 어니스트') {
           this.lineHonest.totalPacks += 1 * item.Order.count
-          const deliveryType = item.Order.deliveryType
+          const deliveryType = item.Order.deliveryType.trim()
 
           switch (deliveryType) {
             case '새벽배송':
@@ -433,13 +437,15 @@ export default {
             default:
               break
           }
-          console.log(item)
+          return
+        }
+        if (this.specialPrograms.includes(item.Order.buyer)) {
           return
         }
 
         const tmpOrder = item.Order
         const carboAmount = item.Order.carboAmount
-        const deliveryType = item.Order.deliveryType
+        const deliveryType = item.Order.deliveryType.trim()
         const eatPerDay = item.Order.Package.eatPerDay
         const carboType = item.Order.CarboType.name
         const proteinAmount = item.Order.proteinAmount
@@ -771,32 +777,34 @@ export default {
       if (!this.showSummary) {
         window.alert('먼저 제조물량 간략보기 버튼을 눌러주세요.')
       }
-      const excelData = this.searchList.map((item) => {
-        return {
-          구매자명: item.Order.buyer,
-          수취인명: item.Order.receiver,
-          수취인연락처: item.Order.receiverPhone,
-          구매자연락처: item.Order.buyerPhone,
-          배송지: `${item.Order.address1} ${item.Order.address2}` || '',
-          '(기본주소)': item.Order.address1,
-          '(상세주소)': item.Order.address2,
-
-          '공동현관 비밀번호': item.Order.entrancePassword,
-          배송메세지: item.Order.deliveryMessage,
-          배송일: item.deliveryDate,
-          배송시작일: item.Order.startDate,
-          배송종료일: item.endDate,
-          상품정보: item.productInfo,
-          상품명: item.productName,
-          '탄수화물 구성': item.Order.CarboType.name,
-          단백질량: item.Order.carboAmount,
-          탄수화물량: item.Order.proteinAmount,
-          제외메뉴: item.excludeProduct,
-          제외토핑: item.excludeTopping,
-          배송: item.Order.deliveryType,
-          우편번호: item.Order.postNumber,
+      const excelData = [...this.searchList, ...this.specialProgramList].map(
+        (item) => {
+          return {
+            구매자명: item.Order.buyer,
+            수취인명: item.Order.receiver,
+            수취인연락처: item.Order.receiverPhone,
+            구매자연락처: item.Order.buyerPhone,
+            배송지: `${item.Order.address1} ${item.Order.address2}` || '',
+            '(기본주소)': item.Order.address1,
+            '(상세주소)': item.Order.address2,
+            '공동현관 비밀번호': item.Order.entrancePassword,
+            배송메세지: item.Order.deliveryMessage,
+            배송일: item.deliveryDate,
+            배송시작일: item.Order.startDate,
+            배송종료일: item.endDate,
+            상품정보:
+              item.productName == '라인 어니스트' ? 8 : item.productInfo,
+            상품명: item.productName,
+            '탄수화물 구성': item.Order.CarboType.name,
+            단백질량: item.Order.carboAmount,
+            탄수화물량: item.Order.proteinAmount,
+            제외메뉴: item.excludeProduct,
+            제외토핑: item.excludeTopping,
+            배송: item.Order.deliveryType.trim(),
+            우편번호: item.Order.postNumber,
+          }
         }
-      })
+      )
 
       const early = []
       const day = []
@@ -983,18 +991,36 @@ export default {
       const res = await api.postDeliveryList(this.searchDate, this.products)
 
       const makeList = []
-
+      const specialprogramNames = this.specialPrograms.map((item) => item.name)
+      console.log(specialprogramNames)
       res
         // .filter((item) => item !== false)
         .map((result) => {
           const { item, excludeProduct, lastReserve } = result
           item.endDate = lastReserve
+          if (specialprogramNames.includes(item.Order.buyer)) {
+            const curProgram = this.specialPrograms.find(
+              (menu) => menu.name == item.Order.buyer
+            )
+
+            this.specialProgramList.push({
+              ...item,
+              productInfo: curProgram.id,
+              productName: curProgram.name,
+              excludeProduct: [],
+              excludeTopping: [],
+              excludeMenus: [],
+            })
+
+            return
+          }
 
           let isSpecial = false
           let specialList = []
           let carboType = []
           let availableMenu = []
 
+          // 탄수화물 종류
           if (item.Order.carboType !== 1) {
             isSpecial = true
             if (item.Order.carboType === 2) {
@@ -1004,6 +1030,7 @@ export default {
             }
           }
 
+          // 단백질 양
           if (item.Order.proteinAmount !== 1) {
             isSpecial = true
             if (item.Order.proteinAmount === 1.5) {
@@ -1012,6 +1039,7 @@ export default {
               specialList.push('단200')
             }
           }
+          // 탄수화물 양
           if (item.Order.carboAmount !== 1) {
             isSpecial = true
             if (item.Order.carboAmount === 1.5) {
@@ -1020,6 +1048,7 @@ export default {
               specialList.push('탄200')
             }
           }
+          //  토핑 제외 리스트
 
           if (item.Order.Ingredients.length) {
             const toppings = []
@@ -1113,11 +1142,6 @@ export default {
                 availableMenu.includes(fifthProduct))
           }
 
-          // const isNotExcluded =
-          //   !availableMenu.length ||
-          //   (availableMenu.includes(firstProduct) &&
-          //     availableMenu.includes(secondProduct))
-
           if (availableMenu.length && availableMenu.length < saladCount) {
             for (let i = 0; saladCount - availableMenu.length > 0; i++) {
               availableMenu.push(availableMenu[i % availableCount])
@@ -1185,11 +1209,9 @@ export default {
           })
         })
 
+      // 기존 상품들
       makeList.forEach((item) => {
-        if (
-          item.Order.deliveryType === '새벽배송'
-          // item.Order.deliveryType === '직접배송'
-        ) {
+        if (item.Order.deliveryType === '새벽배송') {
           if (!this.requestTableEarly[item.productInfo]) {
             this.requestTableEarly[item.productInfo] = []
           }
@@ -1230,6 +1252,9 @@ export default {
         .forEach((key) => {
           this.searchList = [...this.searchList, ...this.requestTableDay[key]]
         })
+      this.specialProgramList = this.specialProgramList.sort(
+        (a, b) => a.productInfo - b.productInfo
+      )
 
       this.loading = false
     },
